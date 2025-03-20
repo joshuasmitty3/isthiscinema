@@ -16,6 +16,30 @@ import session from "express-session";
 import MemoryStore from "memorystore";
 import { Parser } from "json2csv";
 
+export function setupWatchListRoutes(app: Express) {
+  // Get watch list
+  app.get("/api/watchlist", async (req: Request, res: Response) => {
+    if (!req.session.userId) return res.status(401).json({ message: "Not authenticated" });
+    const movies = await storage.getWatchList(req.session.userId);
+    res.json(movies);
+  });
+
+  // Remove from watch list
+  app.delete("/api/watchlist/:movieId", async (req: Request, res: Response) => {
+    if (!req.session.userId) return res.status(401).json({ message: "Not authenticated" });
+    await storage.removeFromWatchList(req.session.userId, req.params.movieId);
+    res.json({ success: true });
+  });
+
+  // Reorder watch list
+  app.post("/api/watchlist/reorder", async (req: Request, res: Response) => {
+    if (!req.session.userId) return res.status(401).json({ message: "Not authenticated" });
+    const { movieId, direction } = req.body;
+    await storage.reorderWatchList(req.session.userId, movieId, direction);
+    res.json({ success: true });
+  });
+}
+
 const OMDB_API_KEY = process.env.OMDB_API_KEY || "3e92e073";
 
 export async function registerRoutes(app: Express): Promise<Server> {
