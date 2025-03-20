@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getMovieDetails, addToWatchList } from "@/lib/api";
+import { getMovieDetails } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { RiAddLine } from "react-icons/ri";
 import { Movie, SearchResult } from "@/lib/types";
@@ -39,13 +39,23 @@ export default function SearchResults({
     try {
       setAddingMovie(searchResult.imdbID);
       const movie = await getMovieDetails(searchResult.imdbID);
-      await addToWatchList(movie.id);
-      
+      const order = 1; //  Simplified order - needs better implementation in a real app
+      await fetch('/api/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          movieId: Number(movie.imdbID),
+          order
+        }),
+      });
+
       toast({
         title: "Added to Watch List",
         description: `${searchResult.Title} has been added to your watch list.`,
       });
-      
+
       onListsChange();
     } catch (error) {
       console.error("Failed to add movie:", error);
