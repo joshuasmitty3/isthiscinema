@@ -8,6 +8,27 @@ import Login from "@/pages/Login";
 import { useEffect, useState } from "react";
 import { apiRequest } from "./lib/queryClient";
 import { LoadingSpinner } from "./components/ui/loading-spinner"; // Added import
+import MovieCard from "@/components/MovieCard"; // Assuming MovieCard exists
+
+
+// Dummy data for MovieCardTest
+const dummyMovieData = [
+  { title: "Movie 1", poster: "/poster1.jpg", rating: 4.5 },
+  { title: "Movie 2", poster: "/poster2.jpg", rating: 3.8 },
+  { title: "Movie 3", poster: "/poster3.jpg", rating: 4.9 },
+];
+
+function MovieCardTest() {
+  return (
+    <div>
+      <h1>MovieCard Test</h1>
+      {dummyMovieData.map((movie) => (
+        <MovieCard key={movie.title} {...movie} />
+      ))}
+    </div>
+  );
+}
+
 
 function Router() {
   const [location, setLocation] = useLocation();
@@ -60,6 +81,9 @@ function Router() {
       </Route>
       <Route path="/">
         {!user ? <Redirect to="/login" /> : <Home user={user} onLogout={handleLogout} />}
+      </Route>
+      <Route path="/test/movie-card">
+        <MovieCardTest />
       </Route>
       <Route component={NotFound} />
     </Switch>
