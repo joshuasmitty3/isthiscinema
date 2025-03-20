@@ -1,7 +1,8 @@
+
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, Trash2 } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Movie {
   id: number;
@@ -14,21 +15,45 @@ interface Movie {
 export default function WatchList({ movies }: { movies: Movie[] }) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const deleteMovie = useMutation({
     mutationFn: async (movieId: string) => {
+      console.log(`Attempting to delete movie with ID: ${movieId}`);
       const response = await fetch(`/api/watchlist/${movieId}`, {
         method: "DELETE",
       });
+      
       if (!response.ok) {
-        throw new Error("Failed to remove movie");
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Delete movie failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        throw new Error(errorData.message || "Failed to remove movie");
       }
+      
+      console.log(`Successfully deleted movie with ID: ${movieId}`);
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (_, movieId) => {
       queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+      toast({
+        title: "Success",
+        description: "Movie removed from watchlist",
+      });
+      console.log(`Movie ${movieId} removed and cache invalidated`);
     },
-    onError: (error) => {
-      setError(error.message);
+    onError: (error: Error) => {
+      const errorMessage = error.message || "Failed to remove movie";
+      setError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      console.error('Delete movie mutation error:', error);
     },
   });
 
@@ -48,31 +73,26 @@ export default function WatchList({ movies }: { movies: Movie[] }) {
           <span>{error}</span>
         </div>
       )}
-
-      {movies.map((movie) => (
-        <div
-          key={movie.imdbId}
-          className="flex items-center gap-4 bg-card p-4 rounded-lg shadow-sm"
-        >
-          <img
-            src={movie.poster}
-            alt={movie.title}
-            className="h-24 w-16 object-cover rounded"
-          />
-          <div className="flex-1">
-            <h3 className="font-medium">{movie.title}</h3>
-            <p className="text-sm text-gray-500">{movie.year}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {movies.map((movie) => (
+          <div key={movie.id} className="bg-white rounded-lg shadow p-4">
+            <img 
+              src={movie.poster} 
+              alt={movie.title} 
+              className="w-full h-48 object-cover rounded"
+            />
+            <h3 className="mt-2 font-semibold">{movie.title}</h3>
+            <p className="text-gray-500">{movie.year}</p>
+            <button
+              onClick={() => deleteMovie.mutate(movie.id.toString())}
+              className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              disabled={deleteMovie.isPending}
+            >
+              {deleteMovie.isPending ? "Removing..." : "Remove"}
+            </button>
           </div>
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => deleteMovie.mutate(movie.imdbId)}
-            disabled={deleteMovie.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
