@@ -22,6 +22,7 @@ export default function Home({ user, onLogout }: HomeProps) {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [movieToReview, setMovieToReview] = useState<Movie | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch watch list
   const { data: watchList = [], refetch: refetchWatchList } = useQuery({
