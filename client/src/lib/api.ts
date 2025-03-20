@@ -3,9 +3,7 @@ import { Movie, SearchResult, User } from "./types";
 
 export async function searchMovies(query: string): Promise<SearchResult[]> {
   if (!query.trim()) return [];
-
-  // Add artificial delay for testing loading states
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  
   const res = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`, {
     credentials: "include",
   });

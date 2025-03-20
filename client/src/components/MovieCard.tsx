@@ -35,7 +35,6 @@ export default function MovieCard({ movie, view, onAction, onSelectMovie, isProc
         {/* Hover Overlay with Details */}
         <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between text-white">
           <div>
-            <LoadingSpinner className="mb-2" />
             <h3 className="font-medium text-sm mb-1 line-clamp-2">{movie.title}</h3>
             <p className="text-xs text-neutral-300">{movie.year}</p>
             {movie.director && (
