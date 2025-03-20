@@ -15,6 +15,10 @@ interface HomeProps {
 }
 
 export default function Home({ user, onLogout }: HomeProps) {
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
   const { data: watchList = [] } = useQuery({
     queryKey: ["watchlist"],
     queryFn: async () => {
@@ -32,8 +36,20 @@ export default function Home({ user, onLogout }: HomeProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <h2 className="text-2xl font-bold mb-4">Search Movies</h2>
-            <SearchBar />
-            <SearchResults />
+            <SearchBar 
+              onSearch={(results, query, loading) => {
+                setSearchResults(results);
+                setSearchQuery(query);
+                setIsSearching(loading);
+              }} 
+            />
+            <SearchResults 
+              results={searchResults}
+              query={searchQuery}
+              isLoading={isSearching}
+              onSelectMovie={() => {}}
+              onListsChange={() => {}}
+            />
           </div>
           <div>
             <h2 className="text-2xl font-bold mb-4">Watch List</h2>
