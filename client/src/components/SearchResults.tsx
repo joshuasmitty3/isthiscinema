@@ -17,6 +17,14 @@ interface SearchResultsProps {
 
 import { MovieSkeleton } from "./MovieSkeleton";
 
+interface SearchResultsProps {
+  results: SearchResult[];
+  query: string;
+  onSelectMovie: (movie: Movie) => void;
+  onListsChange: () => void;
+  isLoading?: boolean;
+}
+
 export default function SearchResults({ 
   results, 
   query, 
