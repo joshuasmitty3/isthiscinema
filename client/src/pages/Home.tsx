@@ -48,7 +48,9 @@ export default function Home({ user, onLogout }: HomeProps) {
               query={searchQuery}
               isLoading={isSearching}
               onSelectMovie={() => {}}
-              onListsChange={() => {}}
+              onListsChange={() => {
+                queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+              }}
             />
           </div>
           <div>
