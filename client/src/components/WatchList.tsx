@@ -1,98 +1,54 @@
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { useCallback } from "react";
+import MovieCard from "./MovieCard";
+import { useMovies } from "@/lib/movies";
 
-import { useState } from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { AlertCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+export default function WatchList() {
+  const { watchlist, reorderWatchlist } = useMovies();
 
-interface Movie {
-  id: number;
-  imdbId: string;
-  title: string;
-  year: string;
-  poster: string;
-}
+  const handleDragEnd = useCallback((result: any) => {
+    if (!result.destination) return;
 
-export default function WatchList({ movies }: { movies: Movie[] }) {
-  const queryClient = useQueryClient();
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
+    const startIndex = result.source.index;
+    const endIndex = result.destination.index;
 
-  const deleteMovie = useMutation({
-    mutationFn: async (movieId: number) => {
-      console.log(`Attempting to delete movie with ID: ${movieId}`);
-      const response = await fetch(`/api/watchlist/${movieId}`, {
-        method: "DELETE",
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Delete movie failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData
-        });
-        throw new Error(errorData.message || "Failed to remove movie");
-      }
-      
-      console.log(`Successfully deleted movie with ID: ${movieId}`);
-      return response.json();
-    },
-    onSuccess: (_, movieId) => {
-      queryClient.invalidateQueries({ queryKey: ["watchlist"] });
-      toast({
-        title: "Success",
-        description: "Movie removed from watchlist",
-      });
-      console.log(`Movie ${movieId} removed and cache invalidated`);
-    },
-    onError: (error: Error) => {
-      const errorMessage = error.message || "Failed to remove movie";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      console.error('Delete movie mutation error:', error);
-    },
-  });
-
-  if (movies.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        No movies in your watch list
-      </div>
-    );
-  }
+    reorderWatchlist(startIndex, endIndex);
+  }, [reorderWatchlist]);
 
   return (
-    <div className="space-y-4">
-      {error && (
-        <div className="flex items-center gap-2 text-red-500 mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <span>{error}</span>
-        </div>
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {movies.map((movie) => (
-          <div key={movie.id} className="bg-white rounded-lg shadow p-4">
-            <img 
-              src={movie.poster} 
-              alt={movie.title} 
-              className="w-full h-48 object-cover rounded"
-            />
-            <h3 className="mt-2 font-semibold">{movie.title}</h3>
-            <p className="text-gray-500">{movie.year}</p>
-            <button
-              onClick={() => deleteMovie.mutate(movie.id.toString())}
-              className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              disabled={deleteMovie.isPending}
+    <div className="mt-6">
+      <h2 className="text-2xl font-bold mb-4">Watch List</h2>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="watchlist">
+          {(provided) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className="space-y-4"
             >
-              {deleteMovie.isPending ? "Removing..." : "Remove"}
-            </button>
-          </div>
-        ))}
-      </div>
+              {watchlist.map((movie, index) => (
+                <Draggable 
+                  key={movie.imdbId} 
+                  draggableId={movie.imdbId} 
+                  index={index}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className={`${snapshot.isDragging ? 'opacity-50' : ''}`}
+                    >
+                      <MovieCard movie={movie} />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   );
 }
