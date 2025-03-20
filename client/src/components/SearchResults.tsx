@@ -39,6 +39,7 @@ export default function SearchResults({
     try {
       setAddingMovie(searchResult.imdbID);
       const movie = await getMovieDetails(searchResult.imdbID);
+      console.log("Movie details fetched:", movie); // Added logging for debugging
       const order = 1; //  Simplified order - needs better implementation in a real app
       await fetch('/api/watchlist', {
         method: 'POST',
@@ -57,7 +58,9 @@ export default function SearchResults({
         description: `${searchResult.Title} has been added to your watch list.`,
       });
 
-      onListsChange();
+      if (onListsChange) { //Added check to prevent errors if onListsChange is undefined
+        onListsChange();
+      }
     } catch (error) {
       console.error("Failed to add movie:", error);
       toast({

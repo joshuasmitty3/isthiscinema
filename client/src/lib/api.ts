@@ -34,7 +34,10 @@ export async function login(username: string, password: string): Promise<User> {
 }
 
 export async function addToWatchList(movieId: number): Promise<void> {
-  await apiRequest("POST", "/api/watchlist", { movieId });
+  console.log('API call - Adding movie:', movieId);
+  const response = await apiRequest("POST", "/api/watchlist", { movieId });
+  console.log('API response:', response);
+  return response;
 }
 
 export async function removeFromWatchList(movieId: number): Promise<void> {
