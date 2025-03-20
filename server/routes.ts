@@ -40,7 +40,7 @@ export function setupWatchListRoutes(app: Express) {
   });
 }
 
-const OMDB_API_KEY = process.env.OMDB_API_KEY || "3e92e073";
+const OMDB_API_KEY = process.env.OMDB_API_KEY;
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up session middleware
