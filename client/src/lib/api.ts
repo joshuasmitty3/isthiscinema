@@ -3,15 +3,17 @@ import { Movie, SearchResult, User } from "./types";
 
 export async function searchMovies(query: string): Promise<SearchResult[]> {
   if (!query.trim()) return [];
-  
+
+  // Add artificial delay for testing loading states
+  await new Promise(resolve => setTimeout(resolve, 1000));
   const res = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`, {
     credentials: "include",
   });
-  
+
   if (!res.ok) {
     throw new Error("Failed to search movies");
   }
-  
+
   const data = await res.json();
   return data.results || [];
 }
@@ -20,11 +22,11 @@ export async function getMovieDetails(imdbId: string): Promise<Movie> {
   const res = await fetch(`/api/movies/${imdbId}`, {
     credentials: "include",
   });
-  
+
   if (!res.ok) {
     throw new Error("Failed to get movie details");
   }
-  
+
   return await res.json();
 }
 
