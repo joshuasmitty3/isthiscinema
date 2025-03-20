@@ -66,13 +66,46 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
         </div>
       </div>
 
-      {/* Rating Display (if movie is watched) */}
-      {movie.inWatchedList && movie.review && (
+      {/* Rating Badge */}
+      {movie.inWatchedList && (
         <div className="absolute top-2 right-2 bg-black/75 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
           <RiStarFill className="h-3 w-3 text-yellow-400" />
-          Reviewed
+          {movie.rating ? (
+            <span>{movie.rating}/5</span>
+          ) : (
+            movie.review && <span>Reviewed</span>
+          )}
         </div>
       )}
+
+      {/* Quick Actions */}
+      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/75 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="flex justify-end gap-2">
+          {onAction && (
+            <Button
+              onClick={handleAction}
+              className={cn(
+                "text-xs transition-colors",
+                actionType === "add" && "bg-primary hover:bg-primary/90",
+                actionType === "watch" && "bg-emerald-600 hover:bg-emerald-700",
+                actionType === "remove" && "bg-red-600 hover:bg-red-700"
+              )}
+              size="sm"
+            >
+              <span className="flex items-center gap-1">
+                {actionType === "add" && <RiAddLine className="h-3 w-3" />}
+                {actionType === "watch" && <RiEyeLine className="h-3 w-3" />}
+                {actionType === "remove" && <RiDeleteBin6Line className="h-3 w-3" />}
+                <span className="hidden sm:inline">
+                  {actionType === "add" && "Add"}
+                  {actionType === "watch" && "Watch"}
+                  {actionType === "remove" && "Remove"}
+                </span>
+              </span>
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
