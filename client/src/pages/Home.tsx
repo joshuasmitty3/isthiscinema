@@ -17,8 +17,8 @@ interface HomeProps {
 export default function Home({ user, onLogout }: HomeProps) {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTab, setSelectedTab] = useState<"watchlist" | "watched">("watchlist");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [isSearchLoading, setIsSearchLoading] = useState(false); // Added state for search loading
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [movieToReview, setMovieToReview] = useState<Movie | null>(null);
@@ -34,9 +34,10 @@ export default function Home({ user, onLogout }: HomeProps) {
     queryKey: ["/api/watchedlist"],
   });
 
-  const handleSearch = (results: SearchResult[], query: string) => {
+  const handleSearch = (results: SearchResult[], query: string, isLoading: boolean) => {
     setSearchResults(results);
     setSearchQuery(query);
+    setIsSearchLoading(isLoading); // Update isSearchLoading state
   };
 
   const handleSelectMovie = (movie: Movie) => {
@@ -58,14 +59,14 @@ export default function Home({ user, onLogout }: HomeProps) {
     <Layout user={user} onLogout={onLogout}>
       <main className="flex-1 container mx-auto px-4 py-6">
         <SearchBar onSearch={handleSearch} />
-        
+
         {searchResults.length > 0 && (
-          <SearchResults 
-            results={searchResults} 
-            query={searchQuery} 
+          <SearchResults
+            results={searchResults}
+            query={searchQuery}
             onSelectMovie={handleSelectMovie}
             onListsChange={handleRefreshLists}
-            isLoading={isLoading}
+            isLoading={isSearchLoading} // Pass isSearchLoading to SearchResults
           />
         )}
 
@@ -95,15 +96,15 @@ export default function Home({ user, onLogout }: HomeProps) {
         </div>
 
         {selectedTab === "watchlist" ? (
-          <WatchList 
-            movies={watchList} 
+          <WatchList
+            movies={watchList}
             onSelectMovie={handleSelectMovie}
             onListsChange={handleRefreshLists}
           />
         ) : (
-          <WatchedList 
-            movies={watchedList} 
-            onSelectMovie={handleSelectMovie} 
+          <WatchedList
+            movies={watchedList}
+            onSelectMovie={handleSelectMovie}
             onOpenReviewModal={handleOpenReviewModal}
           />
         )}

@@ -9,7 +9,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { LoadingSpinner } from "./ui/loading-spinner";
 
 interface SearchBarProps {
-  onSearch: (results: SearchResult[], query: string) => void;
+  onSearch: (results: SearchResult[], query: string, loading: boolean) => void;
 }
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
@@ -30,9 +30,10 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     }
 
     setIsLoading(true);
+    onSearch([], trimmedQuery, true);
     try {
       const results = await searchMovies(trimmedQuery);
-      onSearch(results, trimmedQuery);
+      onSearch(results, trimmedQuery, false);
     } catch (error) {
       console.error("Search error:", error);
       toast({
