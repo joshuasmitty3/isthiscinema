@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { RiSearchLine } from "react-icons/ri";
 import { searchMovies } from "@/lib/api";
 import { SearchResult } from "@/lib/types";
