@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Movie } from "@/lib/types";
 import { RiAddLine, RiEyeLine, RiDeleteBin6Line, RiStarLine, RiStarFill } from "react-icons/ri";
@@ -24,7 +23,7 @@ export default function MovieCard({ movie, view, onAction, onSelectMovie, isProc
           className="w-full h-full object-cover"
           loading="lazy"
         />
-        
+
         {/* Rating Badge for Watched Movies */}
         {view === "watched" && movie.rating && (
           <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/75 rounded-full px-2 py-1 z-10">
@@ -36,6 +35,7 @@ export default function MovieCard({ movie, view, onAction, onSelectMovie, isProc
         {/* Hover Overlay with Details */}
         <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between text-white">
           <div>
+            <LoadingSpinner className="mb-2" />
             <h3 className="font-medium text-sm mb-1 line-clamp-2">{movie.title}</h3>
             <p className="text-xs text-neutral-300">{movie.year}</p>
             {movie.director && (
@@ -51,7 +51,7 @@ export default function MovieCard({ movie, view, onAction, onSelectMovie, isProc
             >
               Details
             </Button>
-            
+
             {onAction && (
               <Button
                 size="sm"
