@@ -18,7 +18,7 @@ export default function WatchList({ movies }: { movies: Movie[] }) {
   const { toast } = useToast();
 
   const deleteMovie = useMutation({
-    mutationFn: async (movieId: string) => {
+    mutationFn: async (movieId: number) => {
       console.log(`Attempting to delete movie with ID: ${movieId}`);
       const response = await fetch(`/api/watchlist/${movieId}`, {
         method: "DELETE",
