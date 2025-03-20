@@ -18,16 +18,21 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  const MIN_SEARCH_LENGTH = 2;
+  const DEBOUNCE_MS = 400;
+
   const debouncedSearch = useDebouncedCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
+    const trimmedQuery = searchQuery.trim();
+    
+    if (trimmedQuery.length < MIN_SEARCH_LENGTH) {
       onSearch([], "");
       return;
     }
 
     setIsLoading(true);
     try {
-      const results = await searchMovies(searchQuery);
-      onSearch(results, searchQuery);
+      const results = await searchMovies(trimmedQuery);
+      onSearch(results, trimmedQuery);
     } catch (error) {
       console.error("Search error:", error);
       toast({
@@ -35,11 +40,11 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         description: "Failed to search for movies. Please try again.",
         variant: "destructive",
       });
-      onSearch([], searchQuery);
+      onSearch([], trimmedQuery);
     } finally {
       setIsLoading(false);
     }
-  }, 500);
+  }, DEBOUNCE_MS);
 
   useEffect(() => {
     debouncedSearch(query);
