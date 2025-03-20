@@ -15,8 +15,9 @@ interface HomeProps {
 }
 
 export default function Home({ user, onLogout }: HomeProps) {
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   const { data: watchList = [] } = useQuery({
@@ -50,7 +51,6 @@ export default function Home({ user, onLogout }: HomeProps) {
               onSelectMovie={() => {}}
               onListsChange={() => {
                 // Get queryClient from useQueryClient hook
-                const queryClient = useQueryClient();
                 queryClient.invalidateQueries({ queryKey: ["watchlist"] });
               }}
             />
