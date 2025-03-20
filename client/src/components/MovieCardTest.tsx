@@ -38,11 +38,13 @@ export default function MovieCardTest() {
             movie={sampleMovies[0]} 
             actionType="remove"
             onAction={(movie) => console.log('Remove action:', movie)}
+            isCompact={true}
           />
           <MovieCard 
             movie={sampleMovies[1]} 
             actionType="watch"
             onAction={(movie) => console.log('Watch action:', movie)}
+            isCompact={true}
           />
         </div>
       </div>
