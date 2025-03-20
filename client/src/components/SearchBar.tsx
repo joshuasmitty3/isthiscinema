@@ -6,6 +6,7 @@ import { searchMovies } from "@/lib/api";
 import { SearchResult } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useDebouncedCallback } from "use-debounce";
+import { LoadingSpinner } from "./ui/loading-spinner";
 
 interface SearchBarProps {
   onSearch: (results: SearchResult[], query: string) => void;

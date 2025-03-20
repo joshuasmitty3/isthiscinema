@@ -64,6 +64,7 @@ export default function Home({ user, onLogout }: HomeProps) {
             query={searchQuery} 
             onSelectMovie={handleSelectMovie}
             onListsChange={handleRefreshLists}
+            isLoading={isLoading}
           />
         )}
 

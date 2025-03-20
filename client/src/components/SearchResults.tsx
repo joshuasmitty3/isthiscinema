@@ -5,12 +5,26 @@ import { useToast } from "@/hooks/use-toast";
 import { RiAddLine } from "react-icons/ri";
 import { Movie, SearchResult } from "@/lib/types";
 import { Button } from "./ui/button";
+import { LoadingSpinner } from "./ui/loading-spinner";
 
 interface SearchResultsProps {
   results: SearchResult[];
   query: string;
   onSelectMovie: (movie: Movie) => void;
   onListsChange: () => void;
+  isLoading?: boolean;
+}
+
+function MovieSkeleton() {
+  return (
+    <div className="bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm animate-pulse">
+      <div className="relative aspect-[2/3] bg-neutral-200"/>
+      <div className="p-2">
+        <div className="h-4 bg-neutral-200 rounded w-3/4 mb-2"/>
+        <div className="h-3 bg-neutral-200 rounded w-1/4"/>
+      </div>
+    </div>
+  );
 }
 
 export default function SearchResults({ 
@@ -71,7 +85,14 @@ export default function SearchResults({
           Search Results for "{query}"
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {results.map((result) => (
+          {isLoading ? (
+            <>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <MovieSkeleton key={i} />
+              ))}
+            </>
+          ) : (
+            results.map((result) => (
             <div
               key={result.imdbID}
               className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
@@ -101,7 +122,8 @@ export default function SearchResults({
                 <p className="text-xs text-neutral-600">{result.Year}</p>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </CardContent>
     </Card>
