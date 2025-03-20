@@ -18,7 +18,8 @@ export default function Home({ user, onLogout }: HomeProps) {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [isSearchLoading, setIsSearchLoading] = useState(false); // Added state for search loading
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<"watchlist" | "watched">("watchlist");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [movieToReview, setMovieToReview] = useState<Movie | null>(null);
