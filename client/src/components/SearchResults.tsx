@@ -21,7 +21,8 @@ export default function SearchResults({
   results, 
   query, 
   onSelectMovie,
-  onListsChange
+  onListsChange,
+  isLoading = false
 }: SearchResultsProps) {
   const [addingMovie, setAddingMovie] = useState<string | null>(null);
   const { toast } = useToast();
