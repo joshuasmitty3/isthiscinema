@@ -11,23 +11,8 @@ import { LoadingSpinner } from "./components/ui/loading-spinner"; // Added impor
 import MovieCard from "@/components/MovieCard"; // Assuming MovieCard exists
 
 
-// Dummy data for MovieCardTest
-const dummyMovieData = [
-  { title: "Movie 1", poster: "/poster1.jpg", rating: 4.5 },
-  { title: "Movie 2", poster: "/poster2.jpg", rating: 3.8 },
-  { title: "Movie 3", poster: "/poster3.jpg", rating: 4.9 },
-];
-
-function MovieCardTest() {
-  return (
-    <div>
-      <h1>MovieCard Test</h1>
-      {dummyMovieData.map((movie) => (
-        <MovieCard key={movie.title} {...movie} />
-      ))}
-    </div>
-  );
-}
+// Using the previously defined MovieCardTest component instead
+import MovieCardTest from './components/MovieCardTest';
 
 
 function Router() {
@@ -82,9 +67,7 @@ function Router() {
       <Route path="/">
         {!user ? <Redirect to="/login" /> : <Home user={user} onLogout={handleLogout} />}
       </Route>
-      <Route path="/test/movie-card">
-        <MovieCardTest />
-      </Route>
+      <Route path="/test/movie-card" component={MovieCardTest} />
       <Route component={NotFound} />
     </Switch>
   );
