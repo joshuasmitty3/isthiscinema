@@ -1,7 +1,9 @@
+
 import React from "react";
 import { Movie } from "@/lib/types";
-import { RiAddLine, RiEyeLine, RiDeleteBin6Line } from "react-icons/ri";
+import { RiAddLine, RiEyeLine, RiDeleteBin6Line, RiStarLine, RiStarFill } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface MovieCardProps {
   movie: Movie;
@@ -29,91 +31,86 @@ export default function MovieCard({
 
   return (
     <div
-      className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      className="group movie-card bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 relative"
       onClick={handleClick}
     >
-      {view === "search" && (
-        <div className="relative aspect-[2/3]">
-          <img
-            src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-            alt={movie.title}
-            className="w-full h-full object-cover"
-          />
-          {onAddToWatchList && (
+      <div className="relative aspect-[2/3]">
+        <img
+          src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
+          alt={movie.title}
+          className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+            <h3 className="text-sm font-medium line-clamp-2">{movie.title}</h3>
+            <p className="text-xs opacity-80">{movie.year}</p>
+          </div>
+        </div>
+        
+        {view === "search" && onAddToWatchList && (
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToWatchList();
+            }}
+            disabled={isProcessing}
+            className={cn(
+              "absolute top-2 right-2 p-1 bg-primary/90 text-white rounded-full hover:bg-primary",
+              "opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            )}
+            size="icon"
+            variant="ghost"
+          >
+            <RiAddLine className="h-4 w-4" />
+          </Button>
+        )}
+
+        {view === "watchlist" && (
+          <div className={cn(
+            "absolute top-2 right-2 flex gap-1",
+            "opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          )}>
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                onAddToWatchList();
+                onMoveToWatched?.();
               }}
               disabled={isProcessing}
-              className="absolute top-2 right-2 p-1 bg-primary/90 text-white rounded-full hover:bg-primary"
+              className="p-1 bg-green-500/90 text-white rounded-full hover:bg-green-500"
               size="icon"
               variant="ghost"
             >
-              <RiAddLine className="h-4 w-4" />
+              <RiEyeLine className="h-4 w-4" />
             </Button>
-          )}
-        </div>
-      )}
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemoveFromWatchList?.();
+              }}
+              disabled={isProcessing}
+              className="p-1 bg-red-500/90 text-white rounded-full hover:bg-red-500"
+              size="icon"
+              variant="ghost"
+            >
+              <RiDeleteBin6Line className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
-      {view === "watchlist" && (
-        <div className="flex">
-          <div className="w-16 h-24 flex-shrink-0">
-            <img
-              src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-              alt={movie.title}
-              className="w-full h-full object-cover"
-            />
+        {view === "watched" && movie.rating && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 rounded-full px-2 py-1">
+            <RiStarFill className="h-3 w-3 text-yellow-400" />
+            <span className="text-white text-xs">{movie.rating}</span>
           </div>
-          <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
-            <div>
-              <h3 className="font-medium truncate">{movie.title}</h3>
-              <p className="text-xs text-neutral-600">{movie.year}</p>
-            </div>
-            <div className="flex space-x-2 mt-1">
-              {onMoveToWatched && (
-                <Button
-                  size="sm"
-                  className="text-xs px-2 py-1 bg-[#4CAF50]/10 text-[#4CAF50] hover:bg-[#4CAF50]/20"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveToWatched();
-                  }}
-                  disabled={isProcessing}
-                >
-                  <RiEyeLine className="mr-1 h-3 w-3" /> Watched
-                </Button>
-              )}
-              <Button
-                size="sm"
-                className="text-xs px-2 py-1 bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-              >
-                Details
-              </Button>
-              {onRemoveFromWatchList && (
-                <Button
-                  size="sm"
-                  className="text-xs px-2 py-1 bg-[#F44336]/10 text-[#F44336] hover:bg-[#F44336]/20"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemoveFromWatchList();
-                  }}
-                  disabled={isProcessing}
-                >
-                  <RiDeleteBin6Line className="mr-1 h-3 w-3" /> Remove
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {view === "watched" && (
-        <div className="p-2">
+        <div className="p-3">
           <h3 className="text-sm font-medium truncate">{movie.title}</h3>
           <p className="text-xs text-neutral-600">{movie.year}</p>
           {movie.review && (
-            <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{movie.review}</p>
+            <p className="text-xs text-neutral-500 mt-1 line-clamp-2 italic">"{movie.review}"</p>
           )}
         </div>
       )}
