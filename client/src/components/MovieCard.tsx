@@ -1,6 +1,8 @@
 import React from "react";
 import { Movie } from "@/lib/types";
 import { RiAddLine, RiEyeLine, RiDeleteBin6Line, RiStarLine, RiStarFill } from "react-icons/ri";
+import { Button } from "./ui/button";
+import { LoadingSpinner } from "./ui/loading-spinner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
