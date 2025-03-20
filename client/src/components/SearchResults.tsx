@@ -46,8 +46,9 @@ export default function SearchResults({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          movieId: Number(movie.imdbID),
-          order
+          movieId: movie.id, // Use the internal movie ID instead of IMDB ID
+          order,
+          userId: 1 // This should match the logged in user's ID
         }),
       });
 
