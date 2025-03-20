@@ -79,9 +79,9 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
       )}
 
       {/* Quick Actions */}
-      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/75 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="flex justify-end gap-2">
-          {onAction && (
+      {onAction && !isCompact && (
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/75 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="flex justify-end gap-2">
             <Button
               onClick={handleAction}
               className={cn(
@@ -103,9 +103,9 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
                 </span>
               </span>
             </Button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
