@@ -67,7 +67,11 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
           className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-primary transition-colors"
           disabled={isLoading}
         >
-          <RiSearchLine className="h-5 w-5" />
+          {isLoading ? (
+            <LoadingSpinner size="sm" className="text-primary" />
+          ) : (
+            <RiSearchLine className="h-5 w-5" />
+          )}
         </Button>
       </form>
     </div>
