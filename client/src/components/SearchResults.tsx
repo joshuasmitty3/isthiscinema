@@ -15,17 +15,7 @@ interface SearchResultsProps {
   isLoading?: boolean;
 }
 
-function MovieSkeleton() {
-  return (
-    <div className="bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm animate-pulse">
-      <div className="relative aspect-[2/3] bg-neutral-200"/>
-      <div className="p-2">
-        <div className="h-4 bg-neutral-200 rounded w-3/4 mb-2"/>
-        <div className="h-3 bg-neutral-200 rounded w-1/4"/>
-      </div>
-    </div>
-  );
-}
+import { MovieSkeleton } from "./MovieSkeleton";
 
 export default function SearchResults({ 
   results, 
