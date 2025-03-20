@@ -7,7 +7,7 @@ import WatchedList from "@/components/WatchedList";
 import MovieDetail from "@/components/MovieDetail";
 import ReviewModal from "@/components/ReviewModal";
 import { Movie, SearchResult, User } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface HomeProps {
   user: User;
@@ -49,6 +49,8 @@ export default function Home({ user, onLogout }: HomeProps) {
               isLoading={isSearching}
               onSelectMovie={() => {}}
               onListsChange={() => {
+                // Get queryClient from useQueryClient hook
+                const queryClient = useQueryClient();
                 queryClient.invalidateQueries({ queryKey: ["watchlist"] });
               }}
             />
