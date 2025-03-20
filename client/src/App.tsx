@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import { useEffect, useState } from "react";
 import { apiRequest } from "./lib/queryClient";
+import { LoadingSpinner } from "./components/ui/loading-spinner"; // Added import
 
 function Router() {
   const [location, setLocation] = useLocation();
@@ -19,7 +20,7 @@ function Router() {
         const res = await fetch("/api/me", {
           credentials: "include",
         });
-        
+
         if (res.ok) {
           const userData = await res.json();
           setUser(userData);
@@ -30,7 +31,7 @@ function Router() {
         setLoading(false);
       }
     };
-    
+
     checkAuth();
   }, []);
 

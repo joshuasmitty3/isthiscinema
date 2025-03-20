@@ -23,7 +23,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       onSearch([], "");
       return;
     }
-    
+
     setIsLoading(true);
     try {
       const results = await searchMovies(searchQuery);
