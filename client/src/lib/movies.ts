@@ -62,10 +62,7 @@ export function useMovies() {
     },
     onError: (err, newMovies, context) => {
       queryClient.setQueryData(['watchlist'], context?.previousWatchlist);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['watchlist'] });
-    },
+    }
   });
 
   return {
