@@ -66,6 +66,7 @@ export default function WatchList() {
               movie={movie}
               actionType="remove"
               isCompact={true}
+              onListsChange={onListsChange}
             />
           ))}
         </div>
