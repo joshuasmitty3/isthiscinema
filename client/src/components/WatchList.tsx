@@ -4,6 +4,8 @@ import { useQueryClient, useQuery } from '@tanstack/react-query'; // Added impor
 import { useMovies } from '@/lib/movies';
 import MovieCard from './MovieCard';
 
+import { useState } from 'react';
+
 interface WatchListProps {
   onListsChange?: () => void;
 }
