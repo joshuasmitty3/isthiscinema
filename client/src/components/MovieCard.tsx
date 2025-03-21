@@ -30,6 +30,11 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
       className={`group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${isExpanded ? 'h-auto' : 'h-24'}`}
       onClick={handleClick}
     >
+      {isCompact && (
+        <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-1">
+          <p className="text-xs text-white truncate">{movie.title}</p>
+        </div>
+      )}
       {isExpanded ? (
         <div className="aspect-[2/3] relative">
           <img
