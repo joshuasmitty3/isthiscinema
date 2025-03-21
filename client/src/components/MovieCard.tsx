@@ -27,14 +27,21 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
 
   return (
     <div 
-      className={`group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${isExpanded ? 'h-auto' : 'h-24'}`}
+      className={`group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${isExpanded ? 'h-auto' : 'h-36'}`}
       onClick={handleClick}
     >
-      {isCompact && (
-        <div className="absolute bottom-0 left-0 right-0 bg-black/80 p-2">
-          <p className="text-sm text-white font-medium truncate">{movie.title}</p>
-        </div>
-      )}
+      <div className="h-full w-full">
+        <img
+          src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
+          alt={movie.title}
+          className="w-full h-full object-cover"
+        />
+        {isCompact && (
+          <div className="absolute bottom-0 left-0 right-0 bg-black/80 p-2">
+            <p className="text-sm text-white font-medium truncate">{movie.title}</p>
+          </div>
+        )}
+      </div>
       {isExpanded ? (
         <div className="aspect-[2/3] relative">
           <img
