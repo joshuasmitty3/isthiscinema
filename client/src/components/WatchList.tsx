@@ -47,10 +47,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   }, [watchlist, queryClient]);
 
-  if (isDragging) {
-    return <ListSkeleton />;
-  }
-
   return (
     <div className="space-y-8">
       <div>
