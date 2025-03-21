@@ -9,10 +9,12 @@ interface WatchListProps {
 }
 
 export default function WatchList({ onListsChange }: WatchListProps) {
-  const queryClient = useQueryClient(); // Added useQueryClient
+  const queryClient = useQueryClient();
   const { watchlist, watchedlist, reorderWatchlist, refetchLists } = useMovies();
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleDragEnd = useCallback(async (result: any) => {
+    setIsDragging(true);
     if (!result.destination) return;
 
     const startIndex = result.source.index;
@@ -37,8 +39,14 @@ export default function WatchList({ onListsChange }: WatchListProps) {
       console.error('Failed to update order:', error);
       // Only refetch on error
       queryClient.invalidateQueries(['watchlist']);
+    } finally {
+      setIsDragging(false);
     }
   }, [watchlist, queryClient]);
+
+  if (isDragging) {
+    return <ListSkeleton />;
+  }
 
   return (
     <div className="space-y-8">
