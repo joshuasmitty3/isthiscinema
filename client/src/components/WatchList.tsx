@@ -1,4 +1,3 @@
-
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useCallback } from "react";
 import MovieCard from "./MovieCard";
@@ -54,19 +53,6 @@ export default function WatchList() {
             )}
           </Droppable>
         </DragDropContext>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Watched List</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {watchedlist?.map((movie) => (
-            <MovieCard 
-              key={movie.imdbId}
-              movie={movie}
-              actionType="remove"
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
