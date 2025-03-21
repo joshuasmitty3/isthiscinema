@@ -19,13 +19,14 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     const endIndex = result.destination.index;
 
     try {
-      // Calculate new order
-      // Calculate new order
       const newOrder = [...watchlist];
       const [movedItem] = newOrder.splice(startIndex, 1);
       newOrder.splice(endIndex, 0, movedItem);
-      
-      // Update server first
+
+      // Optimistically update the UI
+      queryClient.setQueryData(['watchlist'], newOrder);
+
+      // Update server
       const response = await fetch('/api/watchlist/order', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -35,16 +36,12 @@ export default function WatchList({ onListsChange }: WatchListProps) {
       if (!response.ok) {
         throw new Error('Failed to update order on server');
       }
-
-      // Then update UI after successful server update
-      reorderWatchlist(startIndex, endIndex);
-      await queryClient.invalidateQueries(['watchlist']);
     } catch (error) {
       console.error('Failed to update order:', error);
-      // Revert local state on error
-      reorderWatchlist(endIndex, startIndex);
+      // Revert optimistic update on error
+      queryClient.setQueryData(['watchlist'], watchlist);
     }
-  }, [reorderWatchlist, watchlist]);
+  }, [reorderWatchlist, watchlist, queryClient]);
 
   return (
     <div className="space-y-8">
