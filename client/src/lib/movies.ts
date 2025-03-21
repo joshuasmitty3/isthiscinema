@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -33,14 +32,12 @@ export function useMovies() {
   const queryClient = useQueryClient();
   const { watchlist, setWatchlist, reorderWatchlist } = useMoviesStore();
 
-  const { data: fetchedWatchlist } = useQuery({
+  const { data: fetchedWatchlist, refetch } = useQuery({
     queryKey: ['watchlist'],
     queryFn: async () => {
       const response = await fetch('/api/watchlist');
       if (!response.ok) throw new Error('Failed to fetch watchlist');
-      const data = await response.json();
-      setWatchlist(data);
-      return data;
+      return response.json();
     },
   });
 
@@ -52,6 +49,7 @@ export function useMovies() {
         body: JSON.stringify({ movieIds: movies.map(movie => movie.id) }),
       });
       if (!response.ok) throw new Error('Failed to update watchlist order');
+      await refetch(); //refetch after successful update
       return response.json();
     },
     onMutate: async (newMovies) => {
@@ -61,7 +59,9 @@ export function useMovies() {
       return { previousWatchlist };
     },
     onError: (err, newMovies, context) => {
+      console.error("Error updating watchlist order:", err); //Added error logging
       queryClient.setQueryData(['watchlist'], context?.previousWatchlist);
+      refetch(); //refetch on error to revert to previous state
     }
   });
 
