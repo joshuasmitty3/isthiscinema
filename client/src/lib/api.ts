@@ -4,7 +4,7 @@ import { Movie, SearchResult, User } from "./types";
 export async function searchMovies(query: string): Promise<SearchResult[]> {
   if (!query.trim()) return [];
   
-  const res = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`, {
+  const res = await fetch(`http://localhost:5000/api/movies/search?query=${encodeURIComponent(query)}`, {
     credentials: "include",
   });
 
@@ -17,7 +17,7 @@ export async function searchMovies(query: string): Promise<SearchResult[]> {
 }
 
 export async function getMovieDetails(imdbId: string): Promise<Movie> {
-  const res = await fetch(`/api/movies/${imdbId}`, {
+  const res = await fetch(`http://localhost:5000/api/movies/${imdbId}`, {
     credentials: "include",
   });
 
