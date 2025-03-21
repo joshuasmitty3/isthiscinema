@@ -1,21 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>is it cinema?</title>
-</head>
-<body>
 
-<header>
-  <h1>is it cinema?</h1>
-</header>
+import { Link } from "react-router-dom";
 
-<main>
-  <!-- Main content of the page -->
-</main>
-
-<footer>
-  <p>&copy; 2023 is it cinema?</p>
-</footer>
-
-</body>
-</html>
+export function Navigation() {
+  return (
+    <div className="flex items-center justify-between p-4 bg-primary text-primary-foreground">
+      <Link to="/" className="text-xl font-bold">
+        is it cinema?
+      </Link>
+      <div className="flex items-center gap-4">
+        <span>shared@gmail.com</span>
+      </div>
+    </div>
+  );
+}
