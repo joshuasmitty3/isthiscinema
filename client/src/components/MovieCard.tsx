@@ -4,6 +4,7 @@ import { Movie } from "@/lib/types";
 import { useState } from "react";
 import { moveToWatched } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface MovieCardProps {
   movie: Movie;
@@ -15,16 +16,21 @@ interface MovieCardProps {
 
 export default function MovieCard({ movie, actionType, isDragging, isCompact, onListsChange }: MovieCardProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleMoveToWatched = async () => {
     try {
       const response = await fetch(`/api/movies/${movie.id}/move-to-watched`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
       if (response.ok) {
+        await Promise.all([
+          queryClient.invalidateQueries(['watchlist']),
+          queryClient.invalidateQueries(['watchedlist'])
+        ]);
         if (onListsChange) {
           await onListsChange();
         }
