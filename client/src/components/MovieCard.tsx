@@ -109,3 +109,22 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
     </div>
   );
 }
+import { Movie } from "@/lib/movies";
+
+interface MovieCardProps {
+  movie: Movie;
+}
+
+export default function MovieCard({ movie }: MovieCardProps) {
+  return (
+    <div className="bg-white rounded-lg shadow p-4">
+      <img 
+        src={movie.poster} 
+        alt={movie.title} 
+        className="w-full h-48 object-cover rounded"
+      />
+      <h3 className="mt-2 font-semibold">{movie.title}</h3>
+      <p className="text-gray-500">{movie.year}</p>
+    </div>
+  );
+}
