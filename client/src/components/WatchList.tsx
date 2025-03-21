@@ -44,6 +44,7 @@ export default function WatchList() {
                           movie={movie} 
                           actionType="watch"
                           isDragging={snapshot.isDragging}
+                          isCompact={true}
                         />
                       </div>
                     )}
@@ -64,6 +65,7 @@ export default function WatchList() {
               key={movie.imdbId}
               movie={movie}
               actionType="remove"
+              isCompact={true}
             />
           ))}
         </div>
