@@ -50,35 +50,32 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
   };
 
   const handleRemoveFromWatched = async () => {
-    try {
-      const response = await fetch(`/api/watchedlist/${movie.id}`, {
-        method: 'DELETE',
-      });
+    const response = await fetch(`/api/watchedlist/${movie.id}`, {
+      method: 'DELETE',
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to remove from watched list');
-      }
-
-      await Promise.all([
-        queryClient.invalidateQueries(['watchlist']),
-        queryClient.invalidateQueries(['watchedlist'])
-      ]);
-
-      if (onListsChange) {
-        onListsChange();
-      }
-      toast({
-        title: "Removed from Watched",
-        description: `${movie.title} has been removed from your watched list.`,
-      });
-    } catch (error) {
-      console.error("Failed to remove movie:", error);
+    if (!response.ok) {
       toast({
         title: "Failed to remove movie",
         description: "There was an error removing the movie from your watched list.",
         variant: "destructive",
       });
+      return;
     }
+
+    await Promise.all([
+      queryClient.invalidateQueries(['watchlist']),
+      queryClient.invalidateQueries(['watchedlist'])
+    ]);
+
+    if (onListsChange) {
+      onListsChange();
+    }
+    
+    toast({
+      title: "Removed from Watched",
+      description: `${movie.title} has been removed from your watched list.`,
+    });
   };
 
 
