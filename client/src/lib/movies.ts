@@ -10,14 +10,18 @@ interface Movie {
 }
 
 interface MoviesStore {
-  watchlist: Movie[];
-  setWatchlist: (movies: Movie[]) => void;
+  watchlist: any[];
+  watchedlist: any[];
+  setWatchlist: (movies: any[]) => void;
+  setWatchedlist: (movies: any[]) => void;
   reorderWatchlist: (startIndex: number, endIndex: number) => void;
 }
 
 const useMoviesStore = create<MoviesStore>((set) => ({
   watchlist: [],
+  watchedlist: [],
   setWatchlist: (movies) => set({ watchlist: movies }),
+  setWatchedlist: (movies) => set({ watchedlist: movies }),
   reorderWatchlist: (startIndex, endIndex) => {
     set((state) => {
       const newWatchlist = [...state.watchlist];
@@ -30,49 +34,33 @@ const useMoviesStore = create<MoviesStore>((set) => ({
 
 export function useMovies() {
   const queryClient = useQueryClient();
-  const { watchlist, setWatchlist, reorderWatchlist } = useMoviesStore();
+  const { watchlist, watchedlist, setWatchlist, setWatchedlist, reorderWatchlist } = useMoviesStore();
 
-  const { data: fetchedWatchlist, refetch } = useQuery({
+  const { data: fetchedWatchlist } = useQuery({
     queryKey: ['watchlist'],
     queryFn: async () => {
       const response = await fetch('/api/watchlist');
       if (!response.ok) throw new Error('Failed to fetch watchlist');
-      return response.json();
+      const data = await response.json();
+      setWatchlist(data);
+      return data;
     },
   });
 
-  const updateWatchlistOrder = useMutation({
-    mutationFn: async (movies: Movie[]) => {
-      const response = await fetch('/api/watchlist/order', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieIds: movies.map(movie => movie.id) }),
-      });
-      if (!response.ok) throw new Error('Failed to update watchlist order');
-      await refetch(); //refetch after successful update
-      return response.json();
+  const { data: fetchedWatchedlist } = useQuery({
+    queryKey: ['watchedlist'],
+    queryFn: async () => {
+      const response = await fetch('/api/watchedlist');
+      if (!response.ok) throw new Error('Failed to fetch watched list');
+      const data = await response.json();
+      setWatchedlist(data);
+      return data;
     },
-    onMutate: async (newMovies) => {
-      await queryClient.cancelQueries({ queryKey: ['watchlist'] });
-      const previousWatchlist = queryClient.getQueryData(['watchlist']);
-      queryClient.setQueryData(['watchlist'], newMovies);
-      return { previousWatchlist };
-    },
-    onError: (err, newMovies, context) => {
-      console.error("Error updating watchlist order:", err); //Added error logging
-      queryClient.setQueryData(['watchlist'], context?.previousWatchlist);
-      refetch(); //refetch on error to revert to previous state
-    }
   });
 
   return {
     watchlist: fetchedWatchlist || [],
-    reorderWatchlist: (startIndex: number, endIndex: number) => {
-      const newWatchlist = [...(fetchedWatchlist || [])];
-      const [movedItem] = newWatchlist.splice(startIndex, 1);
-      newWatchlist.splice(endIndex, 0, movedItem);
-      setWatchlist(newWatchlist);
-      updateWatchlistOrder.mutate(newWatchlist);
-    },
+    watchedlist: fetchedWatchedlist || [],
+    reorderWatchlist,
   };
 }

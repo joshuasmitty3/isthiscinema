@@ -1,8 +1,8 @@
 
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import MovieCard from "./MovieCard";
-import { useMovies } from "@/lib/movies";
-import { useCallback } from "react";
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useCallback } from 'react';
+import { useMovies } from '@/lib/movies';
+import MovieCard from './MovieCard';
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -26,19 +26,15 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         <h2 className="text-2xl font-bold mb-4">Watch List</h2>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="watchlist">
-            {(provided, snapshot) => (
+            {(provided) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
               >
-                {watchlist?.map((movie, index) => (
-                  <Draggable
-                    key={movie.id}
-                    draggableId={movie.id.toString()}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
+                {watchlist.map((movie, index) => (
+                  <Draggable key={movie.id} draggableId={movie.id.toString()} index={index}>
+                    {(provided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
@@ -47,7 +43,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         <MovieCard
                           movie={movie}
                           actionType="watch"
-                          isDragging={snapshot.isDragging}
                           isCompact={true}
                           onListsChange={onListsChange}
                         />
@@ -65,7 +60,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
       <div>
         <h2 className="text-2xl font-bold mb-4">Watched List</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {watchedlist?.map((movie) => (
+          {watchedlist.map((movie) => (
             <MovieCard
               key={movie.id}
               movie={movie}
