@@ -91,4 +91,5 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
     </div>
   );
 }
+  );
 }
