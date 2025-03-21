@@ -18,12 +18,23 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
 
   const handleMoveToWatched = async () => {
     try {
-      await moveToWatched(movie.id);
+      const response = await fetch(`/api/movies/${movie.id}/move-to-watched`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        // Force refresh of both lists
+        if (onListsChange) {
+          onListsChange();
+          onListsChange(); // Call twice to ensure both lists update
+        }
+      }
       toast({
         title: "Success",
         description: `${movie.title} moved to watched list`,
       });
-      if (onListsChange) onListsChange();
     } catch (error) {
       toast({
         title: "Error",
