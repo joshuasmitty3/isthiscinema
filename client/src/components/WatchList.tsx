@@ -37,16 +37,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
       if (!response.ok) {
         throw new Error('Failed to update order on server');
       }
-
-      // Refetch lists to get updated order
-      queryClient.invalidateQueries(['watchlist']);
-      await refetchLists();
+      // Server update successful, local state is already correct
     } catch (error) {
       console.error('Failed to update order:', error);
       // Revert local state on error
       reorderWatchlist(endIndex, startIndex);
     }
-  }, [reorderWatchlist, watchlist, refetchLists, queryClient]);
+  }, [reorderWatchlist, watchlist]);
 
   return (
     <div className="space-y-8">
