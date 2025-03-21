@@ -19,27 +19,9 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     const endIndex = result.destination.index;
 
     try {
-      const newOrder = [...watchlist];
-      const [movedItem] = newOrder.splice(startIndex, 1);
-      newOrder.splice(endIndex, 0, movedItem);
-
-      // Optimistically update the UI
-      queryClient.setQueryData(['watchlist'], newOrder);
-
-      // Update server
-      const response = await fetch('/api/watchlist/order', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieIds: newOrder.map(movie => movie.id) })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update order on server');
-      }
+      await reorderMutation.mutateAsync({ startIndex, endIndex });
     } catch (error) {
       console.error('Failed to update order:', error);
-      // Revert optimistic update on error
-      queryClient.setQueryData(['watchlist'], watchlist);
     }
   }, [reorderWatchlist, watchlist, queryClient]);
 
