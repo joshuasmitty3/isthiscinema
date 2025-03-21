@@ -31,8 +31,8 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
       onClick={handleClick}
     >
       {isCompact && (
-        <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-1">
-          <p className="text-xs text-white truncate">{movie.title}</p>
+        <div className="absolute bottom-0 left-0 right-0 bg-black/80 p-2">
+          <p className="text-sm text-white font-medium truncate">{movie.title}</p>
         </div>
       )}
       {isExpanded ? (
