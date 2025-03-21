@@ -179,6 +179,8 @@ export class MemStorage implements IStorage {
     
     if (itemToRemove) {
       this.watchedListItems.delete(itemToRemove.id);
+    } else {
+      throw new Error("Movie not found in watched list");
     }
   }
 
