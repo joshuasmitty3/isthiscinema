@@ -51,13 +51,7 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
 
   const handleRemoveFromWatched = async () => {
     try {
-      const response = await fetch(`/api/watchedlist/${movie.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to remove from watched list');
-      }
+      await apiRequest('DELETE', `/api/watchedlist/${movie.id}`);
 
       await Promise.all([
         queryClient.invalidateQueries(['watchlist']),
