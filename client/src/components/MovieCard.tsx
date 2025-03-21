@@ -26,11 +26,7 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
       });
       if (response.ok) {
         if (onListsChange) {
-          await Promise.all([
-            onListsChange(),
-            // Small delay to ensure both lists update
-            new Promise(resolve => setTimeout(resolve, 100)).then(() => onListsChange())
-          ]);
+          await onListsChange();
         }
       }
       toast({

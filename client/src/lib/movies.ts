@@ -1,13 +1,6 @@
+
 import { create } from 'zustand';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-interface Movie {
-  id: number;
-  imdbId: string;
-  title: string;
-  year: string;
-  poster: string;
-}
 
 interface MoviesStore {
   watchlist: any[];
@@ -36,7 +29,7 @@ export function useMovies() {
   const queryClient = useQueryClient();
   const { watchlist, watchedlist, setWatchlist, setWatchedlist, reorderWatchlist } = useMoviesStore();
 
-  const { data: fetchedWatchlist } = useQuery({
+  const { data: fetchedWatchlist, refetch: refetchWatchlist } = useQuery({
     queryKey: ['watchlist'],
     queryFn: async () => {
       const response = await fetch('/api/watchlist');
@@ -47,7 +40,7 @@ export function useMovies() {
     },
   });
 
-  const { data: fetchedWatchedlist } = useQuery({
+  const { data: fetchedWatchedlist, refetch: refetchWatchedlist } = useQuery({
     queryKey: ['watchedlist'],
     queryFn: async () => {
       const response = await fetch('/api/watchedlist');
@@ -58,9 +51,36 @@ export function useMovies() {
     },
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: async (movies: any[]) => {
+      const response = await fetch('/api/watchlist/order', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ movieIds: movies.map(movie => movie.id) }),
+      });
+      if (!response.ok) throw new Error('Failed to update watchlist order');
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch both lists
+      Promise.all([
+        queryClient.invalidateQueries(['watchlist']),
+        queryClient.invalidateQueries(['watchedlist'])
+      ]);
+    }
+  });
+
   return {
     watchlist: fetchedWatchlist || [],
     watchedlist: fetchedWatchedlist || [],
     reorderWatchlist,
+    refetchLists: () => {
+      return Promise.all([
+        refetchWatchlist(),
+        refetchWatchedlist()
+      ]);
+    }
   };
 }
