@@ -12,14 +12,31 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient(); // Added useQueryClient
   const { watchlist, watchedlist, reorderWatchlist, refetchLists } = useMovies();
 
-  const handleDragEnd = useCallback((result: any) => {
+  const handleDragEnd = useCallback(async (result: any) => {
     if (!result.destination) return;
 
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
+    // Update local state first for immediate feedback
     reorderWatchlist(startIndex, endIndex);
-  }, [reorderWatchlist]);
+
+    // Then update server
+    const newOrder = [...watchlist];
+    const [movedItem] = newOrder.splice(startIndex, 1);
+    newOrder.splice(endIndex, 0, movedItem);
+
+    const response = await fetch('/api/watchlist/order', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ movieIds: newOrder.map(movie => movie.id) })
+    });
+
+    if (!response.ok) {
+      console.error('Failed to update order on server');
+      // Could add error handling here
+    }
+  }, [reorderWatchlist, watchlist]);
 
   return (
     <div className="space-y-8">
