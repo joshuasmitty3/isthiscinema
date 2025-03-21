@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Movie } from "@/lib/types";
 import { useState } from "react";
-import { moveToWatched } from "@/lib/api";
+import { moveToWatched, removeFromWatchedList as apiRemoveFromWatchedList } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -14,11 +14,6 @@ interface MovieCardProps {
   onListsChange?: () => void;
 }
 
-import { removeFromWatchedList as apiRemoveFromWatchedList } from "../lib/api";
-
-async function removeFromWatchedList(movieId: number) {
-  return apiRemoveFromWatchedList(movieId);
-}
 
 export default function MovieCard({ movie, actionType, isDragging, isCompact, onListsChange }: MovieCardProps) {
   const { toast } = useToast();
@@ -56,7 +51,7 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
 
   const handleRemoveFromWatched = async () => {
     try {
-      await removeFromWatchedList(movie.id);
+      await apiRemoveFromWatchedList(movie.id);
       onListsChange();
       toast({
         title: "Removed from Watched",
