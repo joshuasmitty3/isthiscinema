@@ -56,6 +56,7 @@ export default function Home({ user, onLogout }: HomeProps) {
             />
           </div>
           <div>
+            <h2 className="text-2xl font-bold mb-4">My Movie List</h2> {/* Changed header */}
             <WatchList movies={watchList} />
           </div>
         </div>
