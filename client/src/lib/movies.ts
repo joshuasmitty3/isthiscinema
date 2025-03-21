@@ -46,11 +46,10 @@ export function useMovies() {
 
   const updateWatchlistOrder = useMutation({
     mutationFn: async (movies: Movie[]) => {
-      const movieIds = movies.map(movie => Number(movie.id));
       const response = await fetch('/api/watchlist/order', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieIds }),
+        body: JSON.stringify({ movieIds: movies.map(movie => movie.id) }),
       });
       if (!response.ok) throw new Error('Failed to update watchlist order');
       return response.json();
@@ -61,10 +60,13 @@ export function useMovies() {
   });
 
   return {
-    watchlist: fetchedWatchlist || watchlist,
+    watchlist: fetchedWatchlist || [],
     reorderWatchlist: (startIndex: number, endIndex: number) => {
-      reorderWatchlist(startIndex, endIndex);
-      updateWatchlistOrder.mutate(watchlist);
+      const newWatchlist = [...(fetchedWatchlist || [])];
+      const [movedItem] = newWatchlist.splice(startIndex, 1);
+      newWatchlist.splice(endIndex, 0, movedItem);
+      setWatchlist(newWatchlist);
+      updateWatchlistOrder.mutate(newWatchlist);
     },
   };
 }
