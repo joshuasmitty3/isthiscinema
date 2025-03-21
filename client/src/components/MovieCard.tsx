@@ -112,10 +112,7 @@ export default function MovieCard({ movie, onAction, actionType, isCompact, isLo
   }
 
   return (
-    <div 
-  className={`bg-white rounded-lg shadow-md p-4 ${isDragging ? 'opacity-50' : ''} cursor-pointer transition-transform hover:scale-[1.02]`}
-  onClick={() => onSelectMovie?.(movie)}
->
+    <div className={`bg-white rounded-lg shadow-md p-4 ${isDragging ? 'opacity-50' : ''}`}>
       <img src={movie.poster} alt={movie.title} className="w-full h-48 object-cover rounded-md mb-4" />
       <h3 className="text-lg font-semibold mb-2">{movie.title}</h3>
       {!isCompact && (
