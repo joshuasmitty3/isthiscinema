@@ -52,7 +52,9 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
   const handleRemoveFromWatched = async () => {
     try {
       await apiRemoveFromWatchedList(movie.id);
-      onListsChange();
+      if (onListsChange) {
+        onListsChange();
+      }
       toast({
         title: "Removed from Watched",
         description: `${movie.title} has been removed from your watched list.`,
