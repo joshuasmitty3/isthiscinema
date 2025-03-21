@@ -10,7 +10,7 @@ interface WatchListProps {
 
 export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient(); // Added useQueryClient
-  const { watchlist, watchedlist, reorderWatchlist, refetch } = useMovies(); // Assuming refetch is added to useMovies
+  const { watchlist, watchedlist, reorderWatchlist, refetchLists } = useMovies();
 
   const handleDragEnd = useCallback((result: any) => {
     if (!result.destination) return;
@@ -70,7 +70,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
               onListsChange={() => {
                 queryClient.invalidateQueries(['watchlist']);
                 queryClient.invalidateQueries(['watchedlist']);
-                refetch(); // Call refetch to update the UI
+                refetchLists(); // Call refetchLists to update the UI
               }}
             />
           ))}
