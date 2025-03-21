@@ -5,19 +5,24 @@ import { useState } from "react";
 import { moveToWatched, removeFromWatchedList as apiRemoveFromWatchedList } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { MovieSkeleton } from './MovieSkeleton'; // Assuming this component exists
 
 interface MovieCardProps {
   movie: Movie;
-  actionType: 'watch' | 'remove';
-  isDragging?: boolean;
+  onAction?: (movie: Movie) => void;
+  actionType?: 'watch' | 'remove';
   isCompact?: boolean;
-  onListsChange?: () => void;
+  isLoading?: boolean;
 }
 
 
-export default function MovieCard({ movie, actionType, isDragging, isCompact, onListsChange }: MovieCardProps) {
+export default function MovieCard({ movie, onAction, actionType, isCompact, isLoading }: MovieCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  if (isLoading) {
+    return <MovieSkeleton showActions={!!actionType} />;
+  }
 
   const handleMoveToWatched = async () => {
     try {
@@ -32,8 +37,8 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
           queryClient.invalidateQueries(['watchlist']),
           queryClient.invalidateQueries(['watchedlist'])
         ]);
-        if (onListsChange) {
-          await onListsChange();
+        if (onAction) {
+          await onAction(movie);
         }
       }
       toast({
@@ -68,10 +73,10 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
       queryClient.invalidateQueries(['watchedlist'])
     ]);
 
-    if (onListsChange) {
-      onListsChange();
+    if (onAction) {
+      onAction(movie);
     }
-    
+
     toast({
       title: "Removed from Watched",
       description: `${movie.title} has been removed from your watched list.`,
