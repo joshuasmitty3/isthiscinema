@@ -18,7 +18,9 @@ interface MoviesStore {
 
 const useMoviesStore = create<MoviesStore>((set) => ({
   watchlist: [],
+  watchedlist: [],
   setWatchlist: (movies) => set({ watchlist: movies }),
+  setWatchedlist: (movies) => set({ watchedlist: movies }),
   reorderWatchlist: (startIndex, endIndex) => {
     set((state) => {
       const newWatchlist = [...state.watchlist];
@@ -31,7 +33,7 @@ const useMoviesStore = create<MoviesStore>((set) => ({
 
 export function useMovies() {
   const queryClient = useQueryClient();
-  const { watchlist, setWatchlist, reorderWatchlist } = useMoviesStore();
+  const { watchlist, watchedlist, setWatchlist, setWatchedlist, reorderWatchlist } = useMoviesStore();
 
   const { data: fetchedWatchlist } = useQuery({
     queryKey: ['watchlist'],
@@ -40,6 +42,17 @@ export function useMovies() {
       if (!response.ok) throw new Error('Failed to fetch watchlist');
       const data = await response.json();
       setWatchlist(data);
+      return data;
+    },
+  });
+
+  const { data: fetchedWatchedlist } = useQuery({
+    queryKey: ['watchedlist'],
+    queryFn: async () => {
+      const response = await fetch('/api/watchedlist');
+      if (!response.ok) throw new Error('Failed to fetch watched list');
+      const data = await response.json();
+      setWatchedlist(data);
       return data;
     },
   });
