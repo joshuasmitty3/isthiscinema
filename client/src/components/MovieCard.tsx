@@ -14,6 +14,12 @@ interface MovieCardProps {
   onListsChange?: () => void;
 }
 
+async function removeFromWatchedList(movieId: number) {
+  // Placeholder - Replace with actual API call
+  console.log(`Removing movie ${movieId} from watched list`);
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+}
+
 export default function MovieCard({ movie, actionType, isDragging, isCompact, onListsChange }: MovieCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -48,6 +54,25 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
     }
   };
 
+  const handleRemoveFromWatched = async () => {
+    try {
+      await removeFromWatchedList(movie.id);
+      onListsChange();
+      toast({
+        title: "Removed from Watched",
+        description: `${movie.title} has been removed from your watched list.`,
+      });
+    } catch (error) {
+      console.error("Failed to remove movie:", error);
+      toast({
+        title: "Failed to remove movie",
+        description: "There was an error removing the movie from your watched list.",
+        variant: "destructive",
+      });
+    }
+  };
+
+
   if (isCompact) {
     return (
       <div className={cn(
@@ -63,7 +88,7 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
             <Button
               size="sm"
               variant="ghost"
-              onClick={actionType === 'watch' ? handleMoveToWatched : undefined}
+              onClick={actionType === 'watch' ? handleMoveToWatched : handleRemoveFromWatched}
               className="px-2 h-7 text-xs shrink-0"
             >
               {actionType === 'watch' ? '✓ Watch' : 'Remove'}
@@ -87,6 +112,11 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
       {actionType === 'watch' && (
         <Button onClick={handleMoveToWatched} className="w-full">
           Move to Watched
+        </Button>
+      )}
+      {actionType === 'remove' && (
+        <Button onClick={handleRemoveFromWatched} className="w-full">
+          Remove from Watched
         </Button>
       )}
     </div>
