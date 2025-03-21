@@ -13,6 +13,7 @@ interface MovieCardProps {
   actionType?: 'watch' | 'remove';
   isCompact?: boolean;
   isLoading?: boolean;
+  isDragging?: boolean;
 }
 
 
