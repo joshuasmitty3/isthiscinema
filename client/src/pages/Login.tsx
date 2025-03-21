@@ -44,7 +44,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     <div className="min-h-screen flex items-center justify-center bg-neutral-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="bg-primary text-white rounded-t-lg">
-          <CardTitle className="text-xl font-heading font-semibold text-center">Movie Watch List</CardTitle>
+          <CardTitle className="text-xl font-heading font-semibold text-center">is it cinema?</CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
