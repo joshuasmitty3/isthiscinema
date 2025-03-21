@@ -92,5 +92,12 @@ export async function removeFromWatchedList(movieId: number) {
   if (!response.ok) {
     throw new Error('Failed to remove from watched list');
   }
+  
+  const queryClient = new QueryClient();
+  await Promise.all([
+    queryClient.invalidateQueries(['watchlist']),
+    queryClient.invalidateQueries(['watchedlist'])
+  ]);
+  
   return response.json();
 }
