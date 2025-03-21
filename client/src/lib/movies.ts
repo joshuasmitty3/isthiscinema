@@ -46,8 +46,8 @@ export function useMovies() {
 
   const updateWatchlistOrder = useMutation({
     mutationFn: async (movies: Movie[]) => {
-      const movieIds = movies.map(movie => movie.id);
-      const response = await fetch('/api/watchlist/reorder', {
+      const movieIds = movies.map(movie => Number(movie.id));
+      const response = await fetch('/api/watchlist/order', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ movieIds }),
