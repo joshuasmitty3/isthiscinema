@@ -3,7 +3,7 @@ import { Movie, SearchResult, User } from "./types";
 
 export async function searchMovies(query: string): Promise<SearchResult[]> {
   if (!query.trim()) return [];
-  
+
   const res = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`, {
     credentials: "include",
   });
@@ -60,8 +60,26 @@ export async function updateReview(movieId: number, review: string): Promise<voi
   await apiRequest("PUT", `/api/watchedlist/${movieId}/review`, { review });
 }
 
-export async function moveToWatched(movieId: number, review?: string): Promise<void> {
-  await apiRequest("POST", `/api/movies/${movieId}/move-to-watched`, { review });
+export async function moveToWatched(movieId: number, review?: string) {
+  const response = await fetch(`/api/movies/${movieId}/move-to-watched`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ review }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to move movie to watched');
+  }
+
+  const queryClient = new QueryClient();
+  await Promise.all([
+    queryClient.invalidateQueries(['watchlist']),
+    queryClient.invalidateQueries(['watchedlist'])
+  ]);
+
+  return response.json();
 }
 
 export function getCSVExportUrl(): string {
