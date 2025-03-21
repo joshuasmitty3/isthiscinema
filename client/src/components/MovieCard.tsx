@@ -33,6 +33,32 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
     }
   };
 
+  if (isCompact) {
+    return (
+      <div className={cn(
+        "group relative bg-white border border-neutral-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300",
+        isDragging && "opacity-50"
+      )}>
+        <div className="p-3 flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-medium text-sm truncate">{movie.title}</h3>
+            <p className="text-xs text-neutral-600 truncate">{movie.year} • {movie.director}</p>
+          </div>
+          {actionType && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={actionType === 'watch' ? handleMoveToWatched : undefined}
+              className="px-2 h-7 text-xs shrink-0"
+            >
+              {actionType === 'watch' ? '✓ Watch' : 'Remove'}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`bg-white rounded-lg shadow-md p-4 ${isDragging ? 'opacity-50' : ''}`}>
       <img src={movie.poster} alt={movie.title} className="w-full h-48 object-cover rounded-md mb-4" />
