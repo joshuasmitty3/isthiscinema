@@ -4,7 +4,11 @@ import { useCallback } from "react";
 import MovieCard from "./MovieCard";
 import { useMovies } from "@/lib/movies";
 
-export default function WatchList() {
+interface WatchListProps {
+  onListsChange?: () => void;
+}
+
+export default function WatchList({ onListsChange }: WatchListProps) {
   const { watchlist, watchedlist, reorderWatchlist } = useMovies();
 
   const handleDragEnd = useCallback((result: any) => {
