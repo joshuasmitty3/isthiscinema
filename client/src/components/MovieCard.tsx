@@ -1,8 +1,7 @@
 
-import React from 'react';
+import { useState } from 'react';
 import { Movie } from '@/lib/types';
 import { Button } from './ui/button';
-import { RiAddLine, RiEyeLine, RiDeleteBin6Line, RiStarLine, RiStarFill } from 'react-icons/ri';
 import { cn } from '@/lib/utils';
 
 interface MovieCardProps {
@@ -14,12 +13,65 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ movie, onAction, actionType, isCompact = false, isDragging = false }: MovieCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const handleAction = () => {
     if (onAction) {
       onAction(movie);
     }
   };
 
+  if (isCompact) {
+    return (
+      <div className={cn(
+        "group relative bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300",
+        isDragging && "opacity-50"
+      )}>
+        <div 
+          className="p-3 cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-medium text-sm">{movie.title}</h3>
+              <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
+            </div>
+            {actionType && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAction();
+                }}
+                className="ml-2 text-xs"
+              >
+                {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
+              </Button>
+            )}
+          </div>
+          
+          {isExpanded && (
+            <div className="mt-3">
+              <div className="aspect-[2/3] w-full max-w-[200px] mx-auto mb-3">
+                <img
+                  src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
+                  alt={movie.title}
+                  className="w-full h-full object-cover rounded"
+                />
+              </div>
+              <p className="text-sm text-neutral-700 line-clamp-3">{movie.plot}</p>
+              {movie.actors && (
+                <p className="text-xs text-neutral-600 mt-2">Cast: {movie.actors}</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Original full card view for search results
   return (
     <div className={cn(
       "group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300",
@@ -37,26 +89,17 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
           <div>
             <h3 className="font-medium text-sm mb-1">{movie.title}</h3>
             <p className="text-xs text-neutral-300">{movie.year}</p>
+            {movie.plot && <p className="text-xs mt-2 line-clamp-4">{movie.plot}</p>}
           </div>
-
-          {onAction && (
+          
+          {actionType && (
             <Button
+              size="sm"
+              variant="secondary"
               onClick={handleAction}
-              className={cn(
-                "w-full mt-2",
-                actionType === "add" && "bg-primary hover:bg-primary/90",
-                actionType === "watch" && "bg-emerald-600 hover:bg-emerald-700",
-                actionType === "remove" && "bg-red-600 hover:bg-red-700"
-              )}
+              className="w-full mt-2"
             >
-              <span className="flex items-center gap-2">
-                {actionType === "add" && <RiAddLine className="h-4 w-4" />}
-                {actionType === "watch" && <RiEyeLine className="h-4 w-4" />}
-                {actionType === "remove" && <RiDeleteBin6Line className="h-4 w-4" />}
-                {actionType === "add" && "Add to Watch"}
-                {actionType === "watch" && "Mark Watched"}
-                {actionType === "remove" && "Remove"}
-              </span>
+              {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
             </Button>
           )}
         </div>
