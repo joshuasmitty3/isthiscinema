@@ -14,10 +14,10 @@ interface MovieCardProps {
   onListsChange?: () => void;
 }
 
+import { removeFromWatchedList as apiRemoveFromWatchedList } from "../lib/api";
+
 async function removeFromWatchedList(movieId: number) {
-  // Placeholder - Replace with actual API call
-  console.log(`Removing movie ${movieId} from watched list`);
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+  return apiRemoveFromWatchedList(movieId);
 }
 
 export default function MovieCard({ movie, actionType, isDragging, isCompact, onListsChange }: MovieCardProps) {
