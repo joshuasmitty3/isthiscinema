@@ -45,6 +45,7 @@ export default function WatchList() {
                           actionType="watch"
                           isDragging={snapshot.isDragging}
                           isCompact={true}
+                          onListsChange={onListsChange}
                         />
                       </div>
                     )}
