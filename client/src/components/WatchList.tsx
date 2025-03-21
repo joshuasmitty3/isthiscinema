@@ -1,6 +1,6 @@
-
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useCallback } from 'react';
+import { useQueryClient, useQuery } from '@tanstack/react-query'; // Added imports
 import { useMovies } from '@/lib/movies';
 import MovieCard from './MovieCard';
 
@@ -9,7 +9,8 @@ interface WatchListProps {
 }
 
 export default function WatchList({ onListsChange }: WatchListProps) {
-  const { watchlist, watchedlist, reorderWatchlist } = useMovies();
+  const queryClient = useQueryClient(); // Added useQueryClient
+  const { watchlist, watchedlist, reorderWatchlist, refetch } = useMovies(); // Assuming refetch is added to useMovies
 
   const handleDragEnd = useCallback((result: any) => {
     if (!result.destination) return;
@@ -66,7 +67,11 @@ export default function WatchList({ onListsChange }: WatchListProps) {
               movie={movie}
               actionType="remove"
               isCompact={true}
-              onListsChange={onListsChange}
+              onListsChange={() => {
+                queryClient.invalidateQueries(['watchlist']);
+                queryClient.invalidateQueries(['watchedlist']);
+                refetch(); // Call refetch to update the UI
+              }}
             />
           ))}
         </div>
