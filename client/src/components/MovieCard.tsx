@@ -18,7 +18,7 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
     }
   };
 
-  // Compact view for watch/watched lists - no artwork
+  // Compact view for watch/watched lists
   if (isCompact) {
     return (
       <div className={cn(
@@ -45,7 +45,7 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
     );
   }
 
-  // Full card view for search results only - includes artwork
+  // Full card view for search results
   return (
     <div className={cn(
       "group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300",
@@ -57,12 +57,15 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
           alt={movie.title}
           className="w-full h-full object-cover"
         />
+        
+        {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between text-white">
           <div>
             <h3 className="font-medium text-sm mb-1">{movie.title}</h3>
             <p className="text-xs text-neutral-300">{movie.year}</p>
             {movie.plot && <p className="text-xs mt-2 line-clamp-4">{movie.plot}</p>}
           </div>
+          
           {actionType && (
             <Button
               size="sm"
