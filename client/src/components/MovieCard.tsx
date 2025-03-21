@@ -27,44 +27,20 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
         "group relative bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300",
         isDragging && "opacity-50"
       )}>
-        <div 
-          className="p-3 cursor-pointer"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-medium text-sm">{movie.title}</h3>
-              <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
-            </div>
-            {actionType && (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAction();
-                }}
-                className="ml-2 text-xs"
-              >
-                {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
-              </Button>
-            )}
+        <div className="p-3 flex justify-between items-center">
+          <div>
+            <h3 className="font-medium text-sm">{movie.title}</h3>
+            <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
           </div>
-          
-          {isExpanded && (
-            <div className="mt-3">
-              <div className="aspect-[2/3] w-24 mx-auto mb-3">
-                <img
-                  src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-                  alt={movie.title}
-                  className="w-full h-full object-cover rounded"
-                />
-              </div>
-              <p className="text-sm text-neutral-700 line-clamp-3">{movie.plot}</p>
-              {movie.actors && (
-                <p className="text-xs text-neutral-600 mt-2">Cast: {movie.actors}</p>
-              )}
-            </div>
+          {actionType && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleAction}
+              className="ml-2 text-xs shrink-0"
+            >
+              {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
+            </Button>
           )}
         </div>
       </div>
