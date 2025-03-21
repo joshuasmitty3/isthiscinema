@@ -53,7 +53,7 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
           
           {isExpanded && (
             <div className="mt-3">
-              <div className="aspect-[2/3] w-full max-w-[200px] mx-auto mb-3">
+              <div className="aspect-[2/3] w-24 mx-auto mb-3">
                 <img
                   src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
                   alt={movie.title}
