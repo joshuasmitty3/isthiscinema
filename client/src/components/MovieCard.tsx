@@ -27,7 +27,7 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
 
   return (
     <div 
-      className="group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+      className={`group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${isExpanded ? 'h-auto' : 'h-24'}`}
       onClick={handleClick}
     >
       {isExpanded ? (
