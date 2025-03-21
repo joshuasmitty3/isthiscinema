@@ -13,21 +13,30 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ movie, onAction, actionType, isCompact = false }: MovieCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   const handleAction = () => {
     if (onAction) {
       onAction(movie);
     }
   };
 
+  const handleClick = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <div className="group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300">
-      {/* Movie Poster */}
-      <div className="aspect-[2/3] relative">
-        <img
-          src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-          alt={movie.title}
-          className="w-full h-full object-cover"
-        />
+    <div 
+      className="group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+      onClick={handleClick}
+    >
+      {isExpanded ? (
+        <div className="aspect-[2/3] relative">
+          <img
+            src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
+            alt={movie.title}
+            className="w-full h-full object-cover"
+          />
         
         {/* Hover Overlay with Details */}
         <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between text-white">
@@ -104,6 +113,12 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
               </span>
             </Button>
           </div>
+        </div>
+      )}
+    </div>
+      ) : (
+        <div className="aspect-[2/3] relative flex items-center justify-center p-4 bg-neutral-100">
+          <h3 className="text-center font-medium text-sm">{movie.title}</h3>
         </div>
       )}
     </div>
