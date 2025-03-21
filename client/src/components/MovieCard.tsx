@@ -1,85 +1,53 @@
-
 import { cn } from "@/lib/utils";
-import { Movie } from "@/lib/types";
 import { Button } from "./ui/button";
+import { Movie } from "@/lib/types";
 import { useState } from "react";
+import { moveToWatched } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 interface MovieCardProps {
   movie: Movie;
-  onAction?: (movie: Movie) => void;
-  actionType?: 'add' | 'watch' | 'remove';
-  isCompact?: boolean;
+  actionType: 'watch' | 'remove';
   isDragging?: boolean;
+  isCompact?: boolean;
+  onListsChange?: () => void;
 }
 
-export default function MovieCard({ movie, onAction, actionType, isCompact = false, isDragging = false }: MovieCardProps) {
-  const [expanded, setExpanded] = useState(false);
-  
-  const handleAction = () => {
-    if (onAction) {
-      onAction(movie);
+export default function MovieCard({ movie, actionType, isDragging, isCompact, onListsChange }: MovieCardProps) {
+  const { toast } = useToast();
+
+  const handleMoveToWatched = async () => {
+    try {
+      await moveToWatched(movie.id);
+      toast({
+        title: "Success",
+        description: `${movie.title} moved to watched list`,
+      });
+      if (onListsChange) onListsChange();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to move movie to watched list",
+        variant: "destructive",
+      });
     }
   };
 
-  // Compact view for watch/watched lists
-  if (isCompact) {
-    return (
-      <div 
-        className={cn(
-          "group relative bg-white border border-neutral-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300",
-          isDragging && "opacity-50"
-        )}
-      >
-        <div className="p-3 flex justify-between items-center">
-          <div>
-            <h3 className="font-medium text-sm">{movie.title}</h3>
-            <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
-          </div>
-          {actionType && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleAction}
-              className="ml-2 text-xs shrink-0"
-            >
-              {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Full card view for search results
   return (
-    <div className={cn(
-      "group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300",
-      isDragging && "opacity-50"
-    )}>
-      <div className="aspect-[2/3] relative">
-        <img
-          src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-          alt={movie.title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between text-white">
-          <div>
-            <h3 className="font-medium text-sm mb-1">{movie.title}</h3>
-            <p className="text-xs text-neutral-300">{movie.year}</p>
-            {movie.plot && <p className="text-xs mt-2 line-clamp-4">{movie.plot}</p>}
-          </div>
-          {actionType && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={handleAction}
-              className="w-full mt-2"
-            >
-              {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
-            </Button>
-          )}
-        </div>
-      </div>
+    <div className={`bg-white rounded-lg shadow-md p-4 ${isDragging ? 'opacity-50' : ''}`}>
+      <img src={movie.poster} alt={movie.title} className="w-full h-48 object-cover rounded-md mb-4" />
+      <h3 className="text-lg font-semibold mb-2">{movie.title}</h3>
+      {!isCompact && (
+        <>
+          <p className="text-gray-600 mb-2">{movie.year}</p>
+          <p className="text-gray-600 mb-4">{movie.director}</p>
+        </>
+      )}
+      {actionType === 'watch' && (
+        <Button onClick={handleMoveToWatched} className="w-full">
+          Move to Watched
+        </Button>
+      )}
     </div>
   );
 }
