@@ -21,22 +21,33 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     // Update local state first for immediate feedback
     reorderWatchlist(startIndex, endIndex);
 
-    // Then update server
-    const newOrder = [...watchlist];
-    const [movedItem] = newOrder.splice(startIndex, 1);
-    newOrder.splice(endIndex, 0, movedItem);
+    try {
+      // Then update server
+      const newOrder = [...watchlist];
+      const [movedItem] = newOrder.splice(startIndex, 1);
+      newOrder.splice(endIndex, 0, movedItem);
 
-    const response = await fetch('/api/watchlist/order', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ movieIds: newOrder.map(movie => movie.id) })
-    });
+      const response = await fetch('/api/watchlist/order', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movieIds: newOrder.map(movie => movie.id) })
+      });
 
-    if (!response.ok) {
-      console.error('Failed to update order on server');
-      // Could add error handling here
+      if (!response.ok) {
+        throw new Error('Failed to update order on server');
+      }
+
+      // Refetch lists to ensure we have the latest data
+      await refetchLists();
+      if (onListsChange) {
+        onListsChange();
+      }
+    } catch (error) {
+      console.error('Failed to update order:', error);
+      // Revert local state on error
+      reorderWatchlist(endIndex, startIndex);
     }
-  }, [reorderWatchlist, watchlist]);
+  }, [reorderWatchlist, watchlist, refetchLists, onListsChange]);
 
   return (
     <div className="space-y-8">
