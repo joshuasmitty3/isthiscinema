@@ -102,8 +102,8 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
           )}
         </div>
       ) : (
-        <div className="aspect-[2/3] relative flex items-center justify-center p-4 bg-neutral-100">
-          <h3 className="text-center font-semibold text-base text-neutral-800">{movie.title}</h3>
+        <div className="aspect-[2/3] relative flex items-center justify-center p-4 bg-white border border-neutral-200">
+          <h3 className="text-center font-bold text-lg text-neutral-900">{movie.title}</h3>
         </div>
       )}
     </div>
