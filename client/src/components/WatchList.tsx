@@ -57,7 +57,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4"
               >
                 {watchlist.map((movie, index) => (
                   <Draggable key={movie.id} draggableId={movie.id.toString()} index={index}>
@@ -86,7 +86,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
       <div>
         <h2 className="text-2xl font-bold mb-4">Watched List</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
           {watchedlist.map((movie) => (
             <MovieCard
               key={movie.id}
