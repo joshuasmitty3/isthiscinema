@@ -1,8 +1,7 @@
 
-import { useState } from 'react';
-import { Movie } from '@/lib/types';
-import { Button } from './ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
+import { Movie } from "@/lib/types";
+import { Button } from "./ui/button";
 
 interface MovieCardProps {
   movie: Movie;
@@ -13,14 +12,13 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ movie, onAction, actionType, isCompact = false, isDragging = false }: MovieCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const handleAction = () => {
     if (onAction) {
       onAction(movie);
     }
   };
 
+  // Compact view for watch/watched lists
   if (isCompact) {
     return (
       <div className={cn(
@@ -47,7 +45,7 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
     );
   }
 
-  // Original full card view for search results
+  // Full card view for search results
   return (
     <div className={cn(
       "group relative rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300",
