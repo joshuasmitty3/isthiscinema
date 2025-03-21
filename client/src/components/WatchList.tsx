@@ -1,8 +1,9 @@
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useCallback } from 'react';
-import { useQueryClient, useQuery } from '@tanstack/react-query'; // Added imports
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useMovies } from '@/lib/movies';
 import MovieCard from './MovieCard';
+import { ListSkeleton } from './ListSkeleton';
 
 import { useState } from 'react';
 
@@ -26,7 +27,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     const newOrder = [...watchlist];
     const [movedItem] = newOrder.splice(startIndex, 1);
     newOrder.splice(endIndex, 0, movedItem);
-    
+
     // Set optimistic update
     queryClient.setQueryData(['watchlist'], newOrder);
 
