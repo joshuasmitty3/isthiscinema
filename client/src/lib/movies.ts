@@ -62,13 +62,6 @@ export function useMovies() {
       });
       if (!response.ok) throw new Error('Failed to update watchlist order');
       return response.json();
-    },
-    onSuccess: () => {
-      // Invalidate and refetch both lists
-      Promise.all([
-        queryClient.invalidateQueries(['watchlist']),
-        queryClient.invalidateQueries(['watchedlist'])
-      ]);
     }
   });
 
