@@ -1,9 +1,8 @@
-
-import React from "react";
-import { Movie } from "@/lib/types";
-import { RiAddLine, RiEyeLine, RiDeleteBin6Line, RiStarLine, RiStarFill } from "react-icons/ri";
-import { Button } from "./ui/button";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { Movie } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { RiAddLine, RiEyeLine, RiDeleteBin6Line } from 'react-icons/ri';
 
 interface MovieCardProps {
   movie: Movie;
@@ -14,8 +13,9 @@ interface MovieCardProps {
 
 export default function MovieCard({ movie, onAction, actionType, isCompact = false }: MovieCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  
-  const handleAction = () => {
+
+  const handleAction = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (onAction) {
       onAction(movie);
     }
@@ -37,85 +37,70 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
             alt={movie.title}
             className="w-full h-full object-cover"
           />
-        
-        {/* Hover Overlay with Details */}
-        <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between text-white">
-          <div>
-            <h3 className="font-medium text-sm mb-1 line-clamp-2">{movie.title}</h3>
-            <p className="text-xs text-neutral-300">{movie.year}</p>
-            {movie.director && (
-              <p className="text-xs text-neutral-300 mt-1">{movie.director}</p>
-            )}
-            {movie.plot && (
-              <p className="text-xs text-neutral-200 mt-2 line-clamp-3">{movie.plot}</p>
-            )}
+
+          <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between text-white">
+            <div>
+              <h3 className="font-medium text-sm mb-1 line-clamp-2">{movie.title}</h3>
+              <p className="text-xs text-neutral-300">{movie.year}</p>
+              {movie.director && (
+                <p className="text-xs text-neutral-300 mt-1">{movie.director}</p>
+              )}
+              {movie.plot && (
+                <p className="text-xs text-neutral-200 mt-2 line-clamp-3">{movie.plot}</p>
+              )}
+            </div>
           </div>
 
-          {/* Action Button */}
-          {onAction && (
-            <Button
-              onClick={handleAction}
-              className={cn(
-                "w-full mt-2 transition-colors",
-                actionType === "add" && "bg-primary hover:bg-primary/90",
-                actionType === "watch" && "bg-emerald-600 hover:bg-emerald-700",
-                actionType === "remove" && "bg-red-600 hover:bg-red-700"
-              )}
-            >
-              <span className="flex items-center justify-center gap-2">
-                {actionType === "add" && <RiAddLine className="h-4 w-4" />}
-                {actionType === "watch" && <RiEyeLine className="h-4 w-4" />}
-                {actionType === "remove" && <RiDeleteBin6Line className="h-4 w-4" />}
-                {actionType === "add" && "Add to Watch"}
-                {actionType === "watch" && "Mark Watched"}
-                {actionType === "remove" && "Remove"}
-              </span>
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Rating Badge */}
-      {movie.inWatchedList && (
-        <div className="absolute top-2 right-2 bg-black/75 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
-          <RiStarFill className="h-3 w-3 text-yellow-400" />
-          {movie.rating ? (
-            <span>{movie.rating}/5</span>
-          ) : (
-            movie.review && <span>Reviewed</span>
-          )}
-        </div>
-      )}
-
-      {/* Quick Actions */}
-      {onAction && !isCompact && (
-        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/75 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="flex justify-end gap-2">
-            <Button
-              onClick={handleAction}
-              className={cn(
-                "text-xs transition-colors",
-                actionType === "add" && "bg-primary hover:bg-primary/90",
-                actionType === "watch" && "bg-emerald-600 hover:bg-emerald-700",
-                actionType === "remove" && "bg-red-600 hover:bg-red-700"
-              )}
-              size="sm"
-            >
-              <span className="flex items-center gap-1">
+          {/* Compact Action Buttons */}
+          {onAction && isCompact && (
+            <div className="absolute bottom-2 right-2">
+              <Button
+                onClick={handleAction}
+                size="sm"
+                variant="ghost"
+                className={cn(
+                  "text-xs text-white",
+                  actionType === "add" && "bg-primary/90 hover:bg-primary",
+                  actionType === "watch" && "bg-emerald-600/90 hover:bg-emerald-600",
+                  actionType === "remove" && "bg-red-600/90 hover:bg-red-600"
+                )}
+              >
                 {actionType === "add" && <RiAddLine className="h-3 w-3" />}
                 {actionType === "watch" && <RiEyeLine className="h-3 w-3" />}
                 {actionType === "remove" && <RiDeleteBin6Line className="h-3 w-3" />}
-                <span className="hidden sm:inline">
-                  {actionType === "add" && "Add"}
-                  {actionType === "watch" && "Watch"}
-                  {actionType === "remove" && "Remove"}
-                </span>
-              </span>
-            </Button>
-          </div>
+              </Button>
+            </div>
+          )}
+
+          {/* Regular Action Buttons */}
+          {onAction && !isCompact && (
+            <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/75 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex justify-end gap-2">
+                <Button
+                  onClick={handleAction}
+                  className={cn(
+                    "text-xs transition-colors",
+                    actionType === "add" && "bg-primary hover:bg-primary/90",
+                    actionType === "watch" && "bg-emerald-600 hover:bg-emerald-700",
+                    actionType === "remove" && "bg-red-600 hover:bg-red-700"
+                  )}
+                  size="sm"
+                >
+                  <span className="flex items-center gap-1">
+                    {actionType === "add" && <RiAddLine className="h-3 w-3" />}
+                    {actionType === "watch" && <RiEyeLine className="h-3 w-3" />}
+                    {actionType === "remove" && <RiDeleteBin6Line className="h-3 w-3" />}
+                    <span className="hidden sm:inline">
+                      {actionType === "add" && "Add"}
+                      {actionType === "watch" && "Watch"}
+                      {actionType === "remove" && "Remove"}
+                    </span>
+                  </span>
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
       ) : (
         <div className="aspect-[2/3] relative flex items-center justify-center p-4 bg-neutral-100">
           <h3 className="text-center font-medium text-sm">{movie.title}</h3>
