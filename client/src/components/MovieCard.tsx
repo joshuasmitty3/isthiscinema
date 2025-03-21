@@ -24,43 +24,43 @@ export default function MovieCard({ movie, onAction, actionType, isCompact = fal
   // Compact view for watch/watched lists
   if (isCompact) {
     return (
-      <div className={cn(
-        "group relative bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300",
-        isDragging && "opacity-50"
-      )}
+      <div 
+        className={cn(
+          "group relative bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
+          isDragging && "opacity-50"
+        )}
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="p-3 flex justify-between items-center">
-          <div>
-            <h3 className="font-medium text-sm">{movie.title}</h3>
-            <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
+        <div className="p-3">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="font-medium text-sm">{movie.title}</h3>
+              <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
+            </div>
+            {actionType && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAction();
+                }}
+                className="ml-2 text-xs shrink-0"
+              >
+                {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
+              </Button>
+            )}
           </div>
-          {actionType && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAction();
-              }}
-              className="ml-2 text-xs shrink-0"
-            >
-              {actionType === 'remove' ? 'Remove' : actionType === 'watch' ? 'Watch' : 'Add'}
-            </Button>
-          )}
-        </div>
-        
-        {expanded && (
-          <div className="p-3 pt-0">
-            <div className="aspect-[2/3] w-full max-w-[200px] mx-auto">
+          {expanded && (
+            <div className="mt-3">
               <img
                 src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
                 alt={movie.title}
-                className="w-full h-full object-cover rounded"
+                className="w-full max-w-[200px] mx-auto rounded"
               />
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }
