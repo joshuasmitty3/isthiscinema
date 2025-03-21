@@ -1,8 +1,8 @@
 
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { useCallback } from "react";
 import MovieCard from "./MovieCard";
 import { useMovies } from "@/lib/movies";
+import { useCallback } from "react";
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -26,16 +26,16 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         <h2 className="text-2xl font-bold mb-4">Watch List</h2>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="watchlist">
-            {(provided) => (
+            {(provided, snapshot) => (
               <div
-                ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="space-y-4"
+                ref={provided.innerRef}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
               >
-                {watchlist.map((movie, index) => (
-                  <Draggable 
-                    key={movie.imdbId} 
-                    draggableId={movie.imdbId} 
+                {watchlist?.map((movie, index) => (
+                  <Draggable
+                    key={movie.id}
+                    draggableId={movie.id.toString()}
                     index={index}
                   >
                     {(provided, snapshot) => (
@@ -44,8 +44,8 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                       >
-                        <MovieCard 
-                          movie={movie} 
+                        <MovieCard
+                          movie={movie}
                           actionType="watch"
                           isDragging={snapshot.isDragging}
                           isCompact={true}
@@ -66,8 +66,8 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         <h2 className="text-2xl font-bold mb-4">Watched List</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {watchedlist?.map((movie) => (
-            <MovieCard 
-              key={movie.imdbId}
+            <MovieCard
+              key={movie.id}
               movie={movie}
               actionType="remove"
               isCompact={true}
