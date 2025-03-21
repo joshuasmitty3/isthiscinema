@@ -17,7 +17,7 @@ interface MovieCardProps {
 }
 
 
-export default function MovieCard({ movie, onAction, actionType, isCompact, isLoading }: MovieCardProps) {
+export default function MovieCard({ movie, onAction, actionType, isCompact, isLoading, isDragging }: MovieCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
