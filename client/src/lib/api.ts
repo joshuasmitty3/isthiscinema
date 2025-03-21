@@ -85,3 +85,12 @@ export async function moveToWatched(movieId: number, review?: string) {
 export function getCSVExportUrl(): string {
   return "/api/export/csv";
 }
+export async function removeFromWatchedList(movieId: number) {
+  const response = await fetch(`/api/watchedlist/${movieId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to remove from watched list');
+  }
+  return response.json();
+}

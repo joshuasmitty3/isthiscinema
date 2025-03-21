@@ -340,6 +340,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/watchedlist/:movieId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId as number;
+      const movieId = parseInt(req.params.movieId, 10);
+
+      if (isNaN(movieId)) {
+        return res.status(400).json({ message: "Invalid movie ID" });
+      }
+
+      await storage.removeFromWatchedList(userId, movieId);
+      return res.status(200).json({ message: "Removed from watched list" });
+    } catch (error) {
+      console.error("Remove from watched list error:", error);
+      return res.status(500).json({ message: "Failed to remove from watched list" });
+    }
+  });
+
   app.post("/api/movies/:movieId/move-to-watched", requireAuth, async (req, res) => {
     try {
       const userId = req.session.userId as number;

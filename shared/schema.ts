@@ -111,3 +111,33 @@ export type OmdbDetailedMovie = {
   Website: string;
   Response: string;
 };
+
+
+// Storage interface
+export interface StorageInterface {
+  // User operations
+  getUser(id: number): Promise<User | null>;
+  getUserByUsername(username: string): Promise<User | null>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, data: Partial<User>): Promise<void>;
+  deleteUser(id: number): Promise<void>;
+
+  // Movie operations
+  getMovie(id: number): Promise<Movie | null>;
+  getMovieByImdbId(imdbId: string): Promise<Movie | null>;
+  createMovie(movie: InsertMovie): Promise<Movie>;
+  updateMovie(id: number, data: Partial<Movie>): Promise<void>;
+  deleteMovie(id: number): Promise<void>;
+
+  // Watch list operations
+  getWatchListForUser(userId: number): Promise<MovieWithDetails[]>;
+  addToWatchList(watchListItem: InsertWatchListItem): Promise<WatchListItem>;
+  removeFromWatchList(userId: number, movieId: number): Promise<void>;
+  updateWatchListOrder(userId: number, movieIds: number[]): Promise<void>;
+
+  // Watched list operations
+  getWatchedListForUser(userId: number): Promise<MovieWithDetails[]>;
+  addToWatchedList(watchedListItem: InsertWatchedListItem): Promise<WatchedListItem>;
+  updateReview(userId: number, movieId: number, review: string): Promise<void>;
+  removeFromWatchedList(userId: number, movieId: number): Promise<void>;
+}

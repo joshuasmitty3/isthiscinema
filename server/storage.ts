@@ -172,6 +172,16 @@ export class MemStorage implements IStorage {
   }
 
   // Watched list operations
+  async removeFromWatchedList(userId: number, movieId: number): Promise<void> {
+    const itemToRemove = Array.from(this.watchedListItems.values()).find(
+      item => item.userId === userId && item.movieId === movieId
+    );
+    
+    if (itemToRemove) {
+      this.watchedListItems.delete(itemToRemove.id);
+    }
+  }
+
   async getWatchedListForUser(userId: number): Promise<MovieWithDetails[]> {
     const watchedListItems = Array.from(this.watchedListItems.values())
       .filter(item => item.userId === userId)
