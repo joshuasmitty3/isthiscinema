@@ -25,14 +25,16 @@ export default function MovieCard({ movie, actionType, isDragging, isCompact, on
         }
       });
       if (response.ok) {
-        // Force refresh of both lists
         if (onListsChange) {
-          onListsChange();
-          onListsChange(); // Call twice to ensure both lists update
+          await Promise.all([
+            onListsChange(),
+            // Small delay to ensure both lists update
+            new Promise(resolve => setTimeout(resolve, 100)).then(() => onListsChange())
+          ]);
         }
       }
       toast({
-        title: "Success",
+        title: "Success", 
         description: `${movie.title} moved to watched list`,
       });
     } catch (error) {
