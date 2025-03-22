@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Movie } from "@/lib/types";
-import MovieSkeleton from "./MovieSkeleton";
+import { MovieSkeleton } from "./MovieSkeleton";
 import MovieDetail from "./MovieDetail";
 import { useState } from "react";
 
