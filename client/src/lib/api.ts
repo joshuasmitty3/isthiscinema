@@ -82,8 +82,12 @@ export async function moveToWatched(movieId: number, review?: string) {
   return response.json();
 }
 
-export function getCSVExportUrl(): string {
-  return "/api/export/csv";
+export async function exportToCSV(): Promise<Blob> {
+  const response = await fetch('/api/export/csv');
+  if (!response.ok) {
+    throw new Error('Failed to export CSV');
+  }
+  return response.blob();
 }
 export async function removeFromWatchedList(movieId: number) {
   const response = await fetch(`/api/watchedlist/${movieId}`, {

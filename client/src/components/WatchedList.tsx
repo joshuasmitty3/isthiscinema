@@ -12,6 +12,18 @@ import { ReviewModal } from "./ReviewModal";
 
 interface WatchedListProps {
   movies: Movie[];
+
+import { formatMovieForCSV, validateCSVData } from '@/lib/csvUtils';
+
+// Add this inside WatchedList component to test
+useEffect(() => {
+  if (movies.length > 0) {
+    const testRow = formatMovieForCSV(movies[0], 'Watched');
+    console.log('Test CSV Format:', testRow);
+    console.log('CSV Validation:', validateCSVData([testRow]));
+  }
+}, [movies]);
+
   onSelectMovie?: (movie: Movie) => void;
   onOpenReviewModal?: (movie: Movie) => void;
 }
@@ -21,8 +33,23 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false); //Added state for review modal
 
-  const handleExportCSV = () => {
-    window.open(getCSVExportUrl(), "_blank");
+  const handleExportCSV = async () => {
+    try {
+      const blob = await exportToCSV();
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.log('CSV Content Preview:', reader.result); // For testing
+      };
+      reader.readAsText(blob);
+      
+      downloadBlob(
+        await blob.text(),
+        `movie-list-${new Date().toISOString().split('T')[0]}.csv`,
+        'text/csv'
+      );
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
   };
 
   const handleMovieClick = (movie: Movie) => {
