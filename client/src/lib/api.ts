@@ -29,19 +29,8 @@ export async function getMovieDetails(imdbId: string): Promise<Movie> {
 }
 
 export async function login(username: string, password: string): Promise<User> {
-  const response = await fetch('/api/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Invalid credentials');
-  }
-
-  return response.json();
+  const res = await apiRequest("POST", "/api/login", { username, password });
+  return await res.json();
 }
 
 export async function addToWatchList(movieId: number): Promise<void> {
@@ -103,12 +92,12 @@ export async function removeFromWatchedList(movieId: number) {
   if (!response.ok) {
     throw new Error('Failed to remove from watched list');
   }
-
+  
   const queryClient = new QueryClient();
   await Promise.all([
     queryClient.invalidateQueries(['watchlist']),
     queryClient.invalidateQueries(['watchedlist'])
   ]);
-
+  
   return response.json();
 }
