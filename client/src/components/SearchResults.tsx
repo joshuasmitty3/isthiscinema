@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getMovieDetails } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
-import { RiAddLine as Plus } from "react-icons/ri";
+import { RiAddLine } from "react-icons/ri";
 import { Movie, SearchResult } from "@/lib/types";
 import { Button } from "./ui/button";
 import { LoadingSpinner } from "./ui/loading-spinner";
@@ -36,19 +36,8 @@ export default function SearchResults({
   const { toast } = useToast();
 
   const handleAddToWatchList = async (searchResult: SearchResult) => {
-    if (addingMovie === searchResult.imdbID) return;
-
-    setAddingMovie(searchResult.imdbID);
-
-    // Play success sound
-    new Audio('/success.mp3').play().catch(console.error);
-
-    // Animate the clicked button
-    const button = document.querySelector(`button[data-movie-id="${searchResult.imdbID}"]`);
-    button?.classList.add('animate-success');
-    setTimeout(() => button?.classList.remove('animate-success'), 500);
-
     try {
+      setAddingMovie(searchResult.imdbID);
       const movie = await getMovieDetails(searchResult.imdbID);
       console.log("Movie details fetched:", movie); // Added logging for debugging
       const order = 1; //  Simplified order - needs better implementation in a real app
@@ -63,6 +52,13 @@ export default function SearchResults({
           userId: 1 // This should match the logged in user's ID
         }),
       });
+
+      // Play success sound
+      new Audio('/success.mp3').play().catch(console.error);
+      // Trigger button animation via class
+      const button = document.querySelector(`button[data-movie-id="${searchResult.imdbID}"]`);
+      button?.classList.add('animate-success');
+      setTimeout(() => button?.classList.remove('animate-success'), 500);
 
       if (onListsChange) { //Added check to prevent errors if onListsChange is undefined
         onListsChange();
@@ -132,9 +128,8 @@ export default function SearchResults({
                   className="absolute top-2 right-2 p-1 bg-primary/90 text-white rounded-full hover:bg-primary"
                   size="icon"
                   variant="ghost"
-                  data-movie-id={result.imdbID}
                 >
-                  <Plus className="h-4 w-4" />
+                  <RiAddLine className="h-4 w-4" />
                 </Button>
               </div>
               <div className="p-2">

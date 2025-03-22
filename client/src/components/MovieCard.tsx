@@ -10,7 +10,7 @@ import { MovieSkeleton } from './MovieSkeleton'; // Assuming this component exis
 interface MovieCardProps {
   movie: Movie;
   onAction?: (movie: Movie) => void;
-  actionType?: 'watch' | 'remove' | 'add'; // Added 'add' to actionType
+  actionType?: 'watch' | 'remove';
   isCompact?: boolean;
   isLoading?: boolean;
   isDragging?: boolean;
@@ -20,7 +20,6 @@ interface MovieCardProps {
 export default function MovieCard({ movie, onAction, actionType, isCompact, isLoading, isDragging }: MovieCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const successSound = new Audio('/success.mp3'); // Assume this path is correct. Adjust as needed
 
   if (isLoading) {
     return <MovieSkeleton showActions={!!actionType} />;
@@ -85,31 +84,6 @@ export default function MovieCard({ movie, onAction, actionType, isCompact, isLo
     });
   };
 
-  const handleAddToWatchList = async () => {
-    successSound.play().catch(console.error); // Play sound effect
-    // Add your API call to add to watchlist here
-    try {
-      const response = await fetch(`/api/movies/${movie.id}/add-to-watchlist`, { //Example endpoint
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        await queryClient.invalidateQueries(['watchlist']);
-        if (onAction) {
-          await onAction(movie);
-        }
-        toast({ title: "Success", description: `${movie.title} added to watchlist` });
-      } else {
-        toast({ title: "Error", description: "Failed to add movie to watchlist", variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to add movie to watchlist", variant: "destructive" });
-    }
-
-  };
-
 
   if (isCompact) {
     return (
@@ -126,10 +100,10 @@ export default function MovieCard({ movie, onAction, actionType, isCompact, isLo
             <Button
               size="sm"
               variant="ghost"
-              onClick={actionType === 'watch' ? handleMoveToWatched : (actionType === 'remove' ? handleRemoveFromWatched : handleAddToWatchList)} // Added ternary for 'add'
-              className={`px-2 h-7 text-xs shrink-0 ${actionType === 'add' ? 'animate-success group' : ''}`} // Added animation class conditionally
+              onClick={actionType === 'watch' ? handleMoveToWatched : handleRemoveFromWatched}
+              className="px-2 h-7 text-xs shrink-0"
             >
-              {actionType === 'watch' ? '✓ Watch' : (actionType === 'remove' ? 'Remove' : 'Add to Watchlist')} {/* Added 'Add to Watchlist' */}
+              {actionType === 'watch' ? '✓ Watch' : 'Remove'}
             </Button>
           )}
         </div>
@@ -146,11 +120,6 @@ export default function MovieCard({ movie, onAction, actionType, isCompact, isLo
           <p className="text-gray-600 mb-2">{movie.year}</p>
           <p className="text-gray-600 mb-4">{movie.director}</p>
         </>
-      )}
-      {actionType === 'add' && (
-        <Button onClick={handleAddToWatchList} className="w-full animate-success group"> {/* Added animation class */}
-          Add to Watchlist
-        </Button>
       )}
       {actionType === 'watch' && (
         <Button onClick={handleMoveToWatched} className="w-full">
