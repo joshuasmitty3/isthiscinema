@@ -16,10 +16,6 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
     window.open(getCSVExportUrl(), "_blank");
   };
 
-  const handleMovieClick = (movie: Movie) => {
-    onSelectMovie(movie);
-  };
-
   return (
     <Card className="border border-neutral-200">
       <CardContent className="p-4">
@@ -49,7 +45,7 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
                 <div className="flex items-start p-3">
                   <div 
                     className="w-20 h-28 flex-shrink-0 rounded overflow-hidden cursor-pointer"
-                    onClick={() => handleMovieClick(movie)}
+                    onClick={() => onSelectMovie(movie)}
                   >
                     <img 
                       src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
@@ -61,7 +57,7 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
                     <div className="flex justify-between items-start">
                       <h3 
                         className="font-medium cursor-pointer"
-                        onClick={() => handleMovieClick(movie)}
+                        onClick={() => onSelectMovie(movie)}
                       >
                         {movie.title}
                       </h3>
@@ -72,18 +68,18 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
                     <p className="text-xs text-neutral-600 mb-1">
                       {movie.year} • {movie.director}
                     </p>
-
+                    
                     {movie.review && (
                       <div className="mt-2 bg-neutral-100 rounded p-2">
                         <p className="text-xs line-clamp-2">{movie.review}</p>
                       </div>
                     )}
-
+                    
                     <div className="mt-2 flex space-x-2">
                       <Button
                         size="sm"
                         className="text-xs px-2 py-1 bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-                        onClick={() => handleMovieClick(movie)}
+                        onClick={() => onSelectMovie(movie)}
                       >
                         Details
                       </Button>
