@@ -1,9 +1,10 @@
+
 import { useState, useCallback } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Card, CardContent } from "@/components/ui/card";
-import { useMovies } from "../hooks/use-movies";
+import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
-import { Movie } from "@/lib/types";
+import type { Movie } from "@/lib/types";
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -33,8 +34,8 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   };
 
   const handleDragEnd = useCallback(async (result: any) => {
-    setIsDragging(true);
     if (!result.destination) return;
+    setIsDragging(true);
 
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
@@ -46,13 +47,10 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     queryClient.setQueryData(['watchlist'], newOrder);
 
     try {
-      await reorderWatchlist(
-        result.draggableId,
-        startIndex,
-        endIndex
-      );
+      await reorderWatchlist(startIndex, endIndex);
     } catch (error) {
       console.error('Failed to reorder watchlist:', error);
+      queryClient.invalidateQueries(['watchlist']);
     } finally {
       setIsDragging(false);
     }
@@ -60,31 +58,36 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   return (
     <Card className="border border-neutral-200">
-      <CardContent className="p-4">
-        <h2 className="text-lg font-medium font-heading mb-4">Watch List</h2>
+      <CardContent>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="watchlist">
             {(provided) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="space-y-4"
+                className="space-y-2"
               >
-                {watchlist.map((movie, index) => (
-                  <Draggable key={movie.id} draggableId={movie.id.toString()} index={index}>
+                {watchlist?.map((movie, index) => (
+                  <Draggable
+                    key={movie.id}
+                    draggableId={movie.id.toString()}
+                    index={index}
+                  >
                     {(provided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                        className={`bg-white p-4 rounded-lg shadow-sm border border-neutral-200 ${
+                          isDragging ? 'opacity-50' : ''
+                        }`}
                       >
-                        <div className="flex items-start p-3">
-                          <div className="w-20 h-28 flex-shrink-0 rounded overflow-hidden">
-                            <img 
-                              src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-                              alt={movie.title} 
-                              className="w-full h-full object-cover"
+                        <div className="flex items-center">
+                          <div className="w-12 h-16 flex-shrink-0">
+                            <img
+                              src={movie.poster}
+                              alt={movie.title}
+                              className="w-full h-full object-cover rounded"
                             />
                           </div>
                           <div className="flex-1 pl-3 min-w-0">
