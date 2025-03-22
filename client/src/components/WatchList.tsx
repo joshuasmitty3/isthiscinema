@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,12 +42,12 @@ export default function WatchList({ onListsChange }: WatchListProps) {
           'Content-Type': 'application/json',
         }
       });
-
+      
       await Promise.all([
         queryClient.invalidateQueries(['watchlist']),
         queryClient.invalidateQueries(['watchedlist'])
       ]);
-
+      
       if (onListsChange) {
         onListsChange();
       }
@@ -63,10 +64,10 @@ export default function WatchList({ onListsChange }: WatchListProps) {
           'Content-Type': 'application/json',
         }
       });
-
+      
       await queryClient.invalidateQueries(['watchlist']);
       await queryClient.invalidateQueries(['watchedlist']);
-
+      
       if (onListsChange) {
         onListsChange();
       }

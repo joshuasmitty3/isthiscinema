@@ -38,7 +38,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
             <TabsTrigger value="search" className="flex-1">Search</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="watchlist" forceMount>
+          <TabsContent value="watchlist">
             <WatchList 
               onListsChange={() => {
                 queryClient.invalidateQueries({ queryKey: ["watchlist"] });
@@ -46,14 +46,8 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
             />
           </TabsContent>
 
-          <TabsContent value="watched" forceMount>
-            <WatchedList 
-              movies={watchedList} 
-              onSelectMovie={() => {}}
-              onListsChange={() => {
-                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
-              }}
-            />
+          <TabsContent value="watched">
+            <WatchedList movies={watchedList} />
           </TabsContent>
 
           <TabsContent value="search">
