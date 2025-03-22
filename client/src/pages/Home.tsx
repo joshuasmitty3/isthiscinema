@@ -9,6 +9,7 @@ import ReviewModal from "@/components/ReviewModal";
 import { Movie, SearchResult, User } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Search } from "lucide-react";
 
 export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const queryClient = useQueryClient();
@@ -34,7 +35,9 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           <TabsList className="w-full mb-4">
             <TabsTrigger value="watchlist" className="flex-1">Watch List</TabsTrigger>
             <TabsTrigger value="watched" className="flex-1">Watched</TabsTrigger>
-            <TabsTrigger value="search" className="flex-1">Search</TabsTrigger>
+            <TabsTrigger value="search" className="flex-1">
+              <Search className="h-4 w-4" />
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="watchlist">
