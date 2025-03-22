@@ -33,6 +33,23 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   };
 
+  const handleMoveToWatchedList = async (movie: Movie) => {
+    try {
+      await fetch(`/api/watchlist/${movie.id}/watched`, {
+        method: 'POST',
+      });
+      
+      await queryClient.invalidateQueries(['watchlist']);
+      await queryClient.invalidateQueries(['watchedlist']);
+      
+      if (onListsChange) {
+        onListsChange();
+      }
+    } catch (error) {
+      console.error('Failed to mark as watched:', error);
+    }
+  };
+
   const handleMoveToWatched = async (movie: Movie) => {
     try {
       await fetch(`/api/watchlist/${movie.id}/watched`, {
@@ -114,7 +131,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                             </div>
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => handleMoveToWatched(movie)}
+                                onClick={() => handleMoveToWatchedList(movie)}
                                 className="flex items-center justify-center h-6 w-6 rounded-md bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 text-[#4CAF50] transition-colors"
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
