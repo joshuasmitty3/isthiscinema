@@ -22,15 +22,20 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         method: 'DELETE',
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error('Failed to remove movie');
+        throw new Error(data.message || 'Failed to remove movie');
       }
 
+      console.log(`Successfully removed movie ${movie.title} from watchlist`);
+      
       if (onListsChange) {
         onListsChange();
       }
     } catch (error) {
       console.error('Failed to remove movie:', error);
+      // Here we could add UI error feedback
     }
   };
 

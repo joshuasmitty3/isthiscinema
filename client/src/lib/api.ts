@@ -61,25 +61,34 @@ export async function updateReview(movieId: number, review: string): Promise<voi
 }
 
 export async function moveToWatched(movieId: number, review?: string) {
-  const response = await fetch(`/api/movies/${movieId}/move-to-watched`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ review }),
-  });
+  try {
+    const response = await fetch(`/api/movies/${movieId}/move-to-watched`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ review }),
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to move movie to watched');
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to move movie to watched');
+    }
+
+    console.log(`Successfully moved movie ${movieId} to watched list`);
+
+    const queryClient = new QueryClient();
+    await Promise.all([
+      queryClient.invalidateQueries(['watchlist']),
+      queryClient.invalidateQueries(['watchedlist'])
+    ]);
+
+    return data;
+  } catch (error) {
+    console.error('Error moving movie to watched:', error);
+    throw error; // Re-throw to handle in the component
   }
-
-  const queryClient = new QueryClient();
-  await Promise.all([
-    queryClient.invalidateQueries(['watchlist']),
-    queryClient.invalidateQueries(['watchedlist'])
-  ]);
-
-  return response.json();
 }
 
 export async function exportToCSV(): Promise<Blob> {

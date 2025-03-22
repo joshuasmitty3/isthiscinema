@@ -247,17 +247,33 @@ export class MemStorage implements IStorage {
 
   // Move between lists
   async moveToWatched(userId: number, movieId: number, review?: string): Promise<void> {
-    // Remove from watch list
-    await this.removeFromWatchList(userId, movieId);
-    
-    // Add to watched list
-    await this.addToWatchedList({
-      userId,
-      movieId,
-      watchedDate: new Date(),
-      review,
-      rating: null
-    });
+    try {
+      // Check if movie exists in watch list
+      const watchListItem = Array.from(this.watchListItems.values()).find(
+        item => item.userId === userId && item.movieId === movieId
+      );
+      
+      if (!watchListItem) {
+        throw new Error('Movie not found in watch list');
+      }
+
+      // Remove from watch list
+      await this.removeFromWatchList(userId, movieId);
+      
+      // Add to watched list
+      await this.addToWatchedList({
+        userId,
+        movieId,
+        watchedDate: new Date(),
+        review,
+        rating: null
+      });
+
+      console.log(`Successfully moved movie ${movieId} to watched list for user ${userId}`);
+    } catch (error) {
+      console.error('Error in moveToWatched:', error);
+      throw error;
+    }
   }
 }
 

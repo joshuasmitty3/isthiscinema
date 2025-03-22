@@ -367,15 +367,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid movie ID" });
       }
 
-      if (review && (typeof review !== 'string' || review.length > 140)) {
-        return res.status(400).json({ message: "Review must be a string with max 140 characters" });
+      if (review && typeof review !== 'string') {
+        return res.status(400).json({ message: "Review must be a string" });
+      }
+
+      if (review && review.length > 140) {
+        return res.status(400).json({ message: "Review must not exceed 140 characters" });
       }
 
       await storage.moveToWatched(userId, movieId, review);
+      console.log(`User ${userId} moved movie ${movieId} to watched list`);
 
       return res.status(200).json({ message: "Moved to watched list" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Move to watched error:", error);
+      if (error.message === 'Movie not found in watch list') {
+        return res.status(404).json({ message: error.message });
+      }
       return res.status(500).json({ message: "Failed to move to watched list" });
     }
   });
