@@ -9,11 +9,11 @@ import { useState } from "react";
 
 interface WatchedListProps {
   movies: Movie[];
-  onSelectMovie: (movie: Movie) => void;
-  onOpenReviewModal: (movie: Movie) => void;
+  onSelectMovie?: (movie: Movie) => void;
+  onOpenReviewModal?: (movie: Movie) => void;
 }
 
-export default function WatchedList({ movies, onOpenReviewModal }: WatchedListProps) {
+export default function WatchedList({ movies, onOpenReviewModal = () => {} }: WatchedListProps) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
