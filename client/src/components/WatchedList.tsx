@@ -26,18 +26,19 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
 
   const handleExportCSV = async () => {
     try {
-      const blob = await exportToCSV();
-      const reader = new FileReader();
-      reader.onload = () => {
-        console.log('CSV Content Preview:', reader.result); // For testing
-      };
-      reader.readAsText(blob);
-      
-      downloadBlob(
-        await blob.text(),
-        `movie-list-${new Date().toISOString().split('T')[0]}.csv`,
-        'text/csv'
-      );
+      const response = await fetch('/api/export/csv');
+      if (!response.ok) {
+        throw new Error('Failed to export CSV');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `movie-list-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Export failed:', error);
     }
