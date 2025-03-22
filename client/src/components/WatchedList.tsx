@@ -4,6 +4,8 @@ import { Movie } from "@/lib/types";
 import { format } from "date-fns";
 import { getCSVExportUrl } from "@/lib/api";
 import { RiDownloadLine } from "react-icons/ri";
+import MovieDetail from "./MovieDetail"; // Assuming MovieDetail component exists
+import { useState } from "react";
 
 interface WatchedListProps {
   movies: Movie[];
@@ -12,17 +14,25 @@ interface WatchedListProps {
 }
 
 export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }: WatchedListProps) {
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null); //Added state for modal
+
   const handleExportCSV = () => {
     window.open(getCSVExportUrl(), "_blank");
   };
 
   const handleMovieClick = (movie: Movie) => {
+    setSelectedMovie(movie); //Sets the movie to display in the modal
     if (onSelectMovie) {
       onSelectMovie(movie);
     }
   };
 
+  const handleCloseModal = () => {
+    setSelectedMovie(null);
+  };
+
   return (
+    <div> {/*Added a div to encompass both the list and modal */}
     <Card className="border border-neutral-200">
       <CardContent className="p-4">
         <div className="flex justify-between items-center mb-4">
@@ -44,31 +54,31 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
         ) : (
           <div className="space-y-4">
             {movies.map((movie) => (
-              <div 
+              <div
                 key={movie.id}
                 className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start p-3">
-                  <div 
+                  <div
                     className="w-20 h-28 flex-shrink-0 rounded overflow-hidden cursor-pointer"
                     onClick={() => handleMovieClick(movie)}
                   >
-                    <img 
+                    <img
                       src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-                      alt={movie.title} 
+                      alt={movie.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="flex-1 pl-3 min-w-0">
                     <div className="flex justify-between items-start">
-                      <h3 
+                      <h3
                         className="font-medium cursor-pointer"
                         onClick={() => handleMovieClick(movie)}
                       >
                         {movie.title}
                       </h3>
                       <span className="text-xs text-neutral-600 whitespace-nowrap">
-                        {movie.watchedDate ? format(new Date(movie.watchedDate), 'MMM d, yyyy') : 'N/A'}
+                        {movie.watchedDate ? format(new Date(movie.watchedDate), "MMM d, yyyy") : "N/A"}
                       </span>
                     </div>
                     <p className="text-xs text-neutral-600 mb-1">
@@ -105,5 +115,9 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
         )}
       </CardContent>
     </Card>
+    {selectedMovie && ( // Conditional rendering of the modal
+      <MovieDetail movie={selectedMovie} onClose={handleCloseModal} />
+    )}
+    </div>
   );
 }
