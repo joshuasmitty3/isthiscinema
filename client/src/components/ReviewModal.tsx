@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Movie } from "@/lib/types";
 import { updateReview } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReviewModalProps {
   movie: Movie | null;
@@ -26,15 +27,15 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
     }
   }, [movie, isOpen]);
 
+  const queryClient = useQueryClient();
+  
   const handleSave = async () => {
     if (!movie) return;
 
     try {
       setIsLoading(true);
       await updateReview(movie.id, review);
-
-
-      onSave();
+      await queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
       onClose();
     } catch (error) {
       console.error("Failed to save review:", error);
