@@ -13,11 +13,11 @@ interface ReviewModalProps {
   onSave: () => void;
 }
 
-export default function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps) {
+export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps) {
   const [review, setReview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  
+
   const maxLength = 140;
 
   useEffect(() => {
@@ -28,17 +28,18 @@ export default function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewMo
 
   const handleSave = async () => {
     if (!movie) return;
-    
+
     try {
       setIsLoading(true);
       await updateReview(movie.id, review);
-      
+
       toast({
         title: "Review saved",
         description: "Your review has been saved successfully.",
       });
-      
+
       onSave();
+      onClose();
     } catch (error) {
       console.error("Failed to save review:", error);
       toast({
@@ -59,12 +60,12 @@ export default function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewMo
         <DialogHeader>
           <DialogTitle className="text-lg font-medium font-heading">Add Your Review</DialogTitle>
         </DialogHeader>
-        
+
         <div className="p-4">
           <h4 className="text-base font-medium mb-2">
             {movie.title} ({movie.year})
           </h4>
-          
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Your Review</label>
             <Textarea 
@@ -78,84 +79,13 @@ export default function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewMo
               {review.length}/{maxLength} characters
             </div>
           </div>
-          
+
           <div className="flex justify-end space-x-3">
             <Button 
               variant="outline"
               onClick={onClose}
               className="py-2 px-4 border border-neutral-200 text-neutral-600 rounded-md hover:bg-neutral-100"
             >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSave}
-              disabled={isLoading}
-              className="py-2 px-4 bg-primary text-white rounded-md hover:bg-primary/90"
-            >
-              Save Review
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Button } from "./ui/button";
-import { useToast } from "./ui/use-toast";
-import { updateReview } from "@/lib/api";
-import type { Movie } from "@/lib/types";
-
-interface ReviewModalProps {
-  movie: Movie | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
-}
-
-export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps) {
-  const [review, setReview] = useState(movie?.review || "");
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSave = async () => {
-    if (!movie) return;
-    
-    try {
-      setIsLoading(true);
-      await updateReview(movie.id, review);
-      toast({ description: "Review saved successfully" });
-      onSave();
-      onClose();
-    } catch (error) {
-      console.error("Failed to save review:", error);
-      toast({ 
-        variant: "destructive",
-        description: "Failed to save review" 
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Review {movie?.title}</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <textarea
-            value={review}
-            onChange={(e) => setReview(e.target.value)}
-            maxLength={140}
-            rows={4}
-            className="w-full p-2 border rounded-md"
-            placeholder="Write your review (max 140 characters)"
-          />
-          <div className="flex justify-end space-x-2">
-            <Button onClick={onClose} variant="outline">
               Cancel
             </Button>
             <Button 
