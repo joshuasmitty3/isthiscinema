@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { Switch, Route, useLocation, Redirect } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import { LoadingSpinner } from "./components/ui/loading-spinner";
 import Login from "@/pages/Login";
 import Home from "@/pages/Home";
@@ -9,62 +10,52 @@ import { apiRequest } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import type { User } from "./lib/types";
 
 function App() {
-  const [location, setLocation] = useState<{ pathname: string; }>(useLocation());
-  const [user, setUser] = useState<{ id: number; username: string } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [location, setLocation] = useLocation();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/me", {
-          credentials: "include",
-        });
-
-        if (res.ok) {
-          const userData = await res.json();
-          setUser(userData);
-        }
-      } catch (error) {
-        console.error("Auth check failed:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     checkAuth();
   }, []);
 
-  const handleLogout = async () => {
+  async function checkAuth() {
     try {
-      await apiRequest("POST", "/api/logout", {});
-      setUser(null);
-      setLocation({pathname: "/login"});
+      const response = await apiRequest<User>("/api/me");
+      setUser(response);
     } catch (error) {
-      console.error("Logout failed:", error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" className="text-primary" />
-      </div>
-    );
+  async function handleLogout() {
+    await apiRequest("/api/logout", { method: "POST" });
+    setUser(null);
+    setLocation("/login");
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />;
   }
 
   return (
-    <Switch location={location}>
-      <Route path="/login">
-        {user ? <Redirect to="/" /> : <Login onLoginSuccess={setUser} />}
-      </Route>
-      <Route path="/test/movie-card" component={MovieCardTest} />
-      <Route path="/">
-        {!user ? <Redirect to="/login" /> : <Home user={user} onLogout={handleLogout} />}
-      </Route>
-      <Route component={NotFound} />
-    </Switch>
+    <QueryClientProvider client={queryClient}>
+      <Switch>
+        <Route path="/login">
+          {user ? (setLocation("/"), null) : <Login onLogin={setUser} />}
+        </Route>
+        <Route path="/test/movie-card" component={MovieCardTest} />
+        <Route path="/">
+          {!user ? (setLocation("/login"), null) : <Home user={user} onLogout={handleLogout} />}
+        </Route>
+        <Route component={NotFound} />
+      </Switch>
+      <Toaster />
+    </QueryClientProvider>
   );
 }
 
