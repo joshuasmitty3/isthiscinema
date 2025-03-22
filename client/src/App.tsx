@@ -73,19 +73,6 @@ function Router() {
   );
 }
 
-function Router() {
-  const [location] = useLocation();
-
-  return (
-    <Switch location={location}>
-      <Route path="/" component={Home} />
-      <Route path="/login" component={Login} />
-      <Route path="/test" component={MovieCardTest} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
-
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
