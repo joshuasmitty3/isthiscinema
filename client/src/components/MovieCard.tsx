@@ -76,6 +76,43 @@ export default function MovieCard({ movie, onAction, actionType, isCompact, isLo
     queryClient.invalidateQueries(['watchedlist']);
   };
 
+  if (isCompact) {
+    return (
+      <>
+        <div className={cn(
+          "group relative bg-white border border-neutral-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300",
+          isDragging && "opacity-50"
+        )}>
+          <div className="p-3 flex items-center gap-2" onClick={() => setIsDetailOpen(true)}>
+            <div className="min-w-0 flex-1 cursor-pointer">
+              <h3 className="font-medium text-sm truncate">{movie.title}</h3>
+              <p className="text-xs text-neutral-600 truncate">{movie.year} • {movie.director}</p>
+            </div>
+            {actionType && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  actionType === 'watch' ? handleMoveToWatched() : handleRemoveFromWatched();
+                }}
+                className="px-2 h-7 text-xs shrink-0"
+              >
+                {actionType === 'watch' ? '✓ Watch' : 'Remove'}
+              </Button>
+            )}
+          </div>
+        </div>
+        <MovieDetail 
+          movie={movie}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          onListsChange={handleListsChange}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <div className={`bg-white rounded-lg shadow-md p-4 ${isDragging ? 'opacity-50' : ''}`}>
@@ -85,12 +122,8 @@ export default function MovieCard({ movie, onAction, actionType, isCompact, isLo
         >
           <img src={movie.poster} alt={movie.title} className="w-full h-48 object-cover rounded-md mb-4" />
           <h3 className="text-lg font-semibold mb-2">{movie.title}</h3>
-          {!isCompact && (
-            <>
-              <p className="text-gray-600 mb-2">{movie.year}</p>
-              <p className="text-gray-600 mb-4">{movie.director}</p>
-            </>
-          )}
+          <p className="text-gray-600 mb-2">{movie.year}</p>
+          <p className="text-gray-600 mb-4">{movie.director}</p>
         </div>
         {actionType === 'watch' && (
           <Button onClick={handleMoveToWatched} className="w-full">
