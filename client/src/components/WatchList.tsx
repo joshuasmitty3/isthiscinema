@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Movie } from "@/lib/types";
+import { moveToWatched } from "@/lib/api";
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -35,13 +36,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   const handleMoveToWatchedList = async (movie: Movie) => {
     try {
-      await fetch(`/api/watchlist/${movie.id}/watched`, {
-        method: 'POST',
-      });
-      
-      await queryClient.invalidateQueries(['watchlist']);
-      await queryClient.invalidateQueries(['watchedlist']);
-      
+      await moveToWatched(movie.id);
       if (onListsChange) {
         onListsChange();
       }
