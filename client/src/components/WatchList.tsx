@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Card, CardContent } from "@/components/ui/card";
-import { useMovies } from "@/hooks/use-movies";
+import { useMovies } from "../hooks/use-movies";
 import { useQueryClient } from "@tanstack/react-query";
 import { Movie } from "@/lib/types";
 
