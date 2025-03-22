@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import { Movie } from "@/lib/types";
-import { useState } from "react";
-import { moveToWatched, removeFromWatchedList as apiRemoveFromWatchedList } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { MovieSkeleton } from './MovieSkeleton'; // Assuming this component exists
+import { Movie } from "@/lib/types";
+import MovieSkeleton from "./MovieSkeleton";
+import MovieDetail from "./MovieDetail";
+import { useState } from "react";
 
 interface MovieCardProps {
   movie: Movie;
@@ -16,10 +16,10 @@ interface MovieCardProps {
   isDragging?: boolean;
 }
 
-
 export default function MovieCard({ movie, onAction, actionType, isCompact, isLoading, isDragging }: MovieCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   if (isLoading) {
     return <MovieSkeleton showActions={!!actionType} />;
@@ -60,77 +60,55 @@ export default function MovieCard({ movie, onAction, actionType, isCompact, isLo
       method: 'DELETE',
     });
 
-    if (!response.ok) {
+    if (response.ok) {
+      if (onAction) {
+        onAction(movie);
+      }
       toast({
-        title: "Failed to remove movie",
-        description: "There was an error removing the movie from your watched list.",
-        variant: "destructive",
+        title: "Success",
+        description: `${movie.title} removed from watched list`,
       });
-      return;
     }
-
-    await Promise.all([
-      queryClient.invalidateQueries(['watchlist']),
-      queryClient.invalidateQueries(['watchedlist'])
-    ]);
-
-    if (onAction) {
-      onAction(movie);
-    }
-
-    toast({
-      title: "Removed from Watched",
-      description: `${movie.title} has been removed from your watched list.`,
-    });
   };
 
-
-  if (isCompact) {
-    return (
-      <div className={cn(
-        "group relative bg-white border border-neutral-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300",
-        isDragging && "opacity-50"
-      )}>
-        <div className="p-3 flex items-center gap-2">
-          <div className="min-w-0 flex-1">
-            <h3 className="font-medium text-sm truncate">{movie.title}</h3>
-            <p className="text-xs text-neutral-600 truncate">{movie.year} • {movie.director}</p>
-          </div>
-          {actionType && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={actionType === 'watch' ? handleMoveToWatched : handleRemoveFromWatched}
-              className="px-2 h-7 text-xs shrink-0"
-            >
-              {actionType === 'watch' ? '✓ Watch' : 'Remove'}
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  const handleListsChange = () => {
+    queryClient.invalidateQueries(['watchlist']);
+    queryClient.invalidateQueries(['watchedlist']);
+  };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-4 ${isDragging ? 'opacity-50' : ''}`}>
-      <img src={movie.poster} alt={movie.title} className="w-full h-48 object-cover rounded-md mb-4" />
-      <h3 className="text-lg font-semibold mb-2">{movie.title}</h3>
-      {!isCompact && (
-        <>
-          <p className="text-gray-600 mb-2">{movie.year}</p>
-          <p className="text-gray-600 mb-4">{movie.director}</p>
-        </>
-      )}
-      {actionType === 'watch' && (
-        <Button onClick={handleMoveToWatched} className="w-full">
-          Move to Watched
-        </Button>
-      )}
-      {actionType === 'remove' && (
-        <Button onClick={handleRemoveFromWatched} className="w-full">
-          Remove from Watched
-        </Button>
-      )}
-    </div>
+    <>
+      <div className={`bg-white rounded-lg shadow-md p-4 ${isDragging ? 'opacity-50' : ''}`}>
+        <div 
+          onClick={() => setIsDetailOpen(true)}
+          className="cursor-pointer"
+        >
+          <img src={movie.poster} alt={movie.title} className="w-full h-48 object-cover rounded-md mb-4" />
+          <h3 className="text-lg font-semibold mb-2">{movie.title}</h3>
+          {!isCompact && (
+            <>
+              <p className="text-gray-600 mb-2">{movie.year}</p>
+              <p className="text-gray-600 mb-4">{movie.director}</p>
+            </>
+          )}
+        </div>
+        {actionType === 'watch' && (
+          <Button onClick={handleMoveToWatched} className="w-full">
+            Move to Watched
+          </Button>
+        )}
+        {actionType === 'remove' && (
+          <Button onClick={handleRemoveFromWatched} className="w-full">
+            Remove from Watched
+          </Button>
+        )}
+      </div>
+      <MovieDetail 
+        movie={movie}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        onListsChange={handleListsChange}
+      />
+    </>
   );
 }
