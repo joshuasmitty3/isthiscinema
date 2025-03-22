@@ -48,16 +48,16 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   }, [watchlist, queryClient]);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Watch List</h2>
+    <Card className="border border-neutral-200">
+      <CardContent className="p-4">
+        <h2 className="text-lg font-medium font-heading mb-4">Watch List</h2>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="watchlist">
             {(provided) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                className="space-y-4"
               >
                 {watchlist.map((movie, index) => (
                   <Draggable key={movie.id} draggableId={movie.id.toString()} index={index}>
@@ -66,13 +66,26 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
+                        className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                       >
-                        <MovieCard
-                          movie={movie}
-                          actionType="watch"
-                          isCompact={true}
-                          onListsChange={onListsChange}
-                        />
+                        <div className="flex items-start p-3">
+                          <div className="w-20 h-28 flex-shrink-0 rounded overflow-hidden">
+                            <img 
+                              src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
+                              alt={movie.title} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 pl-3 min-w-0">
+                            <h3 className="font-medium">{movie.title}</h3>
+                            <MovieCard
+                              movie={movie}
+                              actionType="watch"
+                              isCompact={true}
+                              onListsChange={onListsChange}
+                            />
+                          </div>
+                        </div>
                       </div>
                     )}
                   </Draggable>
