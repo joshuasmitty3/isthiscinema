@@ -53,10 +53,12 @@ export default function SearchResults({
         }),
       });
 
-      toast({
-        title: "Added to Watch List",
-        description: `${searchResult.Title} has been added to your watch list.`,
-      });
+      // Play success sound
+      new Audio('/success.mp3').play().catch(console.error);
+      // Trigger button animation via class
+      const button = document.querySelector(`button[data-movie-id="${searchResult.imdbID}"]`);
+      button?.classList.add('animate-success');
+      setTimeout(() => button?.classList.remove('animate-success'), 500);
 
       if (onListsChange) { //Added check to prevent errors if onListsChange is undefined
         onListsChange();
