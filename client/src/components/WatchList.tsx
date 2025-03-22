@@ -95,7 +95,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
             )}
           </Droppable>
         </DragDropContext>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
