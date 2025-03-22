@@ -138,6 +138,9 @@ export const useToastSound = () => {
 };
 
 function dispatch(action: Action) {
+  if (action.type === "ADD_TOAST" && action.toast.title?.toString().toLowerCase().includes('success')) {
+    return; // Skip success notifications
+  }
   memoryState = reducer(memoryState, action)
   listeners.forEach((listener) => {
     listener(memoryState)
