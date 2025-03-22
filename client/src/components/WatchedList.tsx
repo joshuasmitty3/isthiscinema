@@ -45,16 +45,17 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
   };
 
   return (
-    <div> {/*Added a div to encompass both the list and modal */}
+    <div>
     <Card className="border border-neutral-200">
       <CardContent className="p-4">
-        <div className="flex justify-end items-center mb-4"> {/*Removed left-aligned h2 */}
+        <div className="flex justify-end items-center mb-4">
           <Button
             onClick={handleExportCSV}
             variant="ghost"
-            className="text-sm text-primary hover:text-primary/80 flex items-center space-x-1"
+            className="text-sm text-primary hover:text-primary/80"
+            title="Export CSV"
           >
-            <RiDownloadLine className="mr-1" />
+            <RiDownloadLine />
           </Button>
         </div>
 
