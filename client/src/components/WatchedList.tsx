@@ -10,20 +10,11 @@ import { useState } from "react";
 import { ReviewModal } from "./ReviewModal";
 
 
+import { formatMovieForCSV, validateCSVData } from '@/lib/csvUtils';
+import { useEffect } from 'react';
+
 interface WatchedListProps {
   movies: Movie[];
-
-import { formatMovieForCSV, validateCSVData } from '@/lib/csvUtils';
-
-// Add this inside WatchedList component to test
-useEffect(() => {
-  if (movies.length > 0) {
-    const testRow = formatMovieForCSV(movies[0], 'Watched');
-    console.log('Test CSV Format:', testRow);
-    console.log('CSV Validation:', validateCSVData([testRow]));
-  }
-}, [movies]);
-
   onSelectMovie?: (movie: Movie) => void;
   onOpenReviewModal?: (movie: Movie) => void;
 }
