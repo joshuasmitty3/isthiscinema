@@ -47,7 +47,13 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           </TabsContent>
 
           <TabsContent value="watched">
-            <WatchedList movies={watchedList || []} onSelectMovie={() => {}} />
+            <WatchedList 
+              movies={watchedList} 
+              onSelectMovie={() => {}}
+              onListsChange={() => {
+                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="search">

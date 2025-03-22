@@ -13,10 +13,10 @@ import { ReviewModal } from "./ReviewModal";
 interface WatchedListProps {
   movies: Movie[];
   onSelectMovie?: (movie: Movie) => void;
-  onOpenReviewModal?: (movie: Movie) => void;
+  onListsChange?: () => void;
 }
 
-export default function WatchedList({ movies, onOpenReviewModal = () => {} }: WatchedListProps) {
+export default function WatchedList({ movies = [], onSelectMovie = () => {}, onListsChange = () => {} }: WatchedListProps) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false); //Added state for review modal
