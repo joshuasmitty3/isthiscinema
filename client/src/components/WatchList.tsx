@@ -13,7 +13,7 @@ interface WatchListProps {
 
 export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient();
-  const { watchlist, watchedlist, reorderWatchlist, refetchLists } = useMovies();
+  const { watchlist, reorderWatchlist, refetchLists } = useMovies();
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragEnd = useCallback(async (result: any) => {
@@ -82,25 +82,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
             )}
           </Droppable>
         </DragDropContext>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Watched List</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {watchedlist.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              actionType="remove"
-              isCompact={true}
-              onListsChange={() => {
-                queryClient.invalidateQueries(['watchlist']);
-                queryClient.invalidateQueries(['watchedlist']);
-                refetchLists(); // Call refetchLists to update the UI
-              }}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
