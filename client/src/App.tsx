@@ -23,8 +23,8 @@ function App() {
 
   async function checkAuth() {
     try {
-      const response = await apiRequest<User>("/api/me");
-      setUser(response);
+      const response = await apiRequest("GET", "/api/me");
+      setUser(await response.json());
     } catch (error) {
       setUser(null);
     } finally {
