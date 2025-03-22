@@ -28,7 +28,7 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
   }, [movie, isOpen]);
 
   const queryClient = useQueryClient();
-  
+
   const handleSave = async () => {
     if (!movie) return;
 
@@ -54,17 +54,8 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md w-full">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-medium font-heading">Add Your Review</DialogTitle>
-        </DialogHeader>
-
         <div className="p-4">
-          <h4 className="text-base font-medium mb-2">
-            {movie.title} ({movie.year})
-          </h4>
-
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Your Review</label>
             <Textarea 
               value={review}
               onChange={(e) => setReview(e.target.value.slice(0, maxLength))}
