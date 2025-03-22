@@ -75,3 +75,29 @@ export default function MovieCard({ movie, actionType, onAction, isCompact = fal
     </div>
   );
 }
+import { motion } from 'framer-motion';
+import { logError } from '../utils/logger';
+
+export const MovieCard = ({ movie, onAction, actionType }) => {
+  const handleClick = () => {
+    try {
+      onAction(movie);
+      logStateChange('MovieCard', `${actionType} clicked`, movie.id);
+    } catch (error) {
+      logError('MovieCard', error);
+    }
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="movie-card"
+    >
+      {/* Existing card content */}
+    </motion.div>
+  );
+};

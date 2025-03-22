@@ -14,6 +14,31 @@ import MovieCard from "@/components/MovieCard"; // Assuming MovieCard exists
 // Using the previously defined MovieCardTest component instead
 import MovieCardTest from './components/MovieCardTest';
 
+// Added logging utility
+const logEvent = (event, data) => {
+  console.log(`Event: ${event}`, data);
+};
+
+//Added ErrorBoundary component
+const ErrorBoundary = ({ children }) => {
+  const [hasError, setHasError] = useState(false);
+
+  const handleError = (error) => {
+    logEvent('Error', error); //Log the error
+    setHasError(true);
+  };
+
+  if (hasError) {
+    return (
+      <div>
+        <h1>Something went wrong.</h1>
+      </div>
+    );
+  }
+
+  return children;
+};
+
 
 function Router() {
   const [location, setLocation] = useLocation();
@@ -32,6 +57,7 @@ function Router() {
           setUser(userData);
         }
       } catch (error) {
+        logEvent('Auth Check Failed', error); //Log the error
         console.error("Auth check failed:", error);
       } finally {
         setLoading(false);
@@ -47,6 +73,7 @@ function Router() {
       setUser(null);
       setLocation("/login");
     } catch (error) {
+      logEvent('Logout Failed', error); //Log the error
       console.error("Logout failed:", error);
     }
   };
@@ -89,8 +116,10 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <ErrorBoundary> {/* Added ErrorBoundary */}
+        <Router />
+        <Toaster />
+      </ErrorBoundary> {/* Closed ErrorBoundary */}
     </QueryClientProvider>
   );
 }

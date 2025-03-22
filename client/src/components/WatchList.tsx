@@ -107,7 +107,14 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   return (
     <Card className="border border-neutral-200">
       <CardContent>
-        <DragDropContext onDragEnd={handleDragEnd}>
+        <DragDropContext onDragEnd={(result) => {
+  try {
+    handleDragEnd(result);
+    logStateChange('WatchList', 'item reordered', result);
+  } catch (error) {
+    logError('WatchList', error);
+  }
+}}>
           <Droppable droppableId="watchlist">
             {(provided) => (
               <div
