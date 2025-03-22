@@ -1,10 +1,10 @@
 
 import { useState, useCallback } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Card, CardContent } from "@/components/ui/card";
-import { useMovies } from "@/lib/movies";
+import { useMovies } from "../hooks/use-movies";
 import { useQueryClient } from "@tanstack/react-query";
-import type { Movie } from "@/lib/types";
+import { Movie } from "@/lib/types";
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -30,6 +30,24 @@ export default function WatchList({ onListsChange }: WatchListProps) {
       }
     } catch (error) {
       console.error('Failed to remove movie:', error);
+    }
+  };
+
+  const handleMoveToWatched = async (movie: Movie) => {
+    try {
+      const response = await fetch(`/api/watchlist/${movie.id}/watched`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark as watched');
+      }
+
+      if (onListsChange) {
+        onListsChange();
+      }
+    } catch (error) {
+      console.error('Failed to mark as watched:', error);
     }
   };
 
@@ -115,7 +133,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                                 </svg>
                               </button>
                             </div>
-                          </div>
                           </div>
                         </div>
                       </div>
