@@ -36,17 +36,18 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   const handleMoveToWatchedList = async (movie: Movie) => {
     try {
-      await moveToWatched(movie.id);
-      // First invalidate queries
+      await fetch(`/api/movies/${movie.id}/move-to-watched`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
       await Promise.all([
         queryClient.invalidateQueries(['watchlist']),
         queryClient.invalidateQueries(['watchedlist'])
       ]);
-      // Then refetch immediately
-      await Promise.all([
-        queryClient.refetchQueries(['watchlist']),
-        queryClient.refetchQueries(['watchedlist'])
-      ]);
+      
       if (onListsChange) {
         onListsChange();
       }
