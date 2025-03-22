@@ -69,8 +69,8 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md w-full">
+        <DialogTitle className="text-lg font-semibold">Review {movie?.title}</DialogTitle>
         <div className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Review {movie.title}</h2>
           <div className="mb-4">
             <Textarea 
               value={review}
