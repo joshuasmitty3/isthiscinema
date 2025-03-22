@@ -1,19 +1,9 @@
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { useCallback } from 'react';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { useMovies } from '@/lib/movies';
-import MovieCard from './MovieCard';
-import { ListSkeleton } from './ListSkeleton';
-import { Card, CardContent } from "@/components/ui/card"; // Added import
-
-import { useState } from 'react';
-
-interface Movie {
-  id: number;
-  title: string;
-  poster: string;
-  // ... other properties
-}
+import { useState, useCallback } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { Card, CardContent } from "@/components/ui/card";
+import { useMovies } from "@/hooks/use-movies";
+import { useQueryClient } from "@tanstack/react-query";
+import { Movie } from "@/lib/types";
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -21,7 +11,7 @@ interface WatchListProps {
 
 export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient();
-  const { watchlist, reorderWatchlist, refetchLists } = useMovies();
+  const { watchlist, reorderWatchlist } = useMovies();
   const [isDragging, setIsDragging] = useState(false);
 
   const handleRemoveFromWatchList = async (movie: Movie) => {
@@ -34,7 +24,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         throw new Error('Failed to remove movie');
       }
 
-      // Trigger a refresh of the lists
       if (onListsChange) {
         onListsChange();
       }
@@ -50,29 +39,24 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
-    // Update local state immediately
     const newOrder = [...watchlist];
     const [movedItem] = newOrder.splice(startIndex, 1);
     newOrder.splice(endIndex, 0, movedItem);
 
-    // Set optimistic update
     queryClient.setQueryData(['watchlist'], newOrder);
 
     try {
-      // Update server
-      await fetch('/api/watchlist/order', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieIds: newOrder.map(movie => movie.id) })
-      });
+      await reorderWatchlist(
+        result.draggableId,
+        startIndex,
+        endIndex
+      );
     } catch (error) {
-      console.error('Failed to update order:', error);
-      // Only refetch on error
-      queryClient.invalidateQueries(['watchlist']);
+      console.error('Failed to reorder watchlist:', error);
     } finally {
       setIsDragging(false);
     }
-  }, [watchlist, queryClient]);
+  }, [watchlist, reorderWatchlist, queryClient]);
 
   return (
     <Card className="border border-neutral-200">
@@ -104,14 +88,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                             />
                           </div>
                           <div className="flex-1 pl-3 min-w-0">
-                            <h3 className="font-medium">{movie.title}</h3>
-                            <MovieCard
-                              movie={movie}
-                              actionType="watch"
-                              isCompact={true}
-                              onListsChange={onListsChange}
-                            />
-                            <button onClick={() => handleRemoveFromWatchList(movie)}>Remove</button>
+                            <h3 className="font-medium mb-2">{movie.title}</h3>
+                            <button 
+                              onClick={() => handleRemoveFromWatchList(movie)}
+                              className="text-sm text-red-600 hover:text-red-700"
+                            >
+                              Remove
+                            </button>
                           </div>
                         </div>
                       </div>
