@@ -126,9 +126,16 @@ export const reducer = (state: State, action: Action): State => {
   }
 }
 
-const listeners: Array<(state: State) => void> = []
+import useSound from 'use-sound';
+import successSound from '../assets/sounds/success.mp3';
 
+const listeners: Array<(state: State) => void> = []
 let memoryState: State = { toasts: [] }
+
+export const useToastSound = () => {
+  const [playSuccess] = useSound(successSound, { volume: 0.5 });
+  return { playSuccess };
+};
 
 function dispatch(action: Action) {
   memoryState = reducer(memoryState, action)

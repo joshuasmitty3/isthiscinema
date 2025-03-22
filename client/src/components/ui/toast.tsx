@@ -40,16 +40,25 @@ const toastVariants = cva(
 
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
-    VariantProps<typeof toastVariants>
->(({ className, variant, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root>
+>(({ className, ...props }, ref) => {
+  const { playSuccess } = useToastSound();
+  React.useEffect(() => {
+    if (props['data-state'] === 'open' && props.children?.toString().includes('success')) {
+      playSuccess();
+    }
+  }, [props['data-state']]);
+
   return (
     <ToastPrimitives.Root
       ref={ref}
-      className={cn(toastVariants({ variant }), className)}
+      className={cn(
+        "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full motion-safe:transition-transform motion-safe:duration-200",
+        className
+      )}
       {...props}
     />
-  )
+  );
 })
 Toast.displayName = ToastPrimitives.Root.displayName
 
@@ -124,4 +133,14 @@ export {
   ToastDescription,
   ToastClose,
   ToastAction,
+}
+
+
+// Placeholder for sound functionality.  Needs actual implementation.
+function useToastSound() {
+  const playSuccess = () => {
+    // Implement sound playback here.  Requires additional packages and configuration.
+    console.log("Playing success sound effect.");
+  };
+  return { playSuccess };
 }
