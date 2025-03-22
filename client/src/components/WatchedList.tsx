@@ -6,6 +6,8 @@ import { getCSVExportUrl } from "@/lib/api";
 import { RiDownloadLine } from "react-icons/ri";
 import MovieDetail from "./MovieDetail"; // Assuming MovieDetail component exists
 import { useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal"; // Import Modal components
+
 
 interface WatchedListProps {
   movies: Movie[];
@@ -16,6 +18,7 @@ interface WatchedListProps {
 export default function WatchedList({ movies, onOpenReviewModal = () => {} }: WatchedListProps) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false); //Added state for review modal
 
   const handleExportCSV = () => {
     window.open(getCSVExportUrl(), "_blank");
@@ -33,6 +36,11 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
 
   const handleListsChange = () => {
     // Implement if needed for refreshing the lists
+  };
+
+  const refetch = () => {
+    // Placeholder for refetching data after saving review.  Implement actual logic here.
+    console.log("Review saved. Refetching data...");
   };
 
   return (
@@ -98,17 +106,13 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                     <div className="mt-2 flex space-x-2">
                       <Button
                         size="sm"
-                        className="text-xs px-2 py-1 bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-                        onClick={() => handleMovieClick(movie)}
-                      >
-                        Details
-                      </Button>
-                      <Button
-                        size="sm"
                         className="text-xs px-2 py-1 bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20"
-                        onClick={() => onOpenReviewModal(movie)}
+                        onClick={() => {
+                          setSelectedMovie(movie);
+                          setIsReviewModalOpen(true);
+                        }}
                       >
-                        Edit Review
+                        {movie.review ? 'Edit Review' : 'Add Review'}
                       </Button>
                     </div>
                   </div>
@@ -125,6 +129,49 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
       onClose={handleCloseModal}
       onListsChange={handleListsChange}
     />
+    <ReviewModal
+      movie={selectedMovie}
+      isOpen={isReviewModalOpen}
+      onClose={() => setIsReviewModalOpen(false)}
+      onSave={refetch}
+    />
     </div>
+  );
+}
+
+// Basic Review Modal Component
+function ReviewModal({ movie, isOpen, onClose, onSave }: { movie: Movie | null; isOpen: boolean; onClose: () => void; onSave: () => void }) {
+  const [reviewText, setReviewText] = useState(movie?.review || "");
+
+  const handleSave = () => {
+    // Implement actual saving logic here, potentially using an API call.
+    console.log("Saving review:", reviewText);
+    onSave();
+    onClose();
+  };
+
+  if (!isOpen || !movie) return null;
+
+  return (
+    <Modal open={isOpen} onClose={onClose}>
+      <ModalContent>
+        <ModalHeader>Review {movie.title}</ModalHeader>
+        <ModalBody>
+          <textarea
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            placeholder="Enter your review (max 140 characters)"
+            maxLength={140}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={onClose} variant="ghost">
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>Save</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
