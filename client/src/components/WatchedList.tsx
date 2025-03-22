@@ -105,46 +105,16 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                     )}
 
                     <div className="mt-2 flex space-x-2">
-                      {movie.review ? (
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            className="text-xs px-2 py-1 bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20"
-                            onClick={() => {
-                              setSelectedMovie(movie);
-                              setIsReviewModalOpen(true);
-                            }}
-                          >
-                            Edit Review
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="text-xs px-2 py-1"
-                            onClick={async () => {
-                              try {
-                                await apiRemoveFromWatchedList(movie.id);
-                                refetch();
-                              } catch (error) {
-                                console.error('Failed to delete review:', error);
-                              }
-                            }}
-                          >
-                            Delete Review
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          size="sm"
-                          className="text-xs px-2 py-1 bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20"
-                          onClick={() => {
-                            setSelectedMovie(movie);
-                            setIsReviewModalOpen(true);
-                          }}
-                        >
-                          Add Review
-                        </Button>
-                      )}
+                      <Button
+                        size="sm"
+                        className="text-xs px-2 py-1 bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20"
+                        onClick={() => {
+                          setSelectedMovie(movie);
+                          setIsReviewModalOpen(true);
+                        }}
+                      >
+                        Review
+                      </Button>
                     </div>
                   </div>
                 </div>

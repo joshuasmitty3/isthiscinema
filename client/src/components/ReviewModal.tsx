@@ -80,21 +80,53 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3">
-            <Button 
-              variant="outline"
-              onClick={onClose}
-              className="py-2 px-4 border border-neutral-200 text-neutral-600 rounded-md hover:bg-neutral-100"
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSave}
-              disabled={isLoading}
-              className="py-2 px-4 bg-primary text-white rounded-md hover:bg-primary/90"
-            >
-              Save Review
-            </Button>
+          <div className="flex justify-between">
+            {movie.review && (
+              <Button 
+                variant="destructive"
+                onClick={async () => {
+                  try {
+                    setIsLoading(true);
+                    await updateReview(movie.id, "");
+                    toast({
+                      title: "Review deleted",
+                      description: "Your review has been deleted successfully.",
+                    });
+                    onSave();
+                    onClose();
+                  } catch (error) {
+                    console.error("Failed to delete review:", error);
+                    toast({
+                      title: "Failed to delete review",
+                      description: "There was an error deleting your review.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                disabled={isLoading}
+                className="py-2 px-4"
+              >
+                Delete Review
+              </Button>
+            )}
+            <div className="flex space-x-3 ml-auto">
+              <Button 
+                variant="outline"
+                onClick={onClose}
+                className="py-2 px-4 border border-neutral-200 text-neutral-600 rounded-md hover:bg-neutral-100"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSave}
+                disabled={isLoading}
+                className="py-2 px-4 bg-primary text-white rounded-md hover:bg-primary/90"
+              >
+                Save Review
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
