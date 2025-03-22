@@ -78,7 +78,7 @@ function App() {
 
   useEffect(() => {
     // Check initial authentication
-    apiRequest("/api/me")
+    apiRequest("GET", "/api/me")
       .catch(() => {})
       .finally(() => setIsLoading(false));
   }, []);
