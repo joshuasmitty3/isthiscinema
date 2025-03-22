@@ -1,22 +1,14 @@
-import { Switch, Route, useLocation, Redirect } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import NotFound from "@/pages/not-found";
-import Home from "@/pages/Home";
-import Login from "@/pages/Login";
-import { useEffect, useState } from "react";
-import { apiRequest } from "./lib/queryClient";
-import { LoadingSpinner } from "./components/ui/loading-spinner"; // Added import
-import MovieCard from "@/components/MovieCard"; // Assuming MovieCard exists
+import React, { useState, useEffect } from "react";
+import { Switch, Route, Redirect, useLocation } from "react-router-dom";
+import { LoadingSpinner } from "./components/ui/loading-spinner";
+import { Login } from "./pages/login";
+import { Home } from "./pages/home";
+import { MovieCardTest } from "./components/MovieCardTest";
+import { NotFound } from "./pages/not-found";
+import { apiRequest } from "./lib/api";
 
-
-// Using the previously defined MovieCardTest component instead
-import MovieCardTest from './components/MovieCardTest';
-
-
-function Router() {
-  const [location, setLocation] = useLocation();
+function App() {
+  const [location, setLocation] = useState<{ pathname: string; }>(useLocation());
   const [user, setUser] = useState<{ id: number; username: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +37,7 @@ function Router() {
     try {
       await apiRequest("POST", "/api/logout", {});
       setUser(null);
-      setLocation("/login");
+      setLocation({pathname: "/login"});
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -60,38 +52,16 @@ function Router() {
   }
 
   return (
-    <Switch>
+    <Switch location={location}>
       <Route path="/login">
         {user ? <Redirect to="/" /> : <Login onLoginSuccess={setUser} />}
       </Route>
+      <Route path="/test/movie-card" component={MovieCardTest} />
       <Route path="/">
         {!user ? <Redirect to="/login" /> : <Home user={user} onLogout={handleLogout} />}
       </Route>
-      <Route path="/test/movie-card" component={MovieCardTest} />
       <Route component={NotFound} />
     </Switch>
-  );
-}
-
-function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check initial authentication
-    apiRequest("GET", "/api/me")
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  if (isLoading) {
-    return <LoadingSpinner size="lg" className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />;
-  }
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
-    </QueryClientProvider>
   );
 }
 
