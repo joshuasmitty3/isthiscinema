@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
@@ -8,35 +9,37 @@ import MovieDetail from "@/components/MovieDetail";
 import ReviewModal from "@/components/ReviewModal";
 import { Movie, SearchResult, User } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-interface HomeProps {
-  user: User;
-  onLogout: () => void;
-}
-
-export default function Home({ user, onLogout }: HomeProps) {
-  const queryClient = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState("");
+export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-
-  const { data: watchList = [] } = useQuery({
-    queryKey: ["watchlist"],
-    queryFn: async () => {
-      const response = await fetch("/api/watchlist");
-      if (!response.ok) {
-        throw new Error("Failed to fetch watch list");
-      }
-      return response.json();
-    },
-  });
+  const queryClient = useQueryClient();
 
   return (
     <Layout user={user} onLogout={onLogout}>
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Search Movies</h2>
+      <div className="container mx-auto px-4 py-4">
+        <Tabs defaultValue="watchlist" className="w-full">
+          <TabsList className="w-full mb-4">
+            <TabsTrigger value="watchlist" className="flex-1">Watch List</TabsTrigger>
+            <TabsTrigger value="watched" className="flex-1">Watched</TabsTrigger>
+            <TabsTrigger value="search" className="flex-1">Search</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="watchlist">
+            <WatchList 
+              onListsChange={() => {
+                queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="watched">
+            <WatchedList />
+          </TabsContent>
+
+          <TabsContent value="search">
             <SearchBar 
               onSearch={(results, query, loading) => {
                 setSearchResults(results);
@@ -50,15 +53,11 @@ export default function Home({ user, onLogout }: HomeProps) {
               isLoading={isSearching}
               onSelectMovie={() => {}}
               onListsChange={() => {
-                // Get queryClient from useQueryClient hook
                 queryClient.invalidateQueries({ queryKey: ["watchlist"] });
               }}
             />
-          </div>
-          <div>
-            <WatchList movies={watchList} />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );
