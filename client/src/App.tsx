@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import { LoadingSpinner } from "./components/ui/loading-spinner";
@@ -11,6 +10,17 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import type { User } from "./lib/types";
+
+async function login(username: string, password: string): Promise<User | null> {
+  try {
+    const response = await apiRequest("POST", "/api/login", {
+      body: JSON.stringify({ username, password }),
+    });
+    return await response.json();
+  } catch (error) {
+    throw new Error("Login failed");
+  }
+}
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +48,16 @@ function App() {
     setLocation("/login");
   }
 
+  async function handleLogin(username: string, password: string) {
+    try {
+      const user = await login(username, password);
+      await checkAuth(); // Recheck auth state after login
+    } catch (error) {
+      console.error("Login failed:", error);
+      setUser(null);
+    }
+  }
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -46,7 +66,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Switch>
         <Route path="/login">
-          {user ? (setLocation("/"), null) : <Login onLogin={setUser} />}
+          {user ? (setLocation("/"), null) : <Login onLogin={handleLogin} />}
         </Route>
         <Route path="/test/movie-card" component={MovieCardTest} />
         <Route path="/">
