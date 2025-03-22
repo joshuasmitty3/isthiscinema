@@ -33,8 +33,8 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
       <div className="container mx-auto px-4 py-4">
         <Tabs defaultValue="watchlist" className="w-full">
           <TabsList className="w-full mb-4">
-            <TabsTrigger value="watchlist" className="flex-1">Watch List</TabsTrigger>
-            <TabsTrigger value="watched" className="flex-1">Watched</TabsTrigger>
+            <TabsTrigger value="watchlist" className="flex-1">Worth Watching</TabsTrigger>
+            <TabsTrigger value="watched" className="flex-1">Already Watched</TabsTrigger>
             <TabsTrigger value="search" className="flex-1">
               <Search className="h-4 w-4" />
             </TabsTrigger>
