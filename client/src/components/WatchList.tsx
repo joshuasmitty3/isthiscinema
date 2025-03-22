@@ -90,7 +90,32 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                               className="w-full h-full object-cover rounded"
                             />
                           </div>
-                          <div className="flex-1 pl-3 min-w-0">
+                          <div className="flex-1 pl-3 min-w-0 flex justify-between items-center">
+                            <div>
+                              <h3 className="font-medium text-sm truncate">{movie.title}</h3>
+                              <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleMoveToWatched(movie)}
+                                className="flex items-center justify-center h-6 w-6 rounded-md bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 text-[#4CAF50] transition-colors"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => removeFromWatchlist(movie)}
+                                className="flex items-center justify-center h-6 w-6 rounded-md bg-[#8B4513]/10 hover:bg-[#8B4513]/20 text-[#8B4513] transition-colors"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M3 6h18"></path>
+                                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
                             <h3 className="font-medium mb-2">{movie.title}</h3>
                             <button 
                               onClick={() => handleRemoveFromWatchList(movie)}
