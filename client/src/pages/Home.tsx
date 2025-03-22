@@ -47,7 +47,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           </TabsContent>
 
           <TabsContent value="watched">
-            <WatchedList movies={watchedList} />
+            <WatchedList movies={watchedList || []} onSelectMovie={() => {}} />
           </TabsContent>
 
           <TabsContent value="search">
