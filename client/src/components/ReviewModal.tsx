@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Movie } from "@/lib/types";
-import { updateReview } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
+import { Movie } from '@/lib/types';
+import { updateReview } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ReviewModalProps {
   movie: Movie | null;
@@ -18,8 +19,10 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
   const [review, setReview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const maxLength = 140;
+  const minLength = 3;
 
   useEffect(() => {
     if (movie && isOpen) {
@@ -27,15 +30,27 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
     }
   }, [movie, isOpen]);
 
-  const queryClient = useQueryClient();
-
   const handleSave = async () => {
     if (!movie) return;
 
+    if (review.trim().length < minLength) {
+      toast({
+        title: "Review too short",
+        description: `Please enter at least ${minLength} characters.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await updateReview(movie.id, review);
+      await updateReview(movie.id, review.trim());
       await queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
+      toast({
+        title: "Review saved",
+        description: "Your review has been saved successfully.",
+      });
+      onSave();
       onClose();
     } catch (error) {
       console.error("Failed to save review:", error);
@@ -55,12 +70,13 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md w-full">
         <div className="p-4">
+          <h2 className="text-lg font-semibold mb-4">Review {movie.title}</h2>
           <div className="mb-4">
             <Textarea 
               value={review}
               onChange={(e) => setReview(e.target.value.slice(0, maxLength))}
               rows={4}
-              placeholder="What did you think? (max 140 characters)"
+              placeholder="What did you think of this movie? (3-140 characters)"
               className="w-full p-3 border border-neutral-200 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
             <div className={`text-xs text-right mt-1 ${review.length >= maxLength ? 'text-[#F44336]' : 'text-neutral-600'}`}>
@@ -103,13 +119,14 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
               <Button 
                 variant="outline"
                 onClick={onClose}
+                disabled={isLoading}
                 className="py-2 px-4 border border-neutral-200 text-neutral-600 rounded-md hover:bg-neutral-100"
               >
                 Cancel
               </Button>
               <Button 
                 onClick={handleSave}
-                disabled={isLoading}
+                disabled={isLoading || review.trim().length < minLength}
                 className="py-2 px-4 bg-primary text-white rounded-md hover:bg-primary/90"
               >
                 Save Review
