@@ -37,6 +37,10 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   const handleMoveToWatchedList = async (movie: Movie) => {
     try {
       await moveToWatched(movie.id);
+      await Promise.all([
+        queryClient.invalidateQueries(['watchlist']),
+        queryClient.invalidateQueries(['watchedlist'])
+      ]);
       if (onListsChange) {
         onListsChange();
       }
