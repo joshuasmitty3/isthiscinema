@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +5,7 @@ import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Movie } from "@/lib/types";
 import { moveToWatched } from "@/lib/api";
+import { logStateChange, logError } from '../utils/logger'; // Added logError import
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -23,13 +23,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to remove movie');
       }
 
       console.log(`Successfully removed movie ${movie.title} from watchlist`);
-      
+
       if (onListsChange) {
         onListsChange();
       }
@@ -47,12 +47,12 @@ export default function WatchList({ onListsChange }: WatchListProps) {
           'Content-Type': 'application/json',
         }
       });
-      
+
       await Promise.all([
         queryClient.invalidateQueries(['watchlist']),
         queryClient.invalidateQueries(['watchedlist'])
       ]);
-      
+
       if (onListsChange) {
         onListsChange();
       }
@@ -69,10 +69,10 @@ export default function WatchList({ onListsChange }: WatchListProps) {
           'Content-Type': 'application/json',
         }
       });
-      
+
       await queryClient.invalidateQueries(['watchlist']);
       await queryClient.invalidateQueries(['watchedlist']);
-      
+
       if (onListsChange) {
         onListsChange();
       }
