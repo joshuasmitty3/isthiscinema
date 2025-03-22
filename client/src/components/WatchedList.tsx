@@ -17,7 +17,9 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
   };
 
   const handleMovieClick = (movie: Movie) => {
-    onSelectMovie(movie);
+    if (onSelectMovie) {
+      onSelectMovie(movie);
+    }
   };
 
   return (
