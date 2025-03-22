@@ -384,20 +384,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/export/csv", requireAuth, async (req, res) => {
     try {
       const userId = req.session.userId as number;
-      const watchList = await storage.getWatchListForUser(userId);
       const watchedList = await storage.getWatchedListForUser(userId);
 
       // Prepare data for CSV
       const csvData = [
-        ...watchList.map(movie => ({
-          title: movie.title,
-          year: movie.year,
-          director: movie.director,
-          list: "Watch List",
-          order: movie.order,
-          watchedDate: "",
-          review: ""
-        })),
         ...watchedList.map(movie => ({
           title: movie.title,
           year: movie.year,
