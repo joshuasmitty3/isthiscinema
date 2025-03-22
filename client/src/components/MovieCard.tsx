@@ -1,5 +1,7 @@
 import { Movie } from "@/lib/types";
 import { Button } from "./ui/button";
+import { motion } from 'framer-motion';
+import { logError, logStateChange } from '../utils/logger';
 
 interface MovieCardProps {
   movie: Movie;
@@ -44,8 +46,24 @@ export default function MovieCard({ movie, actionType, onAction, isCompact = fal
     }
   };
 
+  const handleClick = () => {
+    try {
+      onAction(movie);
+      logStateChange('MovieCard', `${actionType} clicked`, movie.id);
+    } catch (error) {
+      logError('MovieCard', error);
+    }
+  };
+
   return (
-    <div className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <motion.div
+      layout
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+    >
       <div className="flex items-start p-3">
         <div className={`${isCompact ? 'w-16 h-24' : 'w-20 h-28'} flex-shrink-0 rounded overflow-hidden`}>
           <img
@@ -72,32 +90,6 @@ export default function MovieCard({ movie, actionType, onAction, isCompact = fal
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-import { motion } from 'framer-motion';
-import { logError } from '../utils/logger';
-
-export const MovieCard = ({ movie, onAction, actionType }) => {
-  const handleClick = () => {
-    try {
-      onAction(movie);
-      logStateChange('MovieCard', `${actionType} clicked`, movie.id);
-    } catch (error) {
-      logError('MovieCard', error);
-    }
-  };
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="movie-card"
-    >
-      {/* Existing card content */}
     </motion.div>
   );
-};
+}
