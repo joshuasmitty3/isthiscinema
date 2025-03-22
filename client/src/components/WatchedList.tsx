@@ -13,22 +13,26 @@ interface WatchedListProps {
   onOpenReviewModal: (movie: Movie) => void;
 }
 
-export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }: WatchedListProps) {
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null); //Added state for modal
+export default function WatchedList({ movies, onOpenReviewModal }: WatchedListProps) {
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const handleExportCSV = () => {
     window.open(getCSVExportUrl(), "_blank");
   };
 
   const handleMovieClick = (movie: Movie) => {
-    setSelectedMovie(movie); //Sets the movie to display in the modal
-    if (onSelectMovie) {
-      onSelectMovie(movie);
-    }
+    setSelectedMovie(movie);
+    setIsDetailOpen(true);
   };
 
   const handleCloseModal = () => {
+    setIsDetailOpen(false);
     setSelectedMovie(null);
+  };
+
+  const handleListsChange = () => {
+    // Implement if needed for refreshing the lists
   };
 
   return (
@@ -115,9 +119,12 @@ export default function WatchedList({ movies, onSelectMovie, onOpenReviewModal }
         )}
       </CardContent>
     </Card>
-    {selectedMovie && ( // Conditional rendering of the modal
-      <MovieDetail movie={selectedMovie} onClose={handleCloseModal} />
-    )}
+    <MovieDetail 
+      movie={selectedMovie}
+      isOpen={isDetailOpen}
+      onClose={handleCloseModal}
+      onListsChange={handleListsChange}
+    />
     </div>
   );
 }
