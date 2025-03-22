@@ -33,10 +33,6 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
       setIsLoading(true);
       await updateReview(movie.id, review);
 
-      toast({
-        title: "Review saved",
-        description: "Your review has been saved successfully.",
-      });
 
       onSave();
       onClose();
