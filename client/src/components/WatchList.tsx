@@ -4,6 +4,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useMovies } from '@/lib/movies';
 import MovieCard from './MovieCard';
 import { ListSkeleton } from './ListSkeleton';
+import { Card, CardContent } from "@/components/ui/card"; // Added import
 
 import { useState } from 'react';
 
