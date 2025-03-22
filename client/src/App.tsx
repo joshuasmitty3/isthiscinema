@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Redirect } from "wouter";
 import { LoadingSpinner } from "./components/ui/loading-spinner";
 import Login from "@/pages/Login";
 import Home from "@/pages/Home";
