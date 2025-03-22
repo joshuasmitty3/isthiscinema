@@ -4,9 +4,10 @@ import { Movie } from "@/lib/types";
 import { format } from "date-fns";
 import { getCSVExportUrl } from "@/lib/api";
 import { RiDownloadLine } from "react-icons/ri";
-import MovieDetail from "./MovieDetail"; // Assuming MovieDetail component exists
+import MovieDetail from "./MovieDetail";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal"; // Import Modal components
+import { ReviewModal } from "./ReviewModal";
 
 
 interface WatchedListProps {
@@ -139,39 +140,3 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
   );
 }
 
-// Basic Review Modal Component
-function ReviewModal({ movie, isOpen, onClose, onSave }: { movie: Movie | null; isOpen: boolean; onClose: () => void; onSave: () => void }) {
-  const [reviewText, setReviewText] = useState(movie?.review || "");
-
-  const handleSave = () => {
-    // Implement actual saving logic here, potentially using an API call.
-    console.log("Saving review:", reviewText);
-    onSave();
-    onClose();
-  };
-
-  if (!isOpen || !movie) return null;
-
-  return (
-    <Modal open={isOpen} onClose={onClose}>
-      <ModalContent>
-        <ModalHeader>Review {movie.title}</ModalHeader>
-        <ModalBody>
-          <textarea
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            placeholder="Enter your review (max 140 characters)"
-            maxLength={140}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={onClose} variant="ghost">
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>Save</Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-  );
-}
