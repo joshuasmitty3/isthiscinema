@@ -8,6 +8,13 @@ import { Card, CardContent } from "@/components/ui/card"; // Added import
 
 import { useState } from 'react';
 
+interface Movie {
+  id: number;
+  title: string;
+  poster: string;
+  // ... other properties
+}
+
 interface WatchListProps {
   onListsChange?: () => void;
 }
@@ -16,6 +23,25 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient();
   const { watchlist, reorderWatchlist, refetchLists } = useMovies();
   const [isDragging, setIsDragging] = useState(false);
+
+  const handleRemoveFromWatchList = async (movie: Movie) => {
+    try {
+      const response = await fetch(`/api/watchlist/${movie.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove movie');
+      }
+
+      // Trigger a refresh of the lists
+      if (onListsChange) {
+        onListsChange();
+      }
+    } catch (error) {
+      console.error('Failed to remove movie:', error);
+    }
+  };
 
   const handleDragEnd = useCallback(async (result: any) => {
     setIsDragging(true);
@@ -85,6 +111,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                               isCompact={true}
                               onListsChange={onListsChange}
                             />
+                            <button onClick={() => handleRemoveFromWatchList(movie)}>Remove</button>
                           </div>
                         </div>
                       </div>
