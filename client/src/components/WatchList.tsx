@@ -133,28 +133,21 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                     index={index}
                   >
                     {(provided) => (
-                      <div
+                      <MovieCard
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className={`bg-white p-4 rounded-lg shadow-sm border border-neutral-200 ${
-                          isDragging ? 'opacity-50' : ''
-                        }`}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-12 h-16 flex-shrink-0">
-                            <img
-                              src={movie.poster}
-                              alt={movie.title}
-                              className="w-full h-full object-cover rounded"
-                            />
-                          </div>
-                          <div className="ml-4 flex-1">
-                            <h3 className="text-sm font-medium">{movie.title}</h3>
-                            <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <MovieCard
+                        movie={movie}
+                        actions={[
+                          { type: "watch", handler: handleMoveToWatchedList },
+                          { type: "remove", handler: handleRemoveFromWatchList },
+                          { type: "details", handler: () => {
+                            setSelectedMovie(movie);
+                            setIsDetailOpen(true);
+                          }}
+                        ]}
+                        isCompact={true}
+                        isDragging={isDragging}
                               movie={movie}
                               actions={[
                                 { type: "watch", handler: handleMoveToWatchedList },

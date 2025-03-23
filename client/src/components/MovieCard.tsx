@@ -18,9 +18,22 @@ const icons = {
   details: <RiInformationLine className="w-4 h-4" />
 };
 
-export default function MovieCard({ movie, actions, isCompact = false }: MovieCardProps) {
+interface ExtendedMovieCardProps extends MovieCardProps {
+  isDragging?: boolean;
+}
+
+export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function MovieCard(
+  { movie, actions, isCompact = false, isDragging, ...props }, 
+  ref
+) {
   return (
-    <div className={`bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow ${isCompact ? 'p-2' : 'p-3'}`}>
+    <div 
+      ref={ref}
+      {...props}
+      className={`bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
+        isCompact ? 'p-2' : 'p-3'
+      } ${isDragging ? 'opacity-50' : ''}`}
+    >
       <div className="flex items-start">
         <img
           src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
