@@ -8,6 +8,8 @@ interface MovieCardProps {
   isCompact?: boolean;
 }
 
+import { motion } from "framer-motion";
+
 export default function MovieCard({ movie, actions, isCompact = false }: MovieCardProps) {
   return (
     <motion.div
