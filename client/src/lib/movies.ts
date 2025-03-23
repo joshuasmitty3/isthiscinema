@@ -67,6 +67,38 @@ export function useMovies() {
           movieIds: newOrder.map(movie => movie.id)
         }),
       });
+      
+      if (!response.ok) throw new Error('Failed to update watchlist order');
+      return newOrder;
+    },
+    onMutate: async ({ startIndex, endIndex }) => {
+      await queryClient.cancelQueries(['watchlist']);
+      const previousWatchlist = queryClient.getQueryData(['watchlist']);
+      
+      const newOrder = [...(previousWatchlist as any[])];
+      const [movedItem] = newOrder.splice(startIndex, 1);
+      newOrder.splice(endIndex, 0, movedItem);
+      
+      queryClient.setQueryData(['watchlist'], newOrder);
+      
+      return { previousWatchlist };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousWatchlist) {
+        queryClient.setQueryData(['watchlist'], context.previousWatchlist);
+      }
+    }
+});
+
+      const response = await fetch('/api/watchlist/order', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          movieIds: newOrder.map(movie => movie.id)
+        }),
+      });
       if (!response.ok) throw new Error('Failed to update watchlist order');
       return newOrder;
     },
