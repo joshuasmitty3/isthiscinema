@@ -16,6 +16,8 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient();
   const { watchlist, reorderWatchlist } = useMovies();
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const handleRemoveFromWatchList = async (movie: Movie) => {
     try {
