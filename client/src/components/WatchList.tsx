@@ -87,24 +87,23 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   const handleDragEnd = useCallback(async (result: any) => {
     if (!result.destination) return;
-    setIsDragging(true);
 
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
-    const newOrder = [...watchlist];
-    const [movedItem] = newOrder.splice(startIndex, 1);
-    newOrder.splice(endIndex, 0, movedItem);
-
-    queryClient.setQueryData(['watchlist'], newOrder);
+    // Update UI immediately without waiting
+    requestAnimationFrame(() => {
+      const newOrder = [...watchlist];
+      const [movedItem] = newOrder.splice(startIndex, 1);
+      newOrder.splice(endIndex, 0, movedItem);
+      queryClient.setQueryData(['watchlist'], newOrder);
+    });
 
     try {
       await reorderWatchlist(startIndex, endIndex);
     } catch (error) {
       console.error('Failed to reorder watchlist:', error);
       queryClient.invalidateQueries(['watchlist']);
-    } finally {
-      setIsDragging(false);
     }
   }, [watchlist, reorderWatchlist, queryClient]);
 
@@ -134,42 +133,21 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                     index={index}
                   >
                     {(provided) => (
-                      <div
+                      <MovieCard
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className={`bg-white p-4 rounded-lg shadow-sm border border-neutral-200 ${
-                          isDragging ? 'opacity-50' : ''
-                        }`}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-12 h-16 flex-shrink-0">
-                            <img
-                              src={movie.poster}
-                              alt={movie.title}
-                              className="w-full h-full object-cover rounded"
-                            />
-                          </div>
-                          <div className="ml-4 flex-1">
-                            <h3 className="text-sm font-medium">{movie.title}</h3>
-                            <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <MovieCard
-                              movie={movie}
-                              actions={[
-                                { type: "watch", handler: handleMoveToWatchedList },
-                                { type: "remove", handler: handleRemoveFromWatchList },
-                                { type: "details", handler: () => {
-                                  setSelectedMovie(movie);
-                                  setIsDetailOpen(true);
-                                }}
-                              ]}
-                              isCompact={true}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                        movie={movie}
+                        actions={[
+                          { type: "watch", handler: handleMoveToWatchedList },
+                          { type: "remove", handler: handleRemoveFromWatchList },
+                          { type: "details", handler: () => {
+                            setSelectedMovie(movie);
+                            setIsDetailOpen(true);
+                          }}
+                        ]}
+                        isDragging={isDragging}
+                      />
                     )}
                   </Draggable>
                 ))}
@@ -178,18 +156,18 @@ export default function WatchList({ onListsChange }: WatchListProps) {
             )}
           </Droppable>
         </DragDropContext>
-      </CardContent>
-    </Card>
-    {selectedMovie && (
-      <MovieDetail
-        movie={selectedMovie}
-        isOpen={isDetailOpen}
-        onClose={() => {
-          setIsDetailOpen(false);
-          setSelectedMovie(null);
-        }}
-      />
-    )}
+        </CardContent>
+      </Card>
+      {selectedMovie && (
+        <MovieDetail
+          movie={selectedMovie}
+          isOpen={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedMovie(null);
+          }}
+        />
+      )}
     </>
   );
 }
