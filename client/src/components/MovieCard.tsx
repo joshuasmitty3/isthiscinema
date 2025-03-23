@@ -12,6 +12,8 @@ interface MovieCardProps {
   isCompact?: boolean;
 }
 
+import React from 'react';
+
 const MovieCard = React.memo(({ movie, actions, isCompact = false }: MovieCardProps) => {
   return (
     <motion.div
