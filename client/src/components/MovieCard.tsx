@@ -1,7 +1,3 @@
-import { motion } from "framer-motion";
-import { Button } from "./ui/button";
-import type { Movie } from "@/lib/types";
-import { logError, logStateChange } from '../utils/logger';
 
 interface MovieCardProps {
   movie: Movie;
@@ -19,25 +15,32 @@ export default function MovieCard({ movie, actions, isCompact = false }: MovieCa
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={`bg-white shadow rounded-lg overflow-hidden ${isCompact ? 'p-2' : 'p-4'}`}
+      className="bg-white shadow rounded-lg overflow-hidden p-4 w-full"
     >
-      <div className="flex">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+      <div className="flex gap-4">
+        <img 
+          src={movie.poster} 
+          alt={movie.title}
+          className="w-20 h-28 object-cover rounded-md"
+        />
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold mb-1">{movie.title}</h3>
+          <p className="text-neutral-600 text-sm mb-2">{movie.year}</p>
+          <p className="text-neutral-600 text-sm mb-2">Genre: {movie.genre}</p>
+          <p className="text-neutral-600 text-sm mb-4">Cast: {movie.actors}</p>
+          
+          <div className="flex gap-2">
             {actions.map(({type, handler}) => (
-              <Button
+              <button
                 key={type}
-                size="sm"
-                className={`text-xs px-2 py-1 ${
-                  type === "watch" ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" :
-                  type === "remove" ? "bg-red-500/10 text-red-600 hover:bg-red-500/20" :
-                  type === "review" ? "bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20" :
-                  "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
-                }`}
                 onClick={() => handler(movie)}
+                className="p-2 rounded-full hover:bg-neutral-100 transition-colors"
               >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Button>
+                {type === "watch" && <span>👁️</span>}
+                {type === "remove" && <span>🗑️</span>}
+                {type === "details" && <span>ℹ️</span>}
+                {type === "review" && <span>✏️</span>}
+              </button>
             ))}
           </div>
         </div>
