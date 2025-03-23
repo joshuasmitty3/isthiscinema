@@ -12,9 +12,10 @@ interface MovieCardProps {
   isCompact?: boolean;
 }
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
-const MovieCard = React.memo(({ movie, actions, isCompact = false }: MovieCardProps) => {
+const MovieCard = ({ movie, actions, isCompact = false }: MovieCardProps) => {
+  const memoizedActions = useMemo(() => actions, [JSON.stringify(actions)]);
   return (
     <motion.div
       layout

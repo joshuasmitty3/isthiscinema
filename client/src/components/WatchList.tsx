@@ -91,11 +91,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
-    // Optimistically update UI
-    const newOrder = [...watchlist];
-    const [movedItem] = newOrder.splice(startIndex, 1);
-    newOrder.splice(endIndex, 0, movedItem);
-    queryClient.setQueryData(['watchlist'], newOrder);
+    // Update UI immediately without waiting
+    requestAnimationFrame(() => {
+      const newOrder = [...watchlist];
+      const [movedItem] = newOrder.splice(startIndex, 1);
+      newOrder.splice(endIndex, 0, movedItem);
+      queryClient.setQueryData(['watchlist'], newOrder);
+    });
 
     try {
       await reorderWatchlist(startIndex, endIndex);
