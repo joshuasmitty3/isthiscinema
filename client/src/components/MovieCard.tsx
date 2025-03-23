@@ -33,10 +33,10 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
       className={`
         bg-white rounded-lg overflow-hidden
         border border-neutral-200
-        shadow-sm hover:shadow-md
-        transition-all duration-200
+        shadow hover:shadow-md
+        transition-all duration-200 ease-in-out
         ${isCompact ? 'p-3' : 'p-4'}
-        ${isDragging ? 'opacity-50 scale-95' : 'opacity-100'}
+        ${isDragging ? 'opacity-50 scale-95 rotate-2' : 'opacity-100'}
       `}
     >
       <div className="flex gap-3">
@@ -55,10 +55,10 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
               <button
                 key={type}
                 className={`
-                  p-2 rounded-md transition-colors
-                  ${type === "watch" ? "text-emerald-600 hover:bg-emerald-50" :
-                    type === "remove" ? "text-red-600 hover:bg-red-50" :
-                    "text-blue-600 hover:bg-blue-50"}
+                  p-2 rounded-md transition-all
+                  ${type === "watch" ? "text-emerald-600 hover:bg-emerald-50 hover:scale-110" :
+                    type === "remove" ? "text-red-600 hover:bg-red-50 hover:scale-110" :
+                    "text-blue-600 hover:bg-blue-50 hover:scale-110"}
                 `}
                 onClick={() => handler(movie)}
               >
