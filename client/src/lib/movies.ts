@@ -14,7 +14,7 @@ const useMoviesStore = create<MoviesStore>((set) => ({
   watchedlist: [],
   setWatchlist: (movies) => set({ watchlist: movies }),
   setWatchedlist: (movies) => set({ watchedlist: movies }),
-  reorderWatchlist: (startIndex, endIndex) => {
+  reorderWatchlist: async ({ startIndex, endIndex }) => {
     set((state) => {
       const newWatchlist = [...state.watchlist];
       const [movedItem] = newWatchlist.splice(startIndex, 1);
