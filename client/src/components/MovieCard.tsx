@@ -1,7 +1,8 @@
+
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import type { Movie } from "@/lib/types";
-import { logError, logStateChange } from '../utils/logger';
+import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
 
 interface MovieCardProps {
   movie: Movie;
@@ -12,10 +13,16 @@ interface MovieCardProps {
   isCompact?: boolean;
 }
 
-import React, { useMemo } from 'react';
+export default function MovieCard({ movie, actions, isCompact = false }: MovieCardProps) {
+  const getIcon = (type: string) => {
+    switch(type) {
+      case "watch": return <RiEyeLine className="w-4 h-4" />;
+      case "remove": return <RiDeleteBin6Line className="w-4 h-4" />;
+      case "details": return <RiInformationLine className="w-4 h-4" />;
+      default: return null;
+    }
+  };
 
-const MovieCard = ({ movie, actions, isCompact = false }: MovieCardProps) => {
-  const memoizedActions = useMemo(() => actions, [JSON.stringify(actions)]);
   return (
     <motion.div
       layout
@@ -30,16 +37,16 @@ const MovieCard = ({ movie, actions, isCompact = false }: MovieCardProps) => {
             {actions.map(({type, handler}) => (
               <Button
                 key={type}
-                size="sm"
-                className={`text-xs px-2 py-1 ${
-                  type === "watch" ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" :
-                  type === "remove" ? "bg-red-500/10 text-red-600 hover:bg-red-500/20" :
-                  type === "review" ? "bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20" :
-                  "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
+                size="icon"
+                variant="ghost"
+                className={`p-1 ${
+                  type === "watch" ? "text-emerald-600 hover:bg-emerald-500/10" :
+                  type === "remove" ? "text-red-600 hover:bg-red-500/10" :
+                  "text-blue-600 hover:bg-blue-500/10"
                 }`}
                 onClick={() => handler(movie)}
               >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
+                {getIcon(type)}
               </Button>
             ))}
           </div>
@@ -47,6 +54,4 @@ const MovieCard = ({ movie, actions, isCompact = false }: MovieCardProps) => {
       </div>
     </motion.div>
   );
-});
-
-export default MovieCard;
+}
