@@ -52,8 +52,8 @@ export function useMovies() {
 
   const reorderMutation = useMutation({
     mutationFn: async ({ startIndex, endIndex }: { startIndex: number; endIndex: number }) => {
-      const previousWatchlist = queryClient.getQueryData(['watchlist']) as any[];
-      const newOrder = [...previousWatchlist];
+      const watchlist = queryClient.getQueryData(['watchlist']) as any[];
+      const newOrder = [...watchlist];
       const [movedItem] = newOrder.splice(startIndex, 1);
       newOrder.splice(endIndex, 0, movedItem);
 
@@ -72,19 +72,25 @@ export function useMovies() {
     },
     onMutate: async ({ startIndex, endIndex }) => {
       await queryClient.cancelQueries(['watchlist']);
-      const previousWatchlist = queryClient.getQueryData(['watchlist']);
+      const previousWatchlist = queryClient.getQueryData(['watchlist']) as any[];
 
-      const newOrder = [...(previousWatchlist as any[])];
+      const newOrder = [...previousWatchlist];
       const [movedItem] = newOrder.splice(startIndex, 1);
       newOrder.splice(endIndex, 0, movedItem);
 
       queryClient.setQueryData(['watchlist'], newOrder);
+      setWatchlist(newOrder);
 
       return { previousWatchlist };
+    },
+    onSuccess: (newOrder) => {
+      queryClient.setQueryData(['watchlist'], newOrder);
+      setWatchlist(newOrder);
     },
     onError: (_, __, context) => {
       if (context?.previousWatchlist) {
         queryClient.setQueryData(['watchlist'], context.previousWatchlist);
+        setWatchlist(context.previousWatchlist);
       }
     }
   });
