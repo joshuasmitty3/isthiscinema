@@ -1,6 +1,3 @@
-
-import { DropResult } from 'react-beautiful-dnd';
-
 import { useState, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Card, CardContent } from "@/components/ui/card";
@@ -88,14 +85,27 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   };
 
-  const handleDragEnd = useCallback((result: DropResult) => {
+  const handleDragEnd = useCallback(async (result: any) => {
     if (!result.destination) return;
 
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
-    reorderWatchlist({ startIndex, endIndex });
-  }, [reorderWatchlist]);
+    // Update UI immediately without waiting
+    requestAnimationFrame(() => {
+      const newOrder = [...watchlist];
+      const [movedItem] = newOrder.splice(startIndex, 1);
+      newOrder.splice(endIndex, 0, movedItem);
+      queryClient.setQueryData(['watchlist'], newOrder);
+    });
+
+    try {
+      await reorderWatchlist(startIndex, endIndex);
+    } catch (error) {
+      console.error('Failed to reorder watchlist:', error);
+      queryClient.invalidateQueries(['watchlist']);
+    }
+  }, [watchlist, reorderWatchlist, queryClient]);
 
   return (
     <>
@@ -136,6 +146,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                             setIsDetailOpen(true);
                           }}
                         ]}
+                        isCompact={true}
                         isDragging={isDragging}
                       />
                     )}

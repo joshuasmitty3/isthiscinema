@@ -1,78 +1,92 @@
-import React, { forwardRef } from 'react';
-import type { Movie } from '@/lib/types';
-import { Eye, Trash2, Info, Star } from 'lucide-react';
 
-interface Action {
-  type: 'watch' | 'remove' | 'details' | 'review';
-  handler: (movie: Movie) => void;
-}
+import React from 'react';
+import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
+import type { Movie } from "@/lib/types";
 
 interface MovieCardProps {
   movie: Movie;
-  actions: Action[];
+  actions: {
+    type: string;
+    handler: (movie: Movie) => void;
+  }[];
+  isCompact?: boolean;
+}
+
+interface ExtendedMovieCardProps extends MovieCardProps {
   isDragging?: boolean;
 }
 
 const icons = {
-  watch: <Eye size={20} />,
-  remove: <Trash2 size={20} />,
-  details: <Info size={20} />,
-  review: <Star size={20} />
+  watch: <RiEyeLine className="w-4 h-4" />,
+  remove: <RiDeleteBin6Line className="w-4 h-4" />,
+  details: <RiInformationLine className="w-4 h-4" />
 };
 
-const actionStyles = {
-  watch: "text-[hsl(30,25%,40%)] hover:bg-[hsl(30,25%,95%)]",
-  remove: "text-red-600 hover:bg-red-50",
-  details: "text-[hsl(30,25%,40%)] hover:bg-[hsl(30,25%,95%)]",
-  review: "text-yellow-600 hover:bg-yellow-50"
-};
-
-export default forwardRef<HTMLDivElement, MovieCardProps>(function MovieCard(
-  { movie, actions, isDragging, ...props }, 
+export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function MovieCard(
+  { movie, actions, isCompact = false, isDragging, ...props }, 
   ref
 ) {
   return (
-    <div
+    <div 
       ref={ref}
-      className={`
-        bg-white border border-neutral-200 rounded-lg overflow-hidden
-        ${isDragging ? 'shadow-lg' : 'shadow-sm hover:shadow-md'}
-        transition-shadow
-      `}
       {...props}
+      className={`
+        bg-white rounded-lg overflow-hidden
+        border border-neutral-200
+        shadow hover:shadow-md
+        transition-all duration-200 ease-in-out
+        ${isCompact ? 'p-3' : 'p-4'}
+        ${isDragging ? 'opacity-50 scale-95 rotate-2' : 'opacity-100'}
+      `}
     >
-      <div className="flex p-3">
-        <div className="w-20 h-28 flex-shrink-0 rounded overflow-hidden">
-          <img
-            src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-            alt={movie.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex-1 pl-3 min-w-0">
-          <h3 className="font-medium text-lg truncate">{movie.title}</h3>
-          <p className="text-sm text-neutral-600">{movie.year}</p>
-          {movie.genre && (
-            <p className="text-xs text-neutral-600">
-              <span className="font-medium">Genre:</span> {movie.genre}
-            </p>
-          )}
-          {movie.actors && (
-            <p className="text-xs text-neutral-600">
-              <span className="font-medium">Cast:</span> {movie.actors}
-            </p>
+      <div className="flex gap-3">
+        <img
+          src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
+          alt={movie.title}
+          className={`rounded-md object-cover ${isCompact ? 'w-16 h-24' : 'w-32 h-48'}`}
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start gap-2">
+            <h3 className="font-medium text-neutral-900 line-clamp-2">{movie.title}</h3>
+            <span className="text-xs text-neutral-600 whitespace-nowrap">{movie.year}</span>
+          </div>
+          {!isCompact && (
+            <div className="mt-1 space-y-1">
+              {movie.director && (
+                <p className="text-xs text-neutral-600">
+                  <span className="font-medium">Director:</span> {movie.director}
+                </p>
+              )}
+              {movie.runtime && (
+                <p className="text-xs text-neutral-600">
+                  <span className="font-medium">Runtime:</span> {movie.runtime}
+                </p>
+              )}
+              {movie.genre && (
+                <p className="text-xs text-neutral-600">
+                  <span className="font-medium">Genre:</span> {movie.genre}
+                </p>
+              )}
+              {movie.actors && (
+                <p className="text-xs text-neutral-600">
+                  <span className="font-medium">Cast:</span> {movie.actors}
+                </p>
+              )}
+            </div>
           )}
           <div className="mt-3 flex gap-2">
             {actions.map(({type, handler}) => (
               <button
                 key={type}
                 className={`
-                  p-2 rounded-md transition-all hover:scale-110
-                  ${actionStyles[type]}
+                  p-2 rounded-md transition-all
+                  ${type === "watch" ? "text-emerald-600 hover:bg-emerald-50 hover:scale-110" :
+                    type === "remove" ? "text-red-600 hover:bg-red-50 hover:scale-110" :
+                    "text-blue-600 hover:bg-blue-50 hover:scale-110"}
                 `}
                 onClick={() => handler(movie)}
               >
-                {icons[type]}
+                {icons[type] || null}
               </button>
             ))}
           </div>
