@@ -1,3 +1,6 @@
+
+import { DropResult } from 'react-beautiful-dnd';
+
 import { useState, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Card, CardContent } from "@/components/ui/card";
@@ -85,7 +88,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   };
 
-  const handleDragEnd = useCallback(async (result: any) => {
+  const handleDragEnd = useCallback(async (result: DropResult) => {
     if (!result.destination) return;
 
     const startIndex = result.source.index;
