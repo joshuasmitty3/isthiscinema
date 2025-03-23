@@ -92,7 +92,8 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     const endIndex = result.destination.index;
 
     try {
-      await reorderWatchlist(startIndex, endIndex);
+      await reorderWatchlist({ startIndex, endIndex });
+      await queryClient.invalidateQueries(['watchlist']);
     } catch (error) {
       console.error('Failed to reorder watchlist:', error);
       queryClient.invalidateQueries(['watchlist']);
