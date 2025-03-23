@@ -6,7 +6,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Movie } from "@/lib/types";
 import { moveToWatched } from "@/lib/api";
 import { logStateChange, logError } from '../utils/logger';
-import MovieCard from './MovieCard'; // Added logError import
+import MovieCard from './MovieCard';
+import MovieDetail from './MovieDetail'; // Added logError import
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -108,8 +109,9 @@ export default function WatchList({ onListsChange }: WatchListProps) {
   }, [watchlist, reorderWatchlist, queryClient]);
 
   return (
-    <Card className="border border-neutral-200">
-      <CardContent>
+    <>
+      <Card className="border border-neutral-200">
+        <CardContent>
         <DragDropContext onDragEnd={(result) => {
   try {
     handleDragEnd(result);
@@ -178,5 +180,16 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         </DragDropContext>
       </CardContent>
     </Card>
+    {selectedMovie && (
+      <MovieDetail
+        movie={selectedMovie}
+        isOpen={isDetailOpen}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedMovie(null);
+        }}
+      />
+    )}
+    </>
   );
 }
