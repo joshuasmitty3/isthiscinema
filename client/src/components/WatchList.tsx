@@ -145,26 +145,23 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                               className="w-full h-full object-cover rounded"
                             />
                           </div>
-                          <div className="flex-1 pl-3 min-w-0 flex justify-between items-center">
-                            <div>
-                              <h3 className="font-medium text-sm truncate">{movie.title}</h3>
-                              <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MovieCard
-                                movie={movie}
-                                actions={[
-                                  { type: "watch", handler: handleMoveToWatchedList },
-                                  { type: "remove", handler: handleRemoveFromWatchList },
-                                  { type: "details", handler: () => {
-                                    setSelectedMovie(movie);
-                                    setIsDetailOpen(true);
-                                  }}
-                                ]}
-                                isCompact={true}
-                              />
-                              </button>
-                            </div>
+                          <div className="ml-4 flex-1">
+                            <h3 className="text-sm font-medium">{movie.title}</h3>
+                            <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <MovieCard
+                              movie={movie}
+                              actions={[
+                                { type: "watch", handler: handleMoveToWatchedList },
+                                { type: "remove", handler: handleRemoveFromWatchList },
+                                { type: "details", handler: () => {
+                                  setSelectedMovie(movie);
+                                  setIsDetailOpen(true);
+                                }}
+                              ]}
+                              isCompact={true}
+                            />
                           </div>
                         </div>
                       </div>
