@@ -88,19 +88,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   };
 
-  const handleDragEnd = useCallback(async (result: DropResult) => {
+  const handleDragEnd = useCallback((result: DropResult) => {
     if (!result.destination) return;
 
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
-    try {
-      await reorderWatchlist({ startIndex, endIndex });
-      console.log('Reorder successful');
-    } catch (error) {
-      console.error('Failed to reorder watchlist:', error);
-      queryClient.invalidateQueries(['watchlist']);
-    }
+    reorderWatchlist({ startIndex, endIndex });
   }, [reorderWatchlist]);
 
   return (

@@ -97,15 +97,21 @@ export function useMovies() {
 
       return { previousWatchlist };
     },
-    onSuccess: (newOrder) => {
-      queryClient.setQueryData(['watchlist'], newOrder);
-      setWatchlist(newOrder);
+    onMutate: async ({ startIndex, endIndex }) => {
+      const previousWatchlist = queryClient.getQueryData(['watchlist']);
+      const newWatchlist = [...(previousWatchlist as Movie[] || [])];
+      const [removed] = newWatchlist.splice(startIndex, 1);
+      newWatchlist.splice(endIndex, 0, removed);
+      queryClient.setQueryData(['watchlist'], newWatchlist);
+      return { previousWatchlist };
     },
     onError: (_, __, context) => {
       if (context?.previousWatchlist) {
         queryClient.setQueryData(['watchlist'], context.previousWatchlist);
-        setWatchlist(context.previousWatchlist);
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(['watchlist']);
     }
   });
 
