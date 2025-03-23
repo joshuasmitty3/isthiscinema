@@ -19,6 +19,22 @@ const useMoviesStore = create<MoviesStore>((set) => ({
       const newWatchlist = [...state.watchlist];
       const [movedItem] = newWatchlist.splice(startIndex, 1);
       newWatchlist.splice(endIndex, 0, movedItem);
+
+      // Make API call to persist changes
+      fetch('/api/watchlist/order', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          movieIds: newWatchlist.map(movie => movie.id)
+        }),
+      }).catch(error => {
+        console.error('Failed to update order:', error);
+        // Revert local state on error
+        set({ watchlist: state.watchlist });
+      });
+
       return { watchlist: newWatchlist };
     });
   },
