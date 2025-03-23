@@ -53,7 +53,8 @@ export function useMovies() {
 
   const reorderMutation = useMutation({
     mutationFn: async ({ startIndex, endIndex }: { startIndex: number; endIndex: number }) => {
-      const newOrder = [...fetchedWatchlist];
+      const currentWatchlist = queryClient.getQueryData(['watchlist']) as any[];
+      const newOrder = [...currentWatchlist];
       const [movedItem] = newOrder.splice(startIndex, 1);
       newOrder.splice(endIndex, 0, movedItem);
 
@@ -71,7 +72,7 @@ export function useMovies() {
       await queryClient.cancelQueries(['watchlist']);
       const previousWatchlist = queryClient.getQueryData(['watchlist']);
       
-      const newOrder = [...fetchedWatchlist];
+      const newOrder = [...(previousWatchlist as any[])];
       const [movedItem] = newOrder.splice(startIndex, 1);
       newOrder.splice(endIndex, 0, movedItem);
       
