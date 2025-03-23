@@ -22,7 +22,7 @@ interface ExtendedMovieCardProps extends MovieCardProps {
   isDragging?: boolean;
 }
 
-export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>((function MovieCard(
+export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function MovieCard(
   { movie, actions, isCompact = false, isDragging, ...props }, 
   ref
 ) {

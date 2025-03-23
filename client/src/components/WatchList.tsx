@@ -148,9 +148,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         ]}
                         isCompact={true}
                         isDragging={isDragging}
-                                { type: "remove", handler: handleRemoveFromWatchList },
-                                { type: "details", handler: () => {
-                                  setSelectedMovie(movie);
+                      />
                                   setIsDetailOpen(true);
                                 }}
                               ]}
