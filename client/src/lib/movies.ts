@@ -6,7 +6,7 @@ interface MoviesStore {
   watchedlist: any[];
   setWatchlist: (movies: any[]) => void;
   setWatchedlist: (movies: any[]) => void;
-  reorderWatchlist: (startIndex: number, endIndex: number) => void;
+  reorderWatchlist: ({ startIndex, endIndex }: { startIndex: number; endIndex: number }) => Promise<void>;
 }
 
 const useMoviesStore = create<MoviesStore>((set) => ({
