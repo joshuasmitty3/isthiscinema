@@ -148,9 +148,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         ]}
                         isCompact={true}
                         isDragging={isDragging}
-                              movie={movie}
-                              actions={[
-                                { type: "watch", handler: handleMoveToWatchedList },
                                 { type: "remove", handler: handleRemoveFromWatchList },
                                 { type: "details", handler: () => {
                                   setSelectedMovie(movie);
