@@ -84,16 +84,6 @@ export function useMovies() {
       if (!response.ok) throw new Error('Failed to update watchlist order');
       return newOrder;
     },
-    onMutate: async ({ startIndex, endIndex }) => {
-      await queryClient.cancelQueries(['watchlist']);
-      const previousWatchlist = queryClient.getQueryData(['watchlist']) as any[];
-
-      const newOrder = [...previousWatchlist];
-      const [movedItem] = newOrder.splice(startIndex, 1);
-      newOrder.splice(endIndex, 0, movedItem);
-
-      queryClient.setQueryData(['watchlist'], newOrder);
-      setWatchlist(newOrder);
 
       return { previousWatchlist };
     },
