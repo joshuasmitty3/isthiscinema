@@ -86,9 +86,6 @@ export function useMovies() {
         queryClient.setQueryData(['watchlist'], context.previousWatchlist);
       }
     }
-      newOrder.splice(endIndex, 0, movedItem);
-      
-      queryClient.setQueryData(['watchlist'], newOrder);
       return { previousWatchlist };
     },
     onError: (err, variables, context) => {
