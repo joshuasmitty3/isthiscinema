@@ -12,7 +12,7 @@ interface MovieCardProps {
   isCompact?: boolean;
 }
 
-export default function MovieCard({ movie, actions, isCompact = false }: MovieCardProps) {
+const MovieCard = React.memo(({ movie, actions, isCompact = false }: MovieCardProps) => {
   return (
     <motion.div
       layout
@@ -44,4 +44,6 @@ export default function MovieCard({ movie, actions, isCompact = false }: MovieCa
       </div>
     </motion.div>
   );
-}
+});
+
+export default MovieCard;

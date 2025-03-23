@@ -87,15 +87,14 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   const handleDragEnd = useCallback(async (result: any) => {
     if (!result.destination) return;
-    setIsDragging(true);
-
+    
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
+    // Optimistically update UI
     const newOrder = [...watchlist];
     const [movedItem] = newOrder.splice(startIndex, 1);
     newOrder.splice(endIndex, 0, movedItem);
-
     queryClient.setQueryData(['watchlist'], newOrder);
 
     try {
@@ -103,8 +102,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     } catch (error) {
       console.error('Failed to reorder watchlist:', error);
       queryClient.invalidateQueries(['watchlist']);
-    } finally {
-      setIsDragging(false);
     }
   }, [watchlist, reorderWatchlist, queryClient]);
 
