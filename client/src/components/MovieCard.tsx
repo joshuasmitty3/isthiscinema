@@ -1,4 +1,3 @@
-
 import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
 import type { Movie } from "@/lib/types";
 
@@ -64,4 +63,4 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
       </div>
     </div>
   );
-}
+});

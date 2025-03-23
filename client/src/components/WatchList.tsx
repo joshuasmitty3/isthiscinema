@@ -87,7 +87,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   const handleDragEnd = useCallback(async (result: any) => {
     if (!result.destination) return;
-    
+
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
 
@@ -149,14 +149,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         isCompact={true}
                         isDragging={isDragging}
                       />
-                                  setIsDetailOpen(true);
-                                }}
-                              ]}
-                              isCompact={true}
-                            />
-                          </div>
-                        </div>
-                      </div>
                     )}
                   </Draggable>
                 ))}
@@ -165,18 +157,18 @@ export default function WatchList({ onListsChange }: WatchListProps) {
             )}
           </Droppable>
         </DragDropContext>
-      </CardContent>
-    </Card>
-    {selectedMovie && (
-      <MovieDetail
-        movie={selectedMovie}
-        isOpen={isDetailOpen}
-        onClose={() => {
-          setIsDetailOpen(false);
-          setSelectedMovie(null);
-        }}
-      />
-    )}
+        </CardContent>
+      </Card>
+      {selectedMovie && (
+        <MovieDetail
+          movie={selectedMovie}
+          isOpen={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedMovie(null);
+          }}
+        />
+      )}
     </>
   );
 }
