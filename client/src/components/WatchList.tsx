@@ -151,17 +151,18 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                               <p className="text-xs text-neutral-600">{movie.year} • {movie.director}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleMoveToWatchedList(movie)}
-                                className="flex items-center justify-center h-6 w-6 rounded-md bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 text-[#4CAF50] transition-colors"
-                              >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => handleRemoveFromWatchList(movie)}
-                                className="flex items-center justify-center h-6 w-6 rounded-md bg-[#8B4513]/10 hover:bg-[#8B4513]/20 text-[#8B4513] transition-colors"
+                              <MovieCard
+                                movie={movie}
+                                actions={[
+                                  { type: "watch", handler: handleMoveToWatchedList },
+                                  { type: "remove", handler: handleRemoveFromWatchList },
+                                  { type: "details", handler: () => {
+                                    setSelectedMovie(movie);
+                                    setIsDetailOpen(true);
+                                  }}
+                                ]}
+                                isCompact={true}
+                              />
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                   <path d="M3 6h18"></path>

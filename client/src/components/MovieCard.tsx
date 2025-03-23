@@ -5,8 +5,10 @@ import { logError, logStateChange } from '../utils/logger';
 
 interface MovieCardProps {
   movie: Movie;
-  actionType: "watch" | "remove" | "review";
-  onAction: (movie: Movie) => void;
+  actions: {
+    type: "watch" | "remove" | "review" | "details";
+    handler: (movie: Movie) => void;
+  }[];
   isCompact?: boolean;
 }
 
@@ -86,7 +88,21 @@ export default function MovieCard({ movie, actionType, onAction, isCompact = fal
             </div>
           )}
           <div className="mt-2 flex space-x-2">
-            {renderActionButton()}
+            {actions.map(({type, handler}) => (
+              <Button
+                key={type}
+                size="sm"
+                className={`text-xs px-2 py-1 ${
+                  type === "watch" ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" :
+                  type === "remove" ? "bg-red-500/10 text-red-600 hover:bg-red-500/20" :
+                  type === "review" ? "bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20" :
+                  "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
+                }`}
+                onClick={() => handler(movie)}
+              >
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </Button>
+            ))}
           </div>
         </div>
       </div>
