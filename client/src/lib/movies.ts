@@ -93,14 +93,6 @@ export function useMovies() {
       queryClient.setQueryData(['watchlist'], newWatchlist);
       return { previousWatchlist };
     },
-    onMutate: async ({ startIndex, endIndex }) => {
-      const previousWatchlist = queryClient.getQueryData(['watchlist']);
-      const newWatchlist = [...(previousWatchlist as Movie[] || [])];
-      const [removed] = newWatchlist.splice(startIndex, 1);
-      newWatchlist.splice(endIndex, 0, removed);
-      queryClient.setQueryData(['watchlist'], newWatchlist);
-      return { previousWatchlist };
-    },
     onError: (_, __, context) => {
       if (context?.previousWatchlist) {
         queryClient.setQueryData(['watchlist'], context.previousWatchlist);
