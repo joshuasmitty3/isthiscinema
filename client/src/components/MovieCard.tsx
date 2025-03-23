@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
 import type { Movie } from "@/lib/types";
+import { motion, Reorder } from "framer-motion";
 
 interface MovieCardProps {
   movie: Movie;
@@ -27,9 +27,16 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
   ref
 ) {
   return (
-    <div 
+    <motion.div
       ref={ref}
       {...props}
+      layout
+      initial={false}
+      animate={{ 
+        opacity: 1,
+        scale: isDragging ? 1.02 : 1,
+        transition: { duration: 0.2 }
+      }}
       className={`
         bg-white rounded-lg overflow-hidden
         border border-neutral-200
@@ -90,6 +97,6 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 });
