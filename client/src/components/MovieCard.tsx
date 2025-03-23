@@ -51,28 +51,27 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
             <span className="text-xs text-neutral-600 whitespace-nowrap">{movie.year}</span>
           </div>
           <div className="mt-1 space-y-1">
-              {movie.director && (
-                <p className="text-xs text-neutral-600">
-                  <span className="font-medium">Director:</span> {movie.director}
-                </p>
-              )}
-              {movie.runtime && (
-                <p className="text-xs text-neutral-600">
-                  <span className="font-medium">Runtime:</span> {movie.runtime}
-                </p>
-              )}
-              {movie.genre && (
-                <p className="text-xs text-neutral-600">
-                  <span className="font-medium">Genre:</span> {movie.genre}
-                </p>
-              )}
-              {movie.actors && (
-                <p className="text-xs text-neutral-600">
-                  <span className="font-medium">Cast:</span> {movie.actors}
-                </p>
-              )}
-            </div>
-          )}
+            {movie.director && (
+              <p className="text-xs text-neutral-600">
+                <span className="font-medium">Director:</span> {movie.director}
+              </p>
+            )}
+            {movie.runtime && (
+              <p className="text-xs text-neutral-600">
+                <span className="font-medium">Runtime:</span> {movie.runtime}
+              </p>
+            )}
+            {movie.genre && (
+              <p className="text-xs text-neutral-600">
+                <span className="font-medium">Genre:</span> {movie.genre}
+              </p>
+            )}
+            {movie.actors && (
+              <p className="text-xs text-neutral-600">
+                <span className="font-medium">Cast:</span> {movie.actors}
+              </p>
+            )}
+          </div>
           <div className="mt-3 flex gap-2">
             {actions.map(({type, handler}) => (
               <button
