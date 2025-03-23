@@ -5,7 +5,8 @@ import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Movie } from "@/lib/types";
 import { moveToWatched } from "@/lib/api";
-import { logStateChange, logError } from '../utils/logger'; // Added logError import
+import { logStateChange, logError } from '../utils/logger';
+import MovieCard from './MovieCard'; // Added logError import
 
 interface WatchListProps {
   onListsChange?: () => void;
