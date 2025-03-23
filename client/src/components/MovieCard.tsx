@@ -1,3 +1,4 @@
+import React from 'react';
 import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
 import type { Movie } from "@/lib/types";
 
