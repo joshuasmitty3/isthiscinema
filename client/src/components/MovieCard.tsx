@@ -80,9 +80,9 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
                 key={type}
                 className={`
                   p-2 rounded-md transition-all
-                  ${type === "watch" ? "text-emerald-600 hover:bg-emerald-50 hover:scale-110" :
+                  ${type === "watch" ? "text-[hsl(30,25%,40%)] hover:bg-[hsl(30,25%,95%)] hover:scale-110" :
                     type === "remove" ? "text-red-600 hover:bg-red-50 hover:scale-110" :
-                    "text-blue-600 hover:bg-blue-50 hover:scale-110"}
+                    "text-[hsl(30,25%,40%)] hover:bg-[hsl(30,25%,95%)] hover:scale-110"}
                 `}
                 onClick={() => handler(movie)}
               >
