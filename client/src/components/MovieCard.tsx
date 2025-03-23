@@ -5,57 +5,15 @@ import { logError, logStateChange } from '../utils/logger';
 
 interface MovieCardProps {
   movie: Movie;
-  actions: {
-    type: "watch" | "remove" | "review" | "details";
-    handler: (movie: Movie) => void;
-  }[];
+  actionType: "watch" | "remove" | "review" | "details";
+  onAction: (movie: Movie) => void;
   isCompact?: boolean;
 }
 
 export default function MovieCard({ movie, actionType, onAction, isCompact = false }: MovieCardProps) {
-  const renderActionButton = () => {
-    switch (actionType) {
-      case "watch":
-        return (
-          <Button
-            size="sm"
-            className="text-xs px-2 py-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-            onClick={() => onAction(movie)}
-          >
-            Watch
-          </Button>
-        );
-      case "remove":
-        return (
-          <Button
-            size="sm"
-            className="text-xs px-2 py-1 bg-red-500/10 text-red-600 hover:bg-red-500/20"
-            onClick={() => onAction(movie)}
-          >
-            Remove
-          </Button>
-        );
-      case "review":
-        return (
-          <Button
-            size="sm"
-            className="text-xs px-2 py-1 bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20"
-            onClick={() => onAction(movie)}
-          >
-            Review
-          </Button>
-        );
-    }
-  };
 
-  const handleClick = () => {
-    try {
-      onAction(movie);
-      logStateChange('MovieCard', `${actionType} clicked`, movie.id);
-    } catch (error) {
-      logError('MovieCard', error);
-    }
-  };
+  const actions = [{type: actionType, handler: onAction}];
+
 
   return (
     <motion.div
