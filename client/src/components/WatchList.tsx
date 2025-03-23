@@ -146,7 +146,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                             setIsDetailOpen(true);
                           }}
                         ]}
-                        isCompact={true}
                         isDragging={isDragging}
                       />
                     )}
