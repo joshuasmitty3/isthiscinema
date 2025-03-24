@@ -125,7 +125,7 @@ export default function SearchResults({
                     handleAddToWatchList(result);
                   }}
                   disabled={addingMovie === result.imdbID}
-                  className="absolute top-2 right-2 p-1 bg-primary/90 text-white rounded-full hover:bg-primary"
+                  className="absolute top-2 right-2 p-1 bg-primary/90 text-white rounded-full hover:bg-primary transition-all duration-300 hover:rotate-90 active:scale-95 active:bg-green-500"
                   size="icon"
                   variant="ghost"
                 >
