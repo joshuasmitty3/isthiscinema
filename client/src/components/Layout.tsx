@@ -34,7 +34,7 @@ export default function Layout({ children, user, onLogout }: LayoutProps) {
       
       <footer className="bg-primary/10 py-3 text-center text-sm text-neutral-600">
         <div className="container mx-auto px-4">
-          <p>Movie Watch List &copy; {new Date().getFullYear()}</p>
+          <p>is it cinema? &copy; {new Date().getFullYear()}</p>
         </div>
       </footer>
     </div>
