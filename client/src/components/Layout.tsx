@@ -1,6 +1,7 @@
 import { User } from "@/lib/types";
 import { RiLogoutBoxLine, RiUser3Line } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
+import Footer from "@/components/Footer"; // Assuming Footer component is imported from this path
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -31,12 +32,7 @@ export default function Layout({ children, user, onLogout }: LayoutProps) {
       </header>
 
       {children}
-
-      <footer className="bg-primary/10 py-3 text-center text-sm text-neutral-600">
-        <div className="container mx-auto px-4">
-          <p>is it cinema? &copy; {new Date().getFullYear()}</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
