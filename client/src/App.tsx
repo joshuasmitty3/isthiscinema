@@ -1,4 +1,4 @@
-import { Route, Router, Switch } from "wouter";
+import { Route, Router } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,19 +8,13 @@ import Login from "@/pages/Login";
 import { useEffect, useState } from "react";
 import { apiRequest } from "./lib/queryClient";
 import { LoadingSpinner } from "./components/ui/loading-spinner";
-import MovieCard from "@/components/MovieCard";
 import MovieCardTest from './components/MovieCardTest';
-import Layout from "./components/Layout";
-
-const logEvent = (event, data) => {
-  console.log(`Event: ${event}`, data);
-};
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
 
   const handleError = (error) => {
-    logEvent('Error', error);
+    console.log('Error', error);
     setHasError(true);
   };
 
@@ -33,17 +27,6 @@ const ErrorBoundary = ({ children }) => {
   }
 
   return children;
-};
-
-const AppRouter = () => {
-  return (
-    <Switch>
-      <Route path="/login">{(params) => <Login />}</Route>
-      <Route path="/">{(params) => <Home />}</Route>
-      <Route path="/test/movie-card">{(params) => <MovieCardTest />}</Route>
-      <Route>{(params) => <NotFound />}</Route>
-    </Switch>
-  );
 };
 
 export default function App() {
@@ -60,13 +43,16 @@ export default function App() {
   }
 
   return (
-    <Router>
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <AppRouter />
-          <Toaster />
-        </QueryClientProvider>
-      </ErrorBoundary>
-    </Router>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Route path="/login" component={Login} />
+          <Route path="/" component={Home} />
+          <Route path="/test/movie-card" component={MovieCardTest} />
+          <Route component={NotFound} />
+        </Router>
+        <Toaster />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
