@@ -111,13 +111,13 @@ export default function App() {
   }
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <Router>
+    <Router>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
           <AppRouter />
           <Toaster />
-        </Router>
-      </QueryClientProvider>
-    </ErrorBoundary>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </Router>
   );
 }
