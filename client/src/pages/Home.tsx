@@ -35,8 +35,26 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           <TabsList className="w-full mb-4">
             <TabsTrigger value="watchlist" className="flex-1">worth watching</TabsTrigger>
             <TabsTrigger value="watched" className="flex-1">already watched</TabsTrigger>
-            <TabsTrigger value="search" className="flex-1">
-              <Search className="h-4 w-4" />
+            <TabsTrigger asChild value="search" className="flex-1 !p-0">
+              <div className="relative w-full">
+                <input 
+                  type="text" 
+                  placeholder="Search movies..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsSearching(true);
+                    fetch(`/api/search?q=${encodeURIComponent(e.target.value)}`)
+                      .then(res => res.json())
+                      .then(data => {
+                        setSearchResults(data);
+                        setIsSearching(false);
+                      });
+                  }}
+                  className="w-full h-full px-3 py-1.5 bg-transparent border-none focus:outline-none text-sm"
+                />
+                <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none opacity-50" />
+              </div>
             </TabsTrigger>
           </TabsList>
 
@@ -53,13 +71,6 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           </TabsContent>
 
           <TabsContent value="search">
-            <SearchBar 
-              onSearch={(results, query, loading) => {
-                setSearchResults(results);
-                setSearchQuery(query);
-                setIsSearching(loading);
-              }} 
-            />
             <SearchResults 
               results={searchResults}
               query={searchQuery}
