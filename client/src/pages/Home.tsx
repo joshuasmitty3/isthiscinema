@@ -10,12 +10,19 @@ import { Movie, SearchResult, User } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
+import { useSearch } from "@/hooks/use-search";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const queryClient = useQueryClient();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const { isLoading, debouncedSearch } = useSearch((results, query, loading) => {
+    setSearchResults(results);
+    setSearchQuery(query);
+    setIsSearching(loading);
+  });
 
   const { data: watchedList = [] } = useQuery({
     queryKey: ["watchedlist"],
@@ -43,17 +50,15 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setIsSearching(true);
-                    fetch(`/api/search?q=${encodeURIComponent(e.target.value)}`)
-                      .then(res => res.json())
-                      .then(data => {
-                        setSearchResults(data);
-                        setIsSearching(false);
-                      });
+                    debouncedSearch(e.target.value);
                   }}
                   className="w-full h-full px-3 py-1.5 bg-transparent border-none focus:outline-none text-sm"
                 />
-                <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none opacity-50" />
+                {isSearching ? (
+                  <LoadingSpinner size="sm" className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4" />
+                ) : (
+                  <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none opacity-50" />
+                )}
               </div>
             </TabsTrigger>
           </TabsList>
