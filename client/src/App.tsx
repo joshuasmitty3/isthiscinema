@@ -11,6 +11,7 @@ import { LoadingSpinner } from "./components/ui/loading-spinner";
 import MovieCard from "@/components/MovieCard";
 import MovieCardTest from './components/MovieCardTest';
 import Layout from "./components/Layout";
+import { Router } from "wouter";
 
 const logEvent = (event, data) => {
   console.log(`Event: ${event}`, data);
@@ -112,8 +113,10 @@ export default function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AppRouter />
-        <Toaster />
+        <Router>
+          <AppRouter />
+          <Toaster />
+        </Router>
       </QueryClientProvider>
     </ErrorBoundary>
   );
