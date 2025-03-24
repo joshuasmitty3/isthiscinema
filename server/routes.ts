@@ -19,8 +19,7 @@ import { Parser } from "json2csv";
 export function setupWatchListRoutes(app: Express) {
   // Get watch list
   app.get("/api/watchlist", async (req: Request, res: Response) => {
-    if (!req.session.userId) return res.status(401).json({ message: "Not authenticated" });
-    const movies = await storage.getWatchList(req.session.userId);
+    const movies = await storage.getWatchList(1); // Always use user ID 1
     res.json(movies);
   });
 
@@ -43,27 +42,7 @@ export function setupWatchListRoutes(app: Express) {
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Set up session middleware
-  const MemoryStoreSession = MemoryStore(session);
-  app.use(
-    session({
-      secret: "movie-watch-list-secret",
-      resave: false,
-      saveUninitialized: false,
-      cookie: { secure: false, maxAge: 86400000 }, // 24 hours
-      store: new MemoryStoreSession({
-        checkPeriod: 86400000, // prune expired entries every 24h
-      }),
-    })
-  );
-
-  // Auth middleware
-  const requireAuth = (req: Request, res: Response, next: Function) => {
-    if (!req.session.userId) {
-      return res.status(401).json({ message: "Authentication required" });
-    }
-    next();
-  };
+  // Removed auth middleware - all requests now allowed
 
   // Auth routes
   app.post("/api/login", async (req, res) => {
