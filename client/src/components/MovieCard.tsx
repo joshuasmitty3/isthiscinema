@@ -13,7 +13,6 @@ interface MovieCardProps {
 
 interface ExtendedMovieCardProps extends MovieCardProps {
   isDragging?: boolean;
-  style?: React.CSSProperties;
 }
 
 const icons = {
@@ -34,10 +33,8 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
         bg-white rounded-lg overflow-hidden
         border border-neutral-200
         shadow hover:shadow-md
-        transition-all duration-200 ease-in-out
         ${isCompact ? 'p-3' : 'p-4'}
-        transform transition-transform duration-200 ease-in-out
-        ${isDragging ? 'scale-[1.02] opacity-80' : 'scale-100 opacity-100'}
+        ${isDragging ? 'opacity-50' : ''}
       `}
     >
       <div className="flex gap-3">
