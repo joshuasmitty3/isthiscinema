@@ -8,7 +8,7 @@ export function Navigation() {
         is it cinema?
       </Link>
       <div className="flex items-center gap-4">
-        <span>Movie Watch List</span>
+        <span>is it cinema?</span>
       </div>
     </div>
   );

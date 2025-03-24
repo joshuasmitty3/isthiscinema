@@ -88,6 +88,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           </TabsContent>
         </Tabs>
       </div>
+    <Footer />
     </Layout>
   );
 }
