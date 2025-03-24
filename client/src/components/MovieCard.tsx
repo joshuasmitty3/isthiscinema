@@ -36,8 +36,8 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
         shadow hover:shadow-md
         transition-all duration-200 ease-in-out
         ${isCompact ? 'p-3' : 'p-4'}
-        transform transition-transform duration-200
-        ${isDragging ? 'scale-[1.02] opacity-80' : ''}
+        transform transition-transform duration-200 ease-in-out
+        ${isDragging ? 'scale-[1.02] opacity-80' : 'scale-100 opacity-100'}
       `}
     >
       <div className="flex gap-3">
