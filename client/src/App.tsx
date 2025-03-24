@@ -1,4 +1,4 @@
-import { Switch, Route, useLocation, Redirect } from "wouter";
+import { Route, Router, Switch } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,7 +11,6 @@ import { LoadingSpinner } from "./components/ui/loading-spinner";
 import MovieCard from "@/components/MovieCard";
 import MovieCardTest from './components/MovieCardTest';
 import Layout from "./components/Layout";
-import { Router } from "wouter";
 
 const logEvent = (event, data) => {
   console.log(`Event: ${event}`, data);
@@ -61,13 +60,13 @@ export default function App() {
   }
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <Router>
+    <Router>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
           <AppRouter />
           <Toaster />
-        </Router>
-      </QueryClientProvider>
-    </ErrorBoundary>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </Router>
   );
 }
