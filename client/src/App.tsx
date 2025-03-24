@@ -38,17 +38,14 @@ const ErrorBoundary = ({ children }) => {
 
 const AppRouter = () => {
   return (
-    <Router>
-      <Switch>
-        <Route path="/login">{(params) => <Login />}</Route>
-        <Route path="/">{(params) => <Home />}</Route>
-        <Route path="/test/movie-card">{(params) => <MovieCardTest />}</Route>
-        <Route>{(params) => <NotFound />}</Route>
-      </Switch>
-    </Router>
+    <Switch>
+      <Route path="/login">{(params) => <Login />}</Route>
+      <Route path="/">{(params) => <Home />}</Route>
+      <Route path="/test/movie-card">{(params) => <MovieCardTest />}</Route>
+      <Route>{(params) => <NotFound />}</Route>
+    </Switch>
   );
 };
-
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
