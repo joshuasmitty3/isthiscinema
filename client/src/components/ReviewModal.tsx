@@ -76,7 +76,7 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
               value={review}
               onChange={(e) => setReview(e.target.value.slice(0, maxLength))}
               rows={4}
-              placeholder="What did you think of this movie? (3-140 characters)"
+              placeholder="What did you think of this movie? (0/140 characters)"
               className="w-full p-3 border border-neutral-200 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
             <div className={`text-xs text-right mt-1 ${review.length >= maxLength ? 'text-[#F44336]' : 'text-neutral-600'}`}>
