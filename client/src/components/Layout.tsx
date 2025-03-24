@@ -1,7 +1,7 @@
 import { User } from "@/lib/types";
 import { RiLogoutBoxLine, RiUser3Line } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
-import Footer from "@/components/Footer"; // Assuming Footer component is imported from this path
+import { Footer } from "@/components/Footer";
 
 interface LayoutProps {
   children: React.ReactNode;
