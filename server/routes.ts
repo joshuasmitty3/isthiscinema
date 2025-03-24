@@ -41,6 +41,14 @@ export function setupWatchListRoutes(app: Express) {
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 
+// Auth middleware
+const requireAuth = (req: Request, res: Response, next: Function) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  next();
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Removed auth middleware - all requests now allowed
 
