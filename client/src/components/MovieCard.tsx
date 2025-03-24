@@ -13,6 +13,7 @@ interface MovieCardProps {
 
 interface ExtendedMovieCardProps extends MovieCardProps {
   isDragging?: boolean;
+  style?: React.CSSProperties;
 }
 
 const icons = {
