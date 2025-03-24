@@ -1,37 +1,22 @@
-import { User } from "@/lib/types";
-import { RiLogoutBoxLine, RiUser3Line } from "react-icons/ri";
-import { Button } from "@/components/ui/button";
-import { Footer } from "@/components/Footer";
+import React from "react";
+import { Link, Outlet } from "react-router-dom";
+import { Footer } from "./Footer";
 
-interface LayoutProps {
-  children: React.ReactNode;
-  user: User;
-  onLogout: () => void;
-}
-
-export default function Layout({ children, user, onLogout }: LayoutProps) {
+export function Layout() {
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-100">
-      <header className="bg-primary text-white shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-heading font-semibold">Movie Watch List</h1>
-
-          <div className="flex items-center space-x-2">
-            <span className="text-sm hidden sm:inline">{user.username}</span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:bg-primary/30 transition-colors rounded-full"
-              onClick={onLogout}
-              title="Logout"
-            >
-              <RiLogoutBoxLine className="h-5 w-5" />
-            </Button>
-          </div>
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center">
+          <Link to="/" className="font-semibold">
+            is it cinema?
+          </Link>
         </div>
       </header>
 
-      {children}
+      <main className="flex-1 container py-6">
+        <Outlet />
+      </main>
+
       <Footer />
     </div>
   );
