@@ -1,7 +1,7 @@
 import React from 'react';
 import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
 import type { Movie } from "@/lib/types";
-import { motion } from "framer-motion"; // Added import statement
+// import { motion } from "framer-motion"; // Removed import statement
 
 interface MovieCardProps {
   movie: Movie;
@@ -27,7 +27,7 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
   ref
 ) {
   return (
-    <motion.div // Changed to motion.div for animation
+    <div // Changed to div
       ref={ref}
       {...props}
       className={`
@@ -36,7 +36,8 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
         shadow hover:shadow-md
         transition-all duration-200 ease-in-out
         ${isCompact ? 'p-3' : 'p-4'}
-        ${isDragging ? 'opacity-50 scale-95 rotate-2' : 'opacity-100'}
+        transform transition-transform duration-200
+        ${isDragging ? 'scale-[1.02] opacity-80' : ''}
       `}
     >
       <div className="flex gap-3">
@@ -90,6 +91,6 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
