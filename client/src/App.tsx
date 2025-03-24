@@ -1,5 +1,4 @@
-
-import { Route, Router } from "wouter";
+import { Routes, Route } from "react-router-dom";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -10,29 +9,12 @@ import { useEffect, useState } from "react";
 import { LoadingSpinner } from "./components/ui/loading-spinner";
 import MovieCardTest from './components/MovieCardTest';
 import { User } from "@/lib/types";
-
-const ErrorBoundary = ({ children }) => {
-  const [hasError, setHasError] = useState(false);
-
-  const handleError = (error) => {
-    console.log('Error', error);
-    setHasError(true);
-  };
-
-  if (hasError) {
-    return (
-      <div>
-        <h1>Something went wrong.</h1>
-      </div>
-    );
-  }
-
-  return children;
-};
+import Layout from "./components/Layout";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -47,46 +29,32 @@ export default function App() {
       } catch (error) {
         console.error("Auth check failed:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     checkAuth();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include"
-      });
-      setUser(null);
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+  const handleLogout = () => {
+    setUser(null);
   };
 
-  if (isLoading) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <Router>
-          <Route path="/login">
-            {() => <Login />}
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Home user={user} onLogout={handleLogout} />} />
+            <Route path="/test/movie-card" element={<MovieCardTest />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
-          <Route path="/">
-            {() => <Home user={user} onLogout={handleLogout} />}
-          </Route>
-          <Route path="/test/movie-card">
-            {() => <MovieCardTest />}
-          </Route>
-          <Route>
-            {() => <NotFound />}
-          </Route>
-        </Router>
+        </Routes>
         <Toaster />
       </QueryClientProvider>
     </ErrorBoundary>
