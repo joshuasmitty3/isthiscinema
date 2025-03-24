@@ -40,10 +40,10 @@ const AppRouter = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/" component={Home} />
-        <Route path="/test/movie-card" component={MovieCardTest} />
-        <Route component={NotFound} />
+        <Route path="/login">{(params) => <Login />}</Route>
+        <Route path="/">{(params) => <Home />}</Route>
+        <Route path="/test/movie-card">{(params) => <MovieCardTest />}</Route>
+        <Route>{(params) => <NotFound />}</Route>
       </Switch>
     </Router>
   );
