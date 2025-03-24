@@ -1,7 +1,6 @@
 import React from 'react';
 import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
 import type { Movie } from "@/lib/types";
-// import { motion } from "framer-motion"; // Removed import statement
 
 interface MovieCardProps {
   movie: Movie;
@@ -27,7 +26,7 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
   ref
 ) {
   return (
-    <div // Changed to div
+    <div 
       ref={ref}
       {...props}
       className={`
