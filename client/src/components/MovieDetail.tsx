@@ -42,7 +42,30 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange }: M
     }
   };
 
-  const handleMoveToWatched = async () => {
+  const handleRemoveFromWatched = async () => {
+  try {
+    setIsLoading(true);
+    await removeFromWatchedList(movie.id);
+    
+    toast({
+      title: "Removed from Watched",
+      description: `${movie.title} has been removed from your watched list.`,
+    });
+    
+    onListsChange();
+  } catch (error) {
+    console.error("Failed to remove movie:", error);
+    toast({
+      title: "Failed to remove movie",
+      description: "There was an error removing the movie from your watched list.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const handleMoveToWatched = async () => {
     try {
       setIsLoading(true);
       await moveToWatched(movie.id);
