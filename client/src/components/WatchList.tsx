@@ -15,7 +15,7 @@ interface WatchListProps {
 
 export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient();
-  const { watchlist, reorderWatchlist, watchedList } = useMovies();
+  const { watchlist, reorderWatchlist } = useMovies();
   const [isDragging, setIsDragging] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -43,23 +43,29 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   };
 
-  const handleRemoveFromList = async (movie: Movie, listType: 'watchlist' | 'watchedlist') => {
+  const handleRemoveFromWatchedList = async (movie: Movie) => {
     try {
-      const endpoint = `/api/${listType}/${movie.id}`;
-      const response = await fetch(endpoint, { method: 'DELETE' });
+      const response = await fetch(`/api/watchedlist/${movie.id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.message || 'Failed to remove movie');
       }
-      console.log(`Successfully removed movie ${movie.title} from ${listType}`);
-      onListsChange?.();
+
+      console.log(`Successfully removed movie ${movie.title} from watched list`);
+
+      if (onListsChange) {
+        onListsChange();
+      }
     } catch (error) {
-      console.error(`Failed to remove movie from ${listType}:`, error);
+      console.error('Failed to remove movie:', error);
     }
-  };
+};
 
-
-  const handleMoveToWatchedList = async (movie: Movie) => {
+const handleMoveToWatchedList = async (movie: Movie) => {
     try {
       await fetch(`/api/movies/${movie.id}/move-to-watched`, {
         method: 'POST',
@@ -123,11 +129,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   }, [watchlist, reorderWatchlist, queryClient]);
 
-  const handleMovieClick = (movie: Movie) => {
-    setSelectedMovie(movie);
-    setIsDetailOpen(true);
-  };
-
   return (
     <>
       <Card className="border border-neutral-200">
@@ -166,8 +167,11 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         movie={movie}
                         actions={[
                           { type: "watch", handler: handleMoveToWatchedList },
-                          { type: "remove", handler: () => handleRemoveFromList(movie, 'watchlist') },
-                          { type: "details", handler: () => handleMovieClick(movie) }
+                          { type: "remove", handler: handleRemoveFromWatchList },
+                          { type: "details", handler: () => {
+                            setSelectedMovie(movie);
+                            setIsDetailOpen(true);
+                          }}
                         ]}
                         isDragging={isDragging}
                       />
@@ -179,23 +183,6 @@ export default function WatchList({ onListsChange }: WatchListProps) {
             )}
           </Droppable>
         </DragDropContext>
-        </CardContent>
-      </Card>
-
-      <h2 className="text-xl font-semibold mt-6 mb-4">Already Watched</h2>
-      <Card>
-        <CardContent>
-          {watchedList?.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              actions={[
-                { type: "remove", handler: () => handleRemoveFromList(movie, 'watchedlist') },
-                { type: "details", handler: () => handleMovieClick(movie) }
-              ]}
-              isCompact
-            />
-          ))}
         </CardContent>
       </Card>
       {selectedMovie && (
