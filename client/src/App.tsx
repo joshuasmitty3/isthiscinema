@@ -49,10 +49,10 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route element={<Layout />}>
             <Route index element={<Home user={user} onLogout={handleLogout} />} />
-            <Route path="login" element={<Login />} />
-            <Route path="test/movie-card" element={<MovieCardTest />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/test/movie-card" element={<MovieCardTest />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
