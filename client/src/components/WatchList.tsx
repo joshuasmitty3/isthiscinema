@@ -43,29 +43,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   };
 
-  const handleRemoveFromWatchedList = async (movie: Movie) => {
-    try {
-      const response = await fetch(`/api/watchedlist/${movie.id}`, {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to remove movie');
-      }
-
-      console.log(`Successfully removed movie ${movie.title} from watched list`);
-
-      if (onListsChange) {
-        onListsChange();
-      }
-    } catch (error) {
-      console.error('Failed to remove movie:', error);
-    }
-};
-
-const handleMoveToWatchedList = async (movie: Movie) => {
+  const handleMoveToWatchedList = async (movie: Movie) => {
     try {
       await fetch(`/api/movies/${movie.id}/move-to-watched`, {
         method: 'POST',

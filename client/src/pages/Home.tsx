@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { useSearch } from "@/hooks/use-search";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Footer } from "@/components/Footer"; // Added import for Footer component
 
 export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const queryClient = useQueryClient();
@@ -88,6 +89,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           </TabsContent>
         </Tabs>
       </div>
+      <Footer /> {/* Added Footer component */}
     </Layout>
   );
 }
