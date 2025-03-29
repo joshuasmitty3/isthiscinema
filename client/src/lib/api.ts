@@ -1,112 +1,94 @@
-import { MovieDetails, SearchResults } from '../../../shared/schema';
-import { QueryClient } from '@tanstack/react-query';
+import { apiRequest } from "./queryClient";
+import { Movie, SearchResult, User } from "./types";
 
-export async function searchMovies(query: string): Promise<SearchResults> {
-  const response = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`);
-  if (!response.ok) {
-    throw new Error('Failed to search movies');
-  }
-  return response.json();
-}
+export async function searchMovies(query: string): Promise<SearchResult[]> {
+  if (!query.trim()) return [];
 
-export async function getMovieDetails(id: string): Promise<MovieDetails> {
-  const response = await fetch(`/api/movies/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to get movie details');
-  }
-  return response.json();
-}
-
-export async function addToWatchList(movieId: number) {
-  const response = await fetch('/api/watchlist', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ movieId }),
+  const res = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`, {
+    credentials: "include",
   });
-  if (!response.ok) {
-    throw new Error('Failed to add to watch list');
+
+  if (!res.ok) {
+    throw new Error("Failed to search movies");
   }
-  return response.json();
+
+  const data = await res.json();
+  return data.results || [];
 }
 
-export async function removeFromWatchList(movieId: number) {
-  const response = await fetch(`/api/watchlist/${movieId}`, {
-    method: 'DELETE',
+export async function getMovieDetails(imdbId: string): Promise<Movie> {
+  const res = await fetch(`/api/movies/${imdbId}`, {
+    credentials: "include",
   });
-  if (!response.ok) {
-    throw new Error('Failed to remove from watch list');
+
+  if (!res.ok) {
+    throw new Error("Failed to get movie details");
   }
-  return response.json();
+
+  return await res.json();
 }
 
-export async function getWatchList() {
-  const response = await fetch('/api/watchlist');
-  if (!response.ok) {
-    throw new Error('Failed to get watch list');
-  }
-  return response.json();
+export async function login(username: string, password: string): Promise<User> {
+  const res = await apiRequest("POST", "/api/login", { username, password });
+  return await res.json();
 }
 
-export async function getWatchedList() {
-  const response = await fetch('/api/watchedlist');
-  if (!response.ok) {
-    throw new Error('Failed to get watched list');
-  }
-  return response.json();
+export async function addToWatchList(movieId: number): Promise<void> {
+  console.log('API call - Adding movie:', movieId);
+  const response = await apiRequest("POST", "/api/watchlist", { movieId });
+  console.log('API response:', response);
+  return response;
+}
+
+export async function removeFromWatchList(movieId: number): Promise<void> {
+  await apiRequest("DELETE", `/api/watchlist/${movieId}`);
+}
+
+export async function updateWatchListOrder(movieIds: number[]): Promise<void> {
+  await apiRequest("PUT", "/api/watchlist/order", { movieIds });
+}
+
+export async function addToWatchedList(movieId: number, review?: string): Promise<void> {
+  await apiRequest("POST", "/api/watchedlist", { 
+    movieId, 
+    review,
+    watchedDate: new Date().toISOString()
+  });
+}
+
+export async function updateReview(movieId: number, review: string): Promise<void> {
+  await apiRequest("PUT", `/api/watchedlist/${movieId}/review`, { review });
 }
 
 export async function moveToWatched(movieId: number, review?: string) {
-  const response = await fetch(`/api/movies/${movieId}/move-to-watched`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ review }),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to move to watched');
-  }
-  return response.json();
-}
+  try {
+    const response = await fetch(`/api/movies/${movieId}/move-to-watched`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ review }),
+    });
 
-export async function updateReview(movieId: number, review: string) {
-  const response = await fetch(`/api/watchedlist/${movieId}/review`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ review }),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to update review');
-  }
-  return response.json();
-}
+    const data = await response.json();
 
-export async function updateWatchListOrder(movieIds: number[]) {
-  const response = await fetch('/api/watchlist/order', {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ movieIds }),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to update watch list order');
-  }
-  return response.json();
-}
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to move movie to watched');
+    }
 
-export async function removeFromWatchedList(movieId: number) {
-  const response = await fetch(`/api/watchedlist/${movieId}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to remove from watched list');
+    console.log(`Successfully moved movie ${movieId} to watched list`);
+
+    const queryClient = new QueryClient();
+    await Promise.all([
+      queryClient.invalidateQueries(['watchlist']),
+      queryClient.invalidateQueries(['watchedlist'])
+    ]);
+
+    return data;
+  } catch (error) {
+    console.error('Error moving movie to watched:', error);
+    throw error; // Re-throw to handle in the component
   }
-  return response.json();
 }
 
 export async function exportToCSV(): Promise<Blob> {
@@ -115,4 +97,20 @@ export async function exportToCSV(): Promise<Blob> {
     throw new Error('Failed to export CSV');
   }
   return response.blob();
+}
+export async function removeFromWatchedList(movieId: number) {
+  const response = await fetch(`/api/watchedlist/${movieId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to remove from watched list');
+  }
+  
+  const queryClient = new QueryClient();
+  await Promise.all([
+    queryClient.invalidateQueries(['watchlist']),
+    queryClient.invalidateQueries(['watchedlist'])
+  ]);
+  
+  return response.json();
 }
