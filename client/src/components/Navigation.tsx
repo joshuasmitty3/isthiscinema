@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 export function Navigation() {
@@ -6,6 +7,9 @@ export function Navigation() {
       <Link to="/" className="text-xl font-bold">
         is it cinema?
       </Link>
+      <div className="flex items-center gap-4">
+        <span>Movie Watch List</span>
+      </div>
     </div>
   );
 }

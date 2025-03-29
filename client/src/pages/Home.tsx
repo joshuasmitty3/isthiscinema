@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
 import SearchResults from "@/components/SearchResults";
 import WatchList from "@/components/WatchList";
@@ -87,7 +88,6 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           </TabsContent>
         </Tabs>
       </div>
-      <Footer /> {/* Added Footer component */}
     </Layout>
   );
 }
