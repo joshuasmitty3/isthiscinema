@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
 import SearchResults from "@/components/SearchResults";
 import WatchList from "@/components/WatchList";
@@ -12,7 +11,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { useSearch } from "@/hooks/use-search";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { Footer } from "@/components/Footer"; // Added import for Footer component
 
 export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const queryClient = useQueryClient();
