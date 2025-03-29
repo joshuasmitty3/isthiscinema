@@ -207,7 +207,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Movie } from "@/lib/types";
-import MovieCard from './MovieCard';
 import MovieDetail from './MovieDetail';
 
 
