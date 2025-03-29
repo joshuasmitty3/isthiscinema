@@ -157,17 +157,23 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange, ref
                         In Watched List
                       </Button>
                       {movie.inWatchedList && (
-                        <div className="mt-4">
-                          <p className="text-sm text-gray-600">
-                            Watched on: {new Date(movie.watchedDate!).toLocaleDateString()}
-                          </p>
-                          {movie.review && (
-                            <p className="text-sm text-gray-600">Review: {movie.review}</p>
-                          )}
-                          <Button onClick={handleRemoveFromWatched} disabled={isLoading} className="mt-2 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600">
+                        <>
+                          <Button
+                            onClick={handleRemoveFromWatched}
+                            disabled={isLoading}
+                            className="flex-1 py-2 px-3 bg-red-500 text-white rounded-md hover:bg-red-600"
+                          >
                             Remove from Watched List
                           </Button>
-                        </div>
+                          <div className="mt-4">
+                            <p className="text-sm text-gray-600">
+                              Watched on: {new Date(movie.watchedDate!).toLocaleDateString()}
+                            </p>
+                            {movie.review && (
+                              <p className="text-sm text-gray-600">Review: {movie.review}</p>
+                            )}
+                          </div>
+                        </>
                       )}
                     </>
                   )}
