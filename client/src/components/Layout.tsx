@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
 import { Footer } from "./Footer";
@@ -14,10 +13,8 @@ export default function Layout() {
         </div>
       </header>
 
-      <main className="flex-1">
-        <div className="container py-6">
-          <Outlet />
-        </div>
+      <main className="flex-1 container py-6">
+        <Outlet />
       </main>
 
       <Footer />
