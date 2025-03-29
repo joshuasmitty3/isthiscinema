@@ -2,7 +2,7 @@ import { MovieDetails, SearchResults } from '../../../shared/schema';
 import { QueryClient } from '@tanstack/react-query';
 
 export async function searchMovies(query: string): Promise<SearchResults> {
-  const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+  const response = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`);
   if (!response.ok) {
     throw new Error('Failed to search movies');
   }
