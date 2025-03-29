@@ -15,7 +15,7 @@ interface WatchListProps {
 
 export default function WatchList({ onListsChange }: WatchListProps) {
   const queryClient = useQueryClient();
-  const { watchlist, reorderWatchlist } = useMovies();
+  const { watchlist, reorderWatchlist, watchedList } = useMovies();
   const [isDragging, setIsDragging] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -43,27 +43,21 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   };
 
-  const handleRemoveFromWatchedList = async (movie: Movie) => {
+  const handleRemoveFromList = async (movie: Movie, listType: 'watchlist' | 'watchedlist') => {
     try {
-      const response = await fetch(`/api/watchedlist/${movie.id}`, {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-
+      const endpoint = `/api/${listType}/${movie.id}`;
+      const response = await fetch(endpoint, { method: 'DELETE' });
       if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.message || 'Failed to remove movie');
       }
-
-      console.log(`Successfully removed movie ${movie.title} from watched list`);
-
-      if (onListsChange) {
-        onListsChange();
-      }
+      console.log(`Successfully removed movie ${movie.title} from ${listType}`);
+      onListsChange?.();
     } catch (error) {
-      console.error('Failed to remove movie:', error);
+      console.error(`Failed to remove movie from ${listType}:`, error);
     }
   };
+
 
   const handleMoveToWatchedList = async (movie: Movie) => {
     try {
@@ -129,6 +123,11 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     }
   }, [watchlist, reorderWatchlist, queryClient]);
 
+  const handleMovieClick = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setIsDetailOpen(true);
+  };
+
   return (
     <>
       <Card className="border border-neutral-200">
@@ -167,11 +166,8 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                         movie={movie}
                         actions={[
                           { type: "watch", handler: handleMoveToWatchedList },
-                          { type: "remove", handler: handleRemoveFromWatchList },
-                          { type: "details", handler: () => {
-                            setSelectedMovie(movie);
-                            setIsDetailOpen(true);
-                          }}
+                          { type: "remove", handler: () => handleRemoveFromList(movie, 'watchlist') },
+                          { type: "details", handler: () => handleMovieClick(movie) }
                         ]}
                         isDragging={isDragging}
                       />
@@ -185,76 +181,19 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         </DragDropContext>
         </CardContent>
       </Card>
-      {selectedMovie && (
-        <MovieDetail
-          movie={selectedMovie}
-          isOpen={isDetailOpen}
-          onClose={() => {
-            setIsDetailOpen(false);
-            setSelectedMovie(null);
-          }}
-        />
-      )}
-    </>
-  );
-}
 
-
-// Added WatchedList component
-import { useState, useCallback } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { Card, CardContent } from "@/components/ui/card";
-import { useMovies } from "@/lib/movies";
-import { useQueryClient } from "@tanstack/react-query";
-import type { Movie } from "@/lib/types";
-import MovieDetail from './MovieDetail';
-
-
-interface WatchedListProps {
-  onListsChange?: () => void;
-}
-
-const WatchedList: React.FC<WatchedListProps> = ({ onListsChange }) => {
-  const { watchedList, reorderWatchedList } = useMovies();
-  const queryClient = useQueryClient();
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-
-  const handleRemoveFromWatchedList = async (movie: Movie) => {
-    try {
-      const response = await fetch(`/api/watchedlist/${movie.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || 'Failed to remove movie');
-      }
-
-      console.log(`Successfully removed movie ${movie.title} from watched list`);
-      onListsChange?.();
-    } catch (error) {
-      console.error('Failed to remove movie:', error);
-    }
-  };
-
-  const handleShowDetails = (movie: Movie) => {
-    setSelectedMovie(movie);
-    setIsDetailOpen(true);
-  };
-
-  return (
-    <>
-      <Card className="border border-neutral-200">
+      <h2 className="text-xl font-semibold mt-6 mb-4">Already Watched</h2>
+      <Card>
         <CardContent>
           {watchedList?.map((movie) => (
             <MovieCard
               key={movie.id}
               movie={movie}
               actions={[
-                { type: "remove", handler: () => handleRemoveFromWatchedList(movie) },
-                { type: "details", handler: () => handleShowDetails(movie) },
+                { type: "remove", handler: () => handleRemoveFromList(movie, 'watchedlist') },
+                { type: "details", handler: () => handleMovieClick(movie) }
               ]}
+              isCompact
             />
           ))}
         </CardContent>
@@ -271,6 +210,4 @@ const WatchedList: React.FC<WatchedListProps> = ({ onListsChange }) => {
       )}
     </>
   );
-};
-
-export default WatchedList;
+}
