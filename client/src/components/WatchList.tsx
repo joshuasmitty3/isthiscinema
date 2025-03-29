@@ -63,9 +63,9 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     } catch (error) {
       console.error('Failed to remove movie:', error);
     }
-};
+  };
 
-const handleMoveToWatchedList = async (movie: Movie) => {
+  const handleMoveToWatchedList = async (movie: Movie) => {
     try {
       await fetch(`/api/movies/${movie.id}/move-to-watched`, {
         method: 'POST',
@@ -198,3 +198,80 @@ const handleMoveToWatchedList = async (movie: Movie) => {
     </>
   );
 }
+
+
+// Added WatchedList component
+import { useState, useCallback } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { Card, CardContent } from "@/components/ui/card";
+import { useMovies } from "@/lib/movies";
+import { useQueryClient } from "@tanstack/react-query";
+import type { Movie } from "@/lib/types";
+import MovieCard from './MovieCard';
+import MovieDetail from './MovieDetail';
+
+
+interface WatchedListProps {
+  onListsChange?: () => void;
+}
+
+const WatchedList: React.FC<WatchedListProps> = ({ onListsChange }) => {
+  const { watchedList, reorderWatchedList } = useMovies();
+  const queryClient = useQueryClient();
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  const handleRemoveFromWatchedList = async (movie: Movie) => {
+    try {
+      const response = await fetch(`/api/watchedlist/${movie.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to remove movie');
+      }
+
+      console.log(`Successfully removed movie ${movie.title} from watched list`);
+      onListsChange?.();
+    } catch (error) {
+      console.error('Failed to remove movie:', error);
+    }
+  };
+
+  const handleShowDetails = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setIsDetailOpen(true);
+  };
+
+  return (
+    <>
+      <Card className="border border-neutral-200">
+        <CardContent>
+          {watchedList?.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              actions={[
+                { type: "remove", handler: () => handleRemoveFromWatchedList(movie) },
+                { type: "details", handler: () => handleShowDetails(movie) },
+              ]}
+            />
+          ))}
+        </CardContent>
+      </Card>
+      {selectedMovie && (
+        <MovieDetail
+          movie={selectedMovie}
+          isOpen={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedMovie(null);
+          }}
+        />
+      )}
+    </>
+  );
+};
+
+export default WatchedList;
