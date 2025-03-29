@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -48,10 +49,10 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <Routes>
-          <Route element={<Layout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Home user={user} onLogout={handleLogout} />} />
-            <Route path="/test/movie-card" element={<MovieCardTest />} />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home user={user} onLogout={handleLogout} />} />
+            <Route path="login" element={<Login />} />
+            <Route path="test/movie-card" element={<MovieCardTest />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
