@@ -1,4 +1,3 @@
-
 import { MovieDetails, SearchResults } from '../../../shared/schema';
 import { QueryClient } from '@tanstack/react-query';
 
