@@ -49,16 +49,6 @@ export async function getWatchList() {
   return response.json();
 }
 
-export async function removeFromWatchedList(movieId: number) {
-  const response = await fetch(`/api/watchedlist/${movieId}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to remove from watched list');
-  }
-  return response.json();
-}
-
 export async function getWatchedList() {
   const response = await fetch('/api/watchedlist');
   if (!response.ok) {
