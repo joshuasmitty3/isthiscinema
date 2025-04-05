@@ -25,12 +25,12 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     const trimmedQuery = searchQuery.trim();
     
     if (trimmedQuery.length < MIN_SEARCH_LENGTH) {
-      onSearch([], "");
+      onSearch([], searchQuery, false);
       return;
     }
 
     setIsLoading(true);
-    onSearch([], trimmedQuery, true);
+    onSearch([], searchQuery, true);
     try {
       const results = await searchMovies(trimmedQuery);
       onSearch(results, trimmedQuery, false);
