@@ -22,9 +22,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const DEBOUNCE_MS = 400;
 
   const debouncedSearch = useDebouncedCallback(async (searchQuery: string) => {
-    const trimmedQuery = searchQuery.trim();
-    
-    if (trimmedQuery.length < MIN_SEARCH_LENGTH) {
+    if (searchQuery.trim().length < MIN_SEARCH_LENGTH) {
       onSearch([], searchQuery, false);
       return;
     }
@@ -32,8 +30,8 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     setIsLoading(true);
     onSearch([], searchQuery, true);
     try {
-      const results = await searchMovies(trimmedQuery);
-      onSearch(results, trimmedQuery, false);
+      const results = await searchMovies(searchQuery);
+      onSearch(results, searchQuery, false);
     } catch (error) {
       console.error("Search error:", error);
       toast({
