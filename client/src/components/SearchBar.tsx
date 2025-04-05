@@ -29,8 +29,12 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       return;
     }
 
-    setIsLoading(true);
-    onSearch([], searchQuery, true);
+    // Set loading without triggering input re-render
+    requestAnimationFrame(() => {
+      setIsLoading(true);
+      onSearch([], searchQuery, true);
+    });
+
     try {
       const results = await searchMovies(trimmedQuery);
       onSearch(results, searchQuery, false);
@@ -43,7 +47,9 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       });
       onSearch([], searchQuery, false);
     } finally {
-      setIsLoading(false);
+      requestAnimationFrame(() => {
+        setIsLoading(false);
+      });
     }
   }, DEBOUNCE_MS);
 
