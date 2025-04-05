@@ -70,7 +70,15 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
           type="text"
           placeholder="Search for movies..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            const target = e.target as HTMLInputElement;
+            const cursorPosition = target.selectionStart;
+            setQuery(e.target.value);
+            // Preserve cursor position after state update
+            requestAnimationFrame(() => {
+              target.setSelectionRange(cursorPosition, cursorPosition);
+            });
+          }}
           className="w-full py-3 px-4 pr-10 bg-white border border-neutral-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
         <Button
