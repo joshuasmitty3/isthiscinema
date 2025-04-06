@@ -7,6 +7,7 @@ import { RiDownloadLine } from "react-icons/ri";
 import MovieDetail from "./MovieDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
+import { QueryClient } from "@tanstack/react-query";
 import { ReviewModal } from "./ReviewModal";
 
 
@@ -139,10 +140,18 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                         className="text-xs px-2 py-1"
                         onClick={async () => {
                           try {
-                            await fetch(`/api/watchedlist/${movie.id}`, {
+                            const response = await fetch(`/api/watchedlist/${movie.id}`, {
                               method: 'DELETE',
                             });
-                            // Trigger refetch of the lists
+                            if (!response.ok) {
+                              throw new Error('Failed to remove movie');
+                            }
+                            // Use React Query to invalidate and refetch
+                            const queryClient = new QueryClient();
+                            await Promise.all([
+                              queryClient.invalidateQueries(['watchedlist']),
+                              queryClient.invalidateQueries(['watchlist'])
+                            ]);
                             if (onListsChange) {
                               onListsChange();
                             }
