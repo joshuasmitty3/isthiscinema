@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { searchMovies } from "@/lib/api";
 import { SearchResult } from "@/lib/types";
