@@ -1,16 +1,35 @@
 import { apiRequest } from "./queryClient";
 import { Movie, SearchResult, User } from "./types";
 import { QueryClient } from "@tanstack/react-query";
+import { queryClient } from "./queryClient";
 
-// Create a shared function for query invalidation with proper types
+/**
+ * Cache Invalidation
+ */
 const invalidateMovieQueries = async () => {
-  const queryClient = new QueryClient();
+  // Using the shared queryClient instance instead of creating a new one each time
   await Promise.all([
     queryClient.invalidateQueries({ queryKey: ['watchlist'] }),
     queryClient.invalidateQueries({ queryKey: ['watchedlist'] })
   ]);
 };
 
+/**
+ * Authentication API Functions
+ */
+export async function login(username: string, password: string): Promise<User> {
+  try {
+    const res = await apiRequest("POST", "/api/login", { username, password });
+    return await res.json();
+  } catch (error) {
+    console.error("Login failed:", error);
+    throw new Error("Authentication failed. Please check your credentials.");
+  }
+}
+
+/**
+ * Movie Search and Details API Functions
+ */
 export async function searchMovies(query: string): Promise<SearchResult[]> {
   if (!query.trim()) return [];
 
@@ -34,48 +53,87 @@ export async function getMovieDetails(imdbId: string): Promise<Movie> {
   }
 }
 
-export async function login(username: string, password: string): Promise<User> {
-  const res = await apiRequest("POST", "/api/login", { username, password });
-  return await res.json();
-}
-
+/**
+ * Watch List API Functions
+ */
 export async function addToWatchList(movieId: number): Promise<void> {
-  console.log('API call - Adding movie:', movieId);
-  // Include the order parameter required by the schema
-  await apiRequest("POST", "/api/watchlist", { 
-    movieId,
-    order: 1, // The server will calculate the correct order anyway
-    userId: 1
-  });
-  await invalidateMovieQueries();
-  console.log('API response: success');
+  try {
+    console.log('API call - Adding movie:', movieId);
+    await apiRequest("POST", "/api/watchlist", { 
+      movieId,
+      order: 1, // The server will calculate the correct order anyway
+      userId: 1
+    });
+    await invalidateMovieQueries();
+    console.log('API response: success');
+  } catch (error) {
+    console.error("Failed to add to watch list:", error);
+    throw new Error("Failed to add movie to watch list");
+  }
 }
 
 export async function removeFromWatchList(movieId: number): Promise<void> {
-  await apiRequest("DELETE", `/api/watchlist/${movieId}`);
-  await invalidateMovieQueries();
+  try {
+    await apiRequest("DELETE", `/api/watchlist/${movieId}`);
+    await invalidateMovieQueries();
+  } catch (error) {
+    console.error("Failed to remove from watch list:", error);
+    throw new Error("Failed to remove movie from watch list");
+  }
 }
 
 export async function updateWatchListOrder(movieIds: number[]): Promise<void> {
-  await apiRequest("PUT", "/api/watchlist/order", { movieIds });
-  await invalidateMovieQueries();
+  try {
+    await apiRequest("PUT", "/api/watchlist/order", { movieIds });
+    await invalidateMovieQueries();
+  } catch (error) {
+    console.error("Failed to update watch list order:", error);
+    throw new Error("Failed to reorder watch list");
+  }
 }
 
+/**
+ * Watched List API Functions
+ */
 export async function addToWatchedList(movieId: number, review?: string): Promise<void> {
-  await apiRequest("POST", "/api/watchedlist", { 
-    movieId, 
-    review,
-    watchedDate: new Date().toISOString(),
-    userId: 1
-  });
-  await invalidateMovieQueries();
+  try {
+    await apiRequest("POST", "/api/watchedlist", { 
+      movieId, 
+      review,
+      watchedDate: new Date().toISOString(),
+      userId: 1
+    });
+    await invalidateMovieQueries();
+  } catch (error) {
+    console.error("Failed to add to watched list:", error);
+    throw new Error("Failed to add movie to watched list");
+  }
 }
 
 export async function updateReview(movieId: number, review: string): Promise<void> {
-  await apiRequest("PUT", `/api/watchedlist/${movieId}/review`, { review });
-  await invalidateMovieQueries();
+  try {
+    await apiRequest("PUT", `/api/watchedlist/${movieId}/review`, { review });
+    await invalidateMovieQueries();
+  } catch (error) {
+    console.error("Failed to update review:", error);
+    throw new Error("Failed to update movie review");
+  }
 }
 
+export async function removeFromWatchedList(movieId: number): Promise<any> {
+  try {
+    const response = await apiRequest("DELETE", `/api/watchedlist/${movieId}`);
+    await invalidateMovieQueries();
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to remove from watched list:', error);
+    throw new Error('Failed to remove from watched list');
+  }
+}
+
+/**
+ * List Management API Functions
+ */
 export async function moveToWatched(movieId: number, review?: string): Promise<any> {
   try {
     const response = await apiRequest(
@@ -97,6 +155,9 @@ export async function moveToWatched(movieId: number, review?: string): Promise<a
   }
 }
 
+/**
+ * Export API Functions
+ */
 export async function exportToCSV(): Promise<Blob> {
   try {
     const response = await apiRequest("GET", '/api/export/csv');
@@ -104,16 +165,5 @@ export async function exportToCSV(): Promise<Blob> {
   } catch (error) {
     console.error('Failed to export CSV:', error);
     throw new Error('Failed to export CSV');
-  }
-}
-
-export async function removeFromWatchedList(movieId: number): Promise<any> {
-  try {
-    const response = await apiRequest("DELETE", `/api/watchedlist/${movieId}`);
-    await invalidateMovieQueries();
-    return await response.json();
-  } catch (error) {
-    console.error('Failed to remove from watched list:', error);
-    throw new Error('Failed to remove from watched list');
   }
 }
