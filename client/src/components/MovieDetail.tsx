@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Movie, CommonModalProps, ListChangeHandler } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { addToWatchList, moveToWatched, removeFromWatchedList } from "@/lib/api";
+import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 
 interface MovieDetailProps extends CommonModalProps {
   movie: Movie | null;
@@ -30,11 +31,12 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange, ref
 
       onListsChange();
     } catch (error) {
-      console.error("Failed to add movie:", error);
-      toast({
-        title: "Failed to add movie",
-        description: "There was an error adding the movie to your watch list.",
-        variant: "destructive",
+      handleError(error, {
+        component: "MovieDetail",
+        title: "Failed to Add Movie",
+        fallbackMessage: "There was an error adding the movie to your watch list.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
       });
     } finally {
       setIsLoading(false);
@@ -53,11 +55,12 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange, ref
 
       onListsChange();
     } catch (error) {
-      console.error("Failed to move movie:", error);
-      toast({
-        title: "Failed to move movie",
-        description: "There was an error moving the movie to your watched list.",
-        variant: "destructive",
+      handleError(error, {
+        component: "MovieDetail",
+        title: "Failed to Move Movie",
+        fallbackMessage: "There was an error moving the movie to your watched list.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
       });
     } finally {
       setIsLoading(false);
@@ -68,18 +71,21 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange, ref
     try {
       setIsLoading(true);
       await removeFromWatchedList(movie.id);
+      
       toast({
         title: "Removed from Watched",
         description: `${movie.title} has been removed from your watched list.`,
       });
-      refetch(); //Added refetch call
+      
+      refetch(); // Added refetch call
       onListsChange();
     } catch (error) {
-      console.error("Failed to remove movie:", error);
-      toast({
-        title: "Failed to remove movie",
-        description: "There was an error removing the movie from your watched list.",
-        variant: "destructive",
+      handleError(error, {
+        component: "MovieDetail",
+        title: "Failed to Remove Movie",
+        fallbackMessage: "There was an error removing the movie from your watched list.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
       });
     } finally {
       setIsLoading(false);

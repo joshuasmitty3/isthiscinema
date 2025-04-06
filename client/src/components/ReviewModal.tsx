@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Movie, CommonModalProps, ListChangeHandler } from '@/lib/types';
 import { updateReview } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
+import { handleError, ErrorSeverity } from '@/utils/errorHandler';
 
 interface ReviewModalProps extends CommonModalProps {
   movie: Movie | null;
@@ -51,11 +52,12 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
       onSave();
       onClose();
     } catch (error) {
-      console.error("Failed to save review:", error);
-      toast({
-        title: "Failed to save review",
-        description: "There was an error saving your review.",
-        variant: "destructive",
+      handleError(error, {
+        component: "ReviewModal",
+        title: "Failed to Save Review",
+        fallbackMessage: "There was an error saving your review.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
       });
     } finally {
       setIsLoading(false);
@@ -97,11 +99,12 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
                     onSave();
                     onClose();
                   } catch (error) {
-                    console.error("Failed to delete review:", error);
-                    toast({
-                      title: "Failed to delete review",
-                      description: "There was an error deleting your review.",
-                      variant: "destructive",
+                    handleError(error, {
+                      component: "ReviewModal",
+                      title: "Failed to Delete Review",
+                      fallbackMessage: "There was an error deleting your review.",
+                      severity: ErrorSeverity.ERROR,
+                      showToast: true
                     });
                   } finally {
                     setIsLoading(false);

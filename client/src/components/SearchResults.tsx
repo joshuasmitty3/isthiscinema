@@ -6,6 +6,7 @@ import { RiAddLine } from "react-icons/ri";
 import { Movie, SearchResult, ListChangeHandler } from "@/lib/types";
 import { Button } from "./ui/button";
 import { MovieSkeleton } from "./MovieSkeleton";
+import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 
 interface SearchResultsProps {
   results: SearchResult[];
@@ -44,10 +45,12 @@ export default function SearchResults({
         onListsChange();
       }
     } catch (error) {
-      console.error("Failed to add movie:", error);
-      toast({
-        title: "Failed to add movie",
-        description: "There was an error adding the movie to your watch list."
+      handleError(error, {
+        component: "SearchResults",
+        title: "Failed to Add Movie",
+        fallbackMessage: "There was an error adding the movie to your watch list.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
       });
     } finally {
       setAddingMovie(null);
@@ -59,10 +62,12 @@ export default function SearchResults({
       const movie = await getMovieDetails(searchResult.imdbID);
       onSelectMovie(movie);
     } catch (error) {
-      console.error("Failed to get movie details:", error);
-      toast({
-        title: "Failed to load movie details",
-        description: "There was an error loading the movie details."
+      handleError(error, {
+        component: "SearchResults",
+        title: "Failed to Load Movie Details",
+        fallbackMessage: "There was an error loading the movie details.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
       });
     }
   };

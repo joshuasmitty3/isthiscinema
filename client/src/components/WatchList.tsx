@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Movie, ListChangeHandler, MovieAction } from "@/lib/types";
 import { moveToWatched, removeFromWatchList } from "@/lib/api";
 import { logStateChange, logError } from '../utils/logger';
+import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 import MovieCard from './MovieCard';
 import MovieDetail from './MovieDetail';
 
@@ -29,8 +30,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         onListsChange();
       }
     } catch (error) {
-      console.error('Failed to remove movie:', error);
-      // Here we could add UI error feedback
+      handleError(error, {
+        component: "WatchList",
+        title: "Failed to Remove Movie",
+        fallbackMessage: `Could not remove "${movie.title}" from your watch list.`,
+        severity: ErrorSeverity.ERROR,
+        showToast: true
+      });
     }
   };
 
@@ -46,7 +52,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         onListsChange();
       }
     } catch (error) {
-      console.error('Failed to mark as watched:', error);
+      handleError(error, {
+        component: "WatchList",
+        title: "Failed to Mark as Watched",
+        fallbackMessage: `Could not mark "${movie.title}" as watched.`,
+        severity: ErrorSeverity.ERROR,
+        showToast: true
+      });
     }
   };
 
@@ -67,7 +79,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     try {
       await reorderWatchlist(startIndex, endIndex);
     } catch (error) {
-      console.error('Failed to reorder watchlist:', error);
+      handleError(error, {
+        component: "WatchList",
+        title: "Failed to Reorder List",
+        fallbackMessage: "Could not save the new order of your watch list.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
+      });
       queryClient.invalidateQueries({ queryKey: ['watchlist'] });
     }
   }, [watchlist, reorderWatchlist, queryClient]);
@@ -85,6 +103,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
               handleDragEnd(result);
               logStateChange('WatchList', 'item reordered', result);
             } catch (error) {
+              handleError(error, {
+                component: "WatchList",
+                title: "Drag and Drop Error",
+                fallbackMessage: "An error occurred while reordering items.",
+                severity: ErrorSeverity.ERROR,
+                showToast: true
+              });
               logError('WatchList', error);
             }
           }}

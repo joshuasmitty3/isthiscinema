@@ -1,7 +1,7 @@
 import { apiRequest } from "./queryClient";
 import { Movie, SearchResult, User } from "./types";
-import { QueryClient } from "@tanstack/react-query";
 import { queryClient } from "./queryClient";
+import { ErrorSeverity, handleError } from "@/utils/errorHandler";
 
 /**
  * Cache Invalidation
@@ -22,8 +22,14 @@ export async function login(username: string, password: string): Promise<User> {
     const res = await apiRequest("POST", "/api/login", { username, password });
     return await res.json();
   } catch (error) {
-    console.error("Login failed:", error);
-    throw new Error("Authentication failed. Please check your credentials.");
+    handleError(error, {
+      component: "Authentication",
+      title: "Login Failed",
+      fallbackMessage: "Authentication failed. Please check your credentials.",
+      severity: ErrorSeverity.ERROR,
+      showToast: true
+    });
+    throw error;
   }
 }
 
@@ -38,8 +44,13 @@ export async function searchMovies(query: string): Promise<SearchResult[]> {
     const data = await res.json();
     return data.results || [];
   } catch (error) {
-    console.error("Failed to search movies:", error);
-    throw new Error("Failed to search movies");
+    handleError(error, {
+      component: "MovieSearch",
+      title: "Search Failed",
+      fallbackMessage: "Failed to search movies. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -48,8 +59,13 @@ export async function getMovieDetails(imdbId: string): Promise<Movie> {
     const res = await apiRequest("GET", `/api/movies/${imdbId}`);
     return await res.json();
   } catch (error) {
-    console.error("Failed to get movie details:", error);
-    throw new Error("Failed to get movie details");
+    handleError(error, {
+      component: "MovieDetails",
+      title: "Failed to Load Movie",
+      fallbackMessage: "Could not retrieve movie details. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -67,8 +83,13 @@ export async function addToWatchList(movieId: number): Promise<void> {
     await invalidateMovieQueries();
     console.log('API response: success');
   } catch (error) {
-    console.error("Failed to add to watch list:", error);
-    throw new Error("Failed to add movie to watch list");
+    handleError(error, {
+      component: "WatchList",
+      title: "Failed to Add Movie",
+      fallbackMessage: "Could not add movie to your watch list. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -77,8 +98,13 @@ export async function removeFromWatchList(movieId: number): Promise<void> {
     await apiRequest("DELETE", `/api/watchlist/${movieId}`);
     await invalidateMovieQueries();
   } catch (error) {
-    console.error("Failed to remove from watch list:", error);
-    throw new Error("Failed to remove movie from watch list");
+    handleError(error, {
+      component: "WatchList",
+      title: "Failed to Remove Movie",
+      fallbackMessage: "Could not remove movie from your watch list. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -87,8 +113,13 @@ export async function updateWatchListOrder(movieIds: number[]): Promise<void> {
     await apiRequest("PUT", "/api/watchlist/order", { movieIds });
     await invalidateMovieQueries();
   } catch (error) {
-    console.error("Failed to update watch list order:", error);
-    throw new Error("Failed to reorder watch list");
+    handleError(error, {
+      component: "WatchList",
+      title: "Failed to Reorder List",
+      fallbackMessage: "Could not update the order of your watch list. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -105,8 +136,13 @@ export async function addToWatchedList(movieId: number, review?: string): Promis
     });
     await invalidateMovieQueries();
   } catch (error) {
-    console.error("Failed to add to watched list:", error);
-    throw new Error("Failed to add movie to watched list");
+    handleError(error, {
+      component: "WatchedList",
+      title: "Failed to Add Movie",
+      fallbackMessage: "Could not add movie to your watched list. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -115,8 +151,13 @@ export async function updateReview(movieId: number, review: string): Promise<voi
     await apiRequest("PUT", `/api/watchedlist/${movieId}/review`, { review });
     await invalidateMovieQueries();
   } catch (error) {
-    console.error("Failed to update review:", error);
-    throw new Error("Failed to update movie review");
+    handleError(error, {
+      component: "Reviews",
+      title: "Failed to Update Review",
+      fallbackMessage: "Could not update your review. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -126,8 +167,13 @@ export async function removeFromWatchedList(movieId: number): Promise<any> {
     await invalidateMovieQueries();
     return await response.json();
   } catch (error) {
-    console.error('Failed to remove from watched list:', error);
-    throw new Error('Failed to remove from watched list');
+    handleError(error, {
+      component: "WatchedList",
+      title: "Failed to Remove Movie",
+      fallbackMessage: "Could not remove movie from your watched list. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -150,8 +196,13 @@ export async function moveToWatched(movieId: number, review?: string): Promise<a
     
     return await response.json();
   } catch (error) {
-    console.error('Error moving movie to watched:', error);
-    throw error; // Re-throw to handle in the component
+    handleError(error, {
+      component: "MovieLists",
+      title: "Failed to Move Movie",
+      fallbackMessage: "Could not move movie to your watched list. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }
 
@@ -163,7 +214,12 @@ export async function exportToCSV(): Promise<Blob> {
     const response = await apiRequest("GET", '/api/export/csv');
     return await response.blob();
   } catch (error) {
-    console.error('Failed to export CSV:', error);
-    throw new Error('Failed to export CSV');
+    handleError(error, {
+      component: "Export",
+      title: "Export Failed",
+      fallbackMessage: "Could not export your movie lists to CSV. Please try again.",
+      severity: ErrorSeverity.ERROR
+    });
+    throw error;
   }
 }

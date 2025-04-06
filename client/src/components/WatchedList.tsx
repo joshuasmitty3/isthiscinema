@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ReviewModal } from "./ReviewModal";
 import { downloadBlob } from "@/lib/downloadUtils";
+import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 
 interface WatchedListProps {
   movies: Movie[];
@@ -39,7 +40,13 @@ export default function WatchedList({
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Export failed:', error);
+      handleError(error, {
+        component: "WatchedList",
+        title: "Export Failed",
+        fallbackMessage: "Could not export your movie lists to CSV. Please try again.",
+        severity: ErrorSeverity.ERROR,
+        showToast: true
+      });
     }
   };
 
@@ -70,7 +77,14 @@ export default function WatchedList({
         onListsChange();
       }
     } catch (error) {
-      console.error('Failed to remove movie:', error);
+      handleError(error, {
+        component: "WatchedList",
+        title: "Failed to Remove Movie",
+        fallbackMessage: `Could not remove "${movie.title}" from your watched list.`,
+        severity: ErrorSeverity.ERROR,
+        showToast: true
+      });
+      
       // Revert optimistic update if it fails
       queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
       queryClient.invalidateQueries({ queryKey: ['watchlist'] });
