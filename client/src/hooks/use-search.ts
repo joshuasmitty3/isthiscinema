@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { searchMovies } from "@/lib/api";
@@ -15,7 +14,7 @@ export function useSearch() {
 
   const debouncedSearch = useDebouncedCallback(async (searchQuery: string) => {
     const trimmedQuery = searchQuery.trim();
-    
+
     if (trimmedQuery.length < MIN_SEARCH_LENGTH) {
       setResults([]);
       setIsLoading(false);
@@ -23,7 +22,7 @@ export function useSearch() {
     }
 
     setIsLoading(true);
-    
+
     try {
       const results = await searchMovies(trimmedQuery);
       setResults(results);
