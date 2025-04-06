@@ -78,10 +78,14 @@ export class PostgresStorage implements StorageInterface {
       .where(eq(watchList.userId, userId))
       .orderBy(desc(watchList.order));
 
-    return watchListItems.map(item => ({
-      ...item,
-      inWatchList: true
-    }));
+    return watchListItems.map(item => {
+      const { order, ...movieData } = item;
+      return {
+        ...movieData,
+        inWatchList: true,
+        order: order || undefined
+      };
+    });
   }
 
   async addToWatchList(watchListItem: InsertWatchListItem): Promise<WatchListItem> {
@@ -133,10 +137,15 @@ export class PostgresStorage implements StorageInterface {
       .where(eq(watchedList.userId, userId))
       .orderBy(desc(watchedList.watchedDate));
 
-    return watchedListItems.map(item => ({
-      ...item,
-      inWatchedList: true
-    }));
+    return watchedListItems.map(item => {
+      const { watchedDate, review, rating, ...movieData } = item;
+      return {
+        ...movieData,
+        inWatchedList: true,
+        watchedDate: watchedDate || undefined,
+        review: review || undefined
+      };
+    });
   }
 
   async addToWatchedList(watchedListItem: InsertWatchedListItem): Promise<WatchedListItem> {
