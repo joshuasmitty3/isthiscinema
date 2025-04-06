@@ -136,7 +136,8 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                       </Button>
                       <Button
                         size="sm"
-                        className="text-xs px-2 py-1 bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20"
+                        variant="ghost"
+                        className="text-xs px-2 py-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
                         onClick={async () => {
                           try {
                             const response = await fetch(`/api/watchedlist/${movie.id}`, {
