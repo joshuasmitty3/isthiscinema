@@ -133,6 +133,26 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                       >
                         Review
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="text-xs px-2 py-1"
+                        onClick={async () => {
+                          try {
+                            await fetch(`/api/watchedlist/${movie.id}`, {
+                              method: 'DELETE',
+                            });
+                            // Trigger refetch of the lists
+                            if (onListsChange) {
+                              onListsChange();
+                            }
+                          } catch (error) {
+                            console.error('Failed to remove movie:', error);
+                          }
+                        }}
+                      >
+                        Remove
+                      </Button>
                     </div>
                   </div>
                 </div>
