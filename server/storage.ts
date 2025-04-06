@@ -139,13 +139,12 @@ export class PostgresStorage implements StorageInterface {
     await db.delete(watchedList)
       .where(and(
         eq(watchedList.userId, userId),
-        eq(watchedList.movieId, movieId)
+        eq(watchList.movieId, movieId)
       ));
   }
 
   async moveToWatched(userId: number, movieId: number, review?: string): Promise<void> {
     try {
-      // Check if movie exists in watch list.  This needs to be implemented using Postgres.
       const watchListItemExists = await db.select().from(watchList).where(and(eq(watchList.userId, userId), eq(watchList.movieId, movieId))).count() > 0;
       if (!watchListItemExists) {
         throw new Error('Movie not found in watch list');
@@ -162,39 +161,7 @@ export class PostgresStorage implements StorageInterface {
 
   async getMovieById(id: number): Promise<Movie | undefined> {
     const result = await this.getMovie(id);
-    return result;
-  }
-
-  async getWatchListForUser(userId: number): Promise<MovieWithDetails[]> {
-      return await this.getWatchListForUser(userId);
-  }
-
-  async addToWatchList(watchListItem: InsertWatchListItem): Promise<WatchListItem> {
-      return await this.addToWatchList(watchListItem);
-  }
-
-  async removeFromWatchList(userId: number, movieId: number): Promise<void> {
-    await this.removeFromWatchList(userId, movieId);
-  }
-
-  async updateWatchListOrder(userId: number, orderedMovieIds: number[]): Promise<void> {
-    await this.updateWatchListOrder(userId, orderedMovieIds);
-  }
-
-  async getWatchedListForUser(userId: number): Promise<MovieWithDetails[]> {
-    return await this.getWatchedListForUser(userId);
-  }
-
-  async addToWatchedList(watchedListItem: InsertWatchedListItem): Promise<WatchedListItem> {
-    return await this.addToWatchedList(watchedListItem);
-  }
-
-  async updateReview(userId: number, movieId: number, review: string): Promise<void> {
-    await this.updateReview(userId, movieId, review);
-  }
-
-  async removeFromWatchedList(userId: number, movieId: number): Promise<void> {
-      await this.removeFromWatchedList(userId, movieId);
+    return result || undefined;
   }
 }
 
