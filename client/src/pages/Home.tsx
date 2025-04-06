@@ -15,14 +15,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const queryClient = useQueryClient();
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const { isLoading, debouncedSearch } = useSearch((results, query, loading) => {
-    setSearchResults(results);
-    setSearchQuery(query);
-    setIsSearching(loading);
-  });
+  const { query, setQuery, results, isLoading, debouncedSearch } = useSearch();
 
   const { data: watchedList = [] } = useQuery({
     queryKey: ["watchedlist"],
@@ -47,10 +40,9 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
                 <input 
                   type="text" 
                   placeholder="Search movies..."
-                  value={searchQuery}
+                  value={query}
                   onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    debouncedSearch(e.target.value);
+                    setQuery(e.target.value);
                   }}
                   className="w-full h-full px-3 py-1.5 bg-transparent border-none focus:outline-none text-sm"
                 />
@@ -77,9 +69,9 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
 
           <TabsContent value="search">
             <SearchResults 
-              results={searchResults}
-              query={searchQuery}
-              isLoading={isSearching}
+              results={results}
+              query={query}
+              isLoading={isLoading}
               onSelectMovie={() => {}}
               onListsChange={() => {
                 queryClient.invalidateQueries({ queryKey: ["watchlist"] });

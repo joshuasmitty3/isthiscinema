@@ -1,12 +1,13 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { searchMovies } from "@/lib/api";
 import { SearchResult } from "@/lib/types";
 import { useToast } from "./use-toast";
 
-export function useSearch(onSearch: (results: SearchResult[], query: string, loading: boolean) => void) {
+export function useSearch() {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const MIN_SEARCH_LENGTH = 2;
@@ -16,16 +17,16 @@ export function useSearch(onSearch: (results: SearchResult[], query: string, loa
     const trimmedQuery = searchQuery.trim();
     
     if (trimmedQuery.length < MIN_SEARCH_LENGTH) {
-      onSearch([], "", false);
+      setResults([]);
+      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
-    onSearch([], trimmedQuery, true);
     
     try {
       const results = await searchMovies(trimmedQuery);
-      onSearch(results, trimmedQuery, false);
+      setResults(results);
     } catch (error) {
       console.error("Search error:", error);
       toast({
@@ -33,15 +34,11 @@ export function useSearch(onSearch: (results: SearchResult[], query: string, loa
         description: "Failed to search for movies. Please try again.",
         variant: "destructive",
       });
-      onSearch([], trimmedQuery, false);
+      setResults([]);
     } finally {
       setIsLoading(false);
     }
   }, DEBOUNCE_MS);
 
-  useEffect(() => {
-    debouncedSearch(query);
-  }, [query, debouncedSearch]);
-
-  return { query, setQuery, isLoading, debouncedSearch };
+  return { query, setQuery, results, isLoading, debouncedSearch };
 }
