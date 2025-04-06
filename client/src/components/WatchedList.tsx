@@ -22,7 +22,8 @@ interface WatchedListProps {
 export default function WatchedList({ movies, onOpenReviewModal = () => {} }: WatchedListProps) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false); //Added state for review modal
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleExportCSV = async () => {
     try {
@@ -138,7 +139,6 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                         variant="destructive"
                         className="text-xs px-2 py-1"
                         onClick={async () => {
-                          const queryClient = useQueryClient();
                           try {
                             const response = await fetch(`/api/watchedlist/${movie.id}`, {
                               method: 'DELETE',
