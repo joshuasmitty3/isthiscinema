@@ -38,6 +38,10 @@ export default function WatchList({ onListsChange }: WatchListProps) {
     try {
       await moveToWatched(movie.id);
       
+      // Invalidate both watchlist and watchedlist queries
+      queryClient.invalidateQueries({ queryKey: ['watchlist'] });
+      queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
+      
       if (onListsChange) {
         onListsChange();
       }

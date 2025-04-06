@@ -62,6 +62,10 @@ export default function WatchedList({
       
       await removeFromWatchedList(movie.id);
       
+      // Invalidate both watchlist and watchedlist queries
+      queryClient.invalidateQueries({ queryKey: ['watchlist'] });
+      queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
+      
       if (onListsChange) {
         onListsChange();
       }
@@ -69,6 +73,7 @@ export default function WatchedList({
       console.error('Failed to remove movie:', error);
       // Revert optimistic update if it fails
       queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
+      queryClient.invalidateQueries({ queryKey: ['watchlist'] });
     }
   };
 

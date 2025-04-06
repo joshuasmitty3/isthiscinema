@@ -5,7 +5,6 @@ import SearchResults from "@/components/SearchResults";
 import WatchList from "@/components/WatchList";
 import WatchedList from "@/components/WatchedList";
 import MovieDetail from "@/components/MovieDetail";
-import ReviewModal from "@/components/ReviewModal";
 import { Movie, SearchResult, User } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -15,7 +14,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const queryClient = useQueryClient();
-  const { query, setQuery, results, isLoading, debouncedSearch } = useSearch();
+  const { query, setQuery, results, isLoading } = useSearch();
 
   const { data: watchedList = [] } = useQuery({
     queryKey: ["watchedlist"],
@@ -59,12 +58,19 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
             <WatchList 
               onListsChange={() => {
                 queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
               }}
             />
           </TabsContent>
 
           <TabsContent value="watched">
-            <WatchedList movies={watchedList} />
+            <WatchedList 
+              movies={watchedList} 
+              onListsChange={() => {
+                queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="search">
@@ -75,6 +81,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
               onSelectMovie={() => {}}
               onListsChange={() => {
                 queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
               }}
             />
           </TabsContent>
