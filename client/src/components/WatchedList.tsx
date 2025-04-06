@@ -7,7 +7,7 @@ import { RiDownloadLine } from "react-icons/ri";
 import MovieDetail from "./MovieDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
-import { QueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { ReviewModal } from "./ReviewModal";
 
 
@@ -147,11 +147,9 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                               throw new Error('Failed to remove movie');
                             }
                             // Use React Query to invalidate and refetch
-                            const queryClient = new QueryClient();
-                            await Promise.all([
-                              queryClient.invalidateQueries(['watchedlist']),
-                              queryClient.invalidateQueries(['watchlist'])
-                            ]);
+                            const queryClient = useQueryClient();
+                            await queryClient.invalidateQueries(['watchedlist']);
+                            await queryClient.invalidateQueries(['watchlist']);
                             if (onListsChange) {
                               onListsChange();
                             }
