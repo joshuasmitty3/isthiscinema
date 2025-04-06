@@ -2,24 +2,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Movie } from "@/lib/types";
 import { format } from "date-fns";
-import { getCSVExportUrl } from "@/lib/api";
+import { exportToCSV, removeFromWatchedList } from "@/lib/api";
 import { RiDownloadLine } from "react-icons/ri";
 import MovieDetail from "./MovieDetail";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ReviewModal } from "./ReviewModal";
-
-
-import { formatMovieForCSV, validateCSVData } from '@/lib/csvUtils';
+import { downloadBlob } from "@/lib/downloadUtils";
 
 interface WatchedListProps {
   movies: Movie[];
   onSelectMovie?: (movie: Movie) => void;
   onOpenReviewModal?: (movie: Movie) => void;
+  onListsChange?: () => void;
 }
 
-export default function WatchedList({ movies, onOpenReviewModal = () => {} }: WatchedListProps) {
+export default function WatchedList({ 
+  movies, 
+  onOpenReviewModal = () => {},
+  onListsChange 
+}: WatchedListProps) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -27,11 +29,7 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
 
   const handleExportCSV = async () => {
     try {
-      const response = await fetch('/api/export/csv');
-      if (!response.ok) {
-        throw new Error('Failed to export CSV');
-      }
-      const blob = await response.blob();
+      const blob = await exportToCSV();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -55,13 +53,28 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
     setSelectedMovie(null);
   };
 
-  const handleListsChange = () => {
-    // Implement if needed for refreshing the lists
+  const handleRemoveFromWatchedList = async (movie: Movie) => {
+    try {
+      // Optimistically update UI
+      queryClient.setQueryData(['watchedlist'], (old: Movie[] | undefined) => 
+        old?.filter(m => m.id !== movie.id) || []
+      );
+      
+      await removeFromWatchedList(movie.id);
+      
+      if (onListsChange) {
+        onListsChange();
+      }
+    } catch (error) {
+      console.error('Failed to remove movie:', error);
+      // Revert optimistic update if it fails
+      queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
+    }
   };
 
   const refetch = () => {
-    // Placeholder for refetching data after saving review.  Implement actual logic here.
-    console.log("Review saved. Refetching data...");
+    queryClient.invalidateQueries({ queryKey: ['watchlist'] });
+    queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
   };
 
   return (
@@ -138,31 +151,7 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                         size="sm"
                         variant="ghost"
                         className="text-xs px-2 py-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
-                        onClick={async () => {
-                          try {
-                            const response = await fetch(`/api/watchedlist/${movie.id}`, {
-                              method: 'DELETE',
-                            });
-                            if (!response.ok) {
-                              throw new Error('Failed to remove movie');
-                            }
-                            
-                            // Optimistically update UI
-                            queryClient.setQueryData(['watchedlist'], (old: Movie[] | undefined) => 
-                              old?.filter(m => m.id !== movie.id) || []
-                            );
-                            
-                            // Force refetch both lists
-                            await queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
-                            await queryClient.invalidateQueries({ queryKey: ['watchlist'] });
-                            
-                            if (onListsChange) {
-                              onListsChange();
-                            }
-                          } catch (error) {
-                            console.error('Failed to remove movie:', error);
-                          }
-                        }}
+                        onClick={() => handleRemoveFromWatchedList(movie)}
                       >
                         Remove
                       </Button>
@@ -179,7 +168,10 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
       movie={selectedMovie}
       isOpen={isDetailOpen}
       onClose={handleCloseModal}
-      onListsChange={handleListsChange}
+      onListsChange={() => {
+        if (onListsChange) onListsChange();
+      }}
+      refetch={refetch}
     />
     <ReviewModal
       movie={selectedMovie}

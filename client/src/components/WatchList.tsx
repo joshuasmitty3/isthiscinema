@@ -4,10 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Movie } from "@/lib/types";
-import { moveToWatched } from "@/lib/api";
+import { moveToWatched, removeFromWatchList } from "@/lib/api";
 import { logStateChange, logError } from '../utils/logger';
 import MovieCard from './MovieCard';
-import MovieDetail from './MovieDetail'; // Added logError import
+import MovieDetail from './MovieDetail';
 
 interface WatchListProps {
   onListsChange?: () => void;
@@ -22,18 +22,9 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   const handleRemoveFromWatchList = async (movie: Movie) => {
     try {
-      const response = await fetch(`/api/watchlist/${movie.id}`, {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to remove movie');
-      }
-
+      await removeFromWatchList(movie.id);
       console.log(`Successfully removed movie ${movie.title} from watchlist`);
-
+      
       if (onListsChange) {
         onListsChange();
       }
@@ -45,38 +36,8 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   const handleMoveToWatchedList = async (movie: Movie) => {
     try {
-      await fetch(`/api/movies/${movie.id}/move-to-watched`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      await Promise.all([
-        queryClient.invalidateQueries(['watchlist']),
-        queryClient.invalidateQueries(['watchedlist'])
-      ]);
-
-      if (onListsChange) {
-        onListsChange();
-      }
-    } catch (error) {
-      console.error('Failed to mark as watched:', error);
-    }
-  };
-
-  const handleMoveToWatched = async (movie: Movie) => {
-    try {
-      await fetch(`/api/movies/${movie.id}/move-to-watched`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      await queryClient.invalidateQueries(['watchlist']);
-      await queryClient.invalidateQueries(['watchedlist']);
-
+      await moveToWatched(movie.id);
+      
       if (onListsChange) {
         onListsChange();
       }
@@ -103,7 +64,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
       await reorderWatchlist(startIndex, endIndex);
     } catch (error) {
       console.error('Failed to reorder watchlist:', error);
-      queryClient.invalidateQueries(['watchlist']);
+      queryClient.invalidateQueries({ queryKey: ['watchlist'] });
     }
   }, [watchlist, reorderWatchlist, queryClient]);
 
@@ -131,7 +92,7 @@ export default function WatchList({ onListsChange }: WatchListProps) {
                 ref={provided.innerRef}
                 className="space-y-2"
               >
-                {watchlist?.map((movie, index) => (
+                {watchlist?.map((movie: Movie, index: number) => (
                   <Draggable
                     key={movie.id}
                     draggableId={movie.id.toString()}
@@ -170,6 +131,13 @@ export default function WatchList({ onListsChange }: WatchListProps) {
           onClose={() => {
             setIsDetailOpen(false);
             setSelectedMovie(null);
+          }}
+          onListsChange={() => {
+            if (onListsChange) onListsChange();
+          }}
+          refetch={() => {
+            queryClient.invalidateQueries({ queryKey: ['watchlist'] });
+            queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
           }}
         />
       )}

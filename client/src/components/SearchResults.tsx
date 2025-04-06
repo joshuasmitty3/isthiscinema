@@ -1,20 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getMovieDetails } from "@/lib/api";
+import { getMovieDetails, addToWatchList } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { RiAddLine } from "react-icons/ri";
 import { Movie, SearchResult } from "@/lib/types";
 import { Button } from "./ui/button";
-import { LoadingSpinner } from "./ui/loading-spinner";
-
-interface SearchResultsProps {
-  results: SearchResult[];
-  query: string;
-  onSelectMovie: (movie: Movie) => void;
-  onListsChange: () => void;
-  isLoading?: boolean;
-}
-
 import { MovieSkeleton } from "./MovieSkeleton";
 
 interface SearchResultsProps {
@@ -39,19 +29,9 @@ export default function SearchResults({
     try {
       setAddingMovie(searchResult.imdbID);
       const movie = await getMovieDetails(searchResult.imdbID);
-      console.log("Movie details fetched:", movie); // Added logging for debugging
-      const order = 1; //  Simplified order - needs better implementation in a real app
-      await fetch('/api/watchlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          movieId: movie.id, // Use the internal movie ID instead of IMDB ID
-          order,
-          userId: 1 // This should match the logged in user's ID
-        }),
-      });
+      console.log("Movie details fetched:", movie);
+      
+      await addToWatchList(movie.id);
 
       // Play success sound
       new Audio('/success.mp3').play().catch(console.error);
@@ -60,15 +40,14 @@ export default function SearchResults({
       button?.classList.add('animate-success');
       setTimeout(() => button?.classList.remove('animate-success'), 500);
 
-      if (onListsChange) { //Added check to prevent errors if onListsChange is undefined
+      if (onListsChange) {
         onListsChange();
       }
     } catch (error) {
       console.error("Failed to add movie:", error);
       toast({
         title: "Failed to add movie",
-        description: "There was an error adding the movie to your watch list.",
-        variant: "destructive",
+        description: "There was an error adding the movie to your watch list."
       });
     } finally {
       setAddingMovie(null);
@@ -83,8 +62,7 @@ export default function SearchResults({
       console.error("Failed to get movie details:", error);
       toast({
         title: "Failed to load movie details",
-        description: "There was an error loading the movie details.",
-        variant: "destructive",
+        description: "There was an error loading the movie details."
       });
     }
   };
@@ -120,6 +98,7 @@ export default function SearchResults({
                   className="w-full h-full object-cover"
                 />
                 <Button
+                  data-movie-id={result.imdbID}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleAddToWatchList(result);
