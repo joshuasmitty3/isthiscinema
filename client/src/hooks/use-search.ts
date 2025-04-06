@@ -25,7 +25,7 @@ export function useSearch() {
 
     try {
       const results = await searchMovies(trimmedQuery);
-      setResults(results);
+      setResults(results || []);
     } catch (error) {
       console.error("Search error:", error);
       toast({
@@ -39,5 +39,9 @@ export function useSearch() {
     }
   }, DEBOUNCE_MS);
 
-  return { query, setQuery, results, isLoading, debouncedSearch };
+  useEffect(() => {
+    debouncedSearch(query);
+  }, [query, debouncedSearch]);
+
+  return { query, setQuery, results, isLoading };
 }
