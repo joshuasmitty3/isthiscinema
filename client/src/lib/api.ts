@@ -41,7 +41,12 @@ export async function login(username: string, password: string): Promise<User> {
 
 export async function addToWatchList(movieId: number): Promise<void> {
   console.log('API call - Adding movie:', movieId);
-  await apiRequest("POST", "/api/watchlist", { movieId });
+  // Include the order parameter required by the schema
+  await apiRequest("POST", "/api/watchlist", { 
+    movieId,
+    order: 1, // The server will calculate the correct order anyway
+    userId: 1
+  });
   await invalidateMovieQueries();
   console.log('API response: success');
 }
@@ -60,7 +65,8 @@ export async function addToWatchedList(movieId: number, review?: string): Promis
   await apiRequest("POST", "/api/watchedlist", { 
     movieId, 
     review,
-    watchedDate: new Date().toISOString()
+    watchedDate: new Date().toISOString(),
+    userId: 1
   });
   await invalidateMovieQueries();
 }
@@ -75,7 +81,10 @@ export async function moveToWatched(movieId: number, review?: string): Promise<a
     const response = await apiRequest(
       "POST", 
       `/api/movies/${movieId}/move-to-watched`, 
-      { review }
+      { 
+        review,
+        userId: 1
+      }
     );
     
     console.log(`Successfully moved movie ${movieId} to watched list`);
