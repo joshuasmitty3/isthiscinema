@@ -6,7 +6,7 @@ import { getCSVExportUrl } from "@/lib/api";
 import { RiDownloadLine } from "react-icons/ri";
 import MovieDetail from "./MovieDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ReviewModal } from "./ReviewModal";
 
@@ -139,6 +139,7 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                         variant="destructive"
                         className="text-xs px-2 py-1"
                         onClick={async () => {
+                          const queryClient = useQueryClient();
                           try {
                             const response = await fetch(`/api/watchedlist/${movie.id}`, {
                               method: 'DELETE',
@@ -146,20 +147,15 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                             if (!response.ok) {
                               throw new Error('Failed to remove movie');
                             }
-                            // Use React Query to invalidate and refetch
-                            // Get the queryClient instance from the component scope
-                            const queryClient = useQueryClient();
                             
-                            // Remove from UI immediately for better UX
+                            // Optimistically update UI
                             queryClient.setQueryData(['watchedlist'], (old: Movie[] | undefined) => 
                               old?.filter(m => m.id !== movie.id) || []
                             );
                             
-                            // Invalidate both queries to trigger a background refresh
-                            await Promise.all([
-                              queryClient.invalidateQueries(['watchedlist']),
-                              queryClient.invalidateQueries(['watchlist'])
-                            ]);
+                            // Force refetch both lists
+                            await queryClient.invalidateQueries({ queryKey: ['watchedlist'] });
+                            await queryClient.invalidateQueries({ queryKey: ['watchlist'] });
                             
                             if (onListsChange) {
                               onListsChange();
