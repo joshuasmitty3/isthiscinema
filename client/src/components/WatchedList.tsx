@@ -12,7 +12,6 @@ import { ReviewModal } from "./ReviewModal";
 
 
 import { formatMovieForCSV, validateCSVData } from '@/lib/csvUtils';
-import { useEffect } from 'react';
 
 interface WatchedListProps {
   movies: Movie[];
