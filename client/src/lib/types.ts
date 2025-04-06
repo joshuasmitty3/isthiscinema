@@ -28,3 +28,18 @@ export interface User {
   id: number;
   username: string;
 }
+
+// Common types for component props
+export type ListChangeHandler = () => void;
+
+export type MovieActionType = 'watch' | 'remove' | 'details';
+
+export type MovieAction = {
+  type: MovieActionType;
+  handler: (movie: Movie) => void;
+};
+
+export interface CommonModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}

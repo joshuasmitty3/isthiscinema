@@ -43,11 +43,19 @@ const Toast = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root>
 >(({ className, ...props }, ref) => {
   const { playSuccess } = useToastSound();
+  // Use a ref to track previous and current state for sound effect
+  const prevOpenRef = React.useRef(false);
+  
   React.useEffect(() => {
-    if (props['data-state'] === 'open' && props.children?.toString().includes('success')) {
+    // Safely check if toast is open based on className changes
+    const isOpen = ref.current?.classList.contains('data-[state=open]:animate-in');
+    
+    if (isOpen && !prevOpenRef.current && props.children?.toString().includes('success')) {
       playSuccess();
     }
-  }, [props['data-state']]);
+    
+    prevOpenRef.current = isOpen || false;
+  }, [props.children, playSuccess]);
 
   return (
     <ToastPrimitives.Root
@@ -119,7 +127,9 @@ const ToastDescription = React.forwardRef<
 ))
 ToastDescription.displayName = ToastPrimitives.Description.displayName
 
-type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
+type ToastProps = React.ComponentPropsWithoutRef<typeof Toast> & {
+  variant?: 'default' | 'destructive' | string;
+}
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 

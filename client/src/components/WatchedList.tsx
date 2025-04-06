@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Movie } from "@/lib/types";
+import { Movie, ListChangeHandler } from "@/lib/types";
 import { format } from "date-fns";
 import { exportToCSV, removeFromWatchedList } from "@/lib/api";
 import { RiDownloadLine } from "react-icons/ri";
@@ -14,7 +14,7 @@ interface WatchedListProps {
   movies: Movie[];
   onSelectMovie?: (movie: Movie) => void;
   onOpenReviewModal?: (movie: Movie) => void;
-  onListsChange?: () => void;
+  onListsChange?: ListChangeHandler;
 }
 
 export default function WatchedList({ 

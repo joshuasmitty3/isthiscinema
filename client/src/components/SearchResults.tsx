@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getMovieDetails, addToWatchList } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { RiAddLine } from "react-icons/ri";
-import { Movie, SearchResult } from "@/lib/types";
+import { Movie, SearchResult, ListChangeHandler } from "@/lib/types";
 import { Button } from "./ui/button";
 import { MovieSkeleton } from "./MovieSkeleton";
 
@@ -11,7 +11,7 @@ interface SearchResultsProps {
   results: SearchResult[];
   query: string;
   onSelectMovie: (movie: Movie) => void;
-  onListsChange: () => void;
+  onListsChange: ListChangeHandler;
   isLoading?: boolean;
 }
 

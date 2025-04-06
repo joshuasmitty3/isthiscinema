@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Movie } from "@/lib/types";
+import { Movie, CommonModalProps, ListChangeHandler } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { addToWatchList, moveToWatched, removeFromWatchedList } from "@/lib/api"; // Added import for removeFromWatchedList
+import { addToWatchList, moveToWatched, removeFromWatchedList } from "@/lib/api";
 
-interface MovieDetailProps {
+interface MovieDetailProps extends CommonModalProps {
   movie: Movie | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onListsChange: () => void;
-  refetch: () => void; // Added refetch function
+  onListsChange: ListChangeHandler;
+  refetch: ListChangeHandler;
 }
 
 export default function MovieDetail({ movie, isOpen, onClose, onListsChange, refetch }: MovieDetailProps) {

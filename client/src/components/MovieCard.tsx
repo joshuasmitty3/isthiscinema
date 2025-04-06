@@ -1,13 +1,10 @@
 import React from 'react';
 import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
-import type { Movie } from "@/lib/types";
+import type { Movie, MovieAction, MovieActionType } from "@/lib/types";
 
 interface MovieCardProps {
   movie: Movie;
-  actions: {
-    type: string;
-    handler: (movie: Movie) => void;
-  }[];
+  actions: MovieAction[];
   isCompact?: boolean;
 }
 
@@ -15,7 +12,7 @@ interface ExtendedMovieCardProps extends MovieCardProps {
   isDragging?: boolean;
 }
 
-const icons = {
+const icons: Record<MovieActionType, React.ReactNode> = {
   watch: <RiEyeLine className="w-4 h-4" />,
   remove: <RiDeleteBin6Line className="w-4 h-4" />,
   details: <RiInformationLine className="w-4 h-4" />

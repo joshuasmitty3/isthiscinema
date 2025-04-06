@@ -4,15 +4,13 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Movie } from '@/lib/types';
+import { Movie, CommonModalProps, ListChangeHandler } from '@/lib/types';
 import { updateReview } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 
-interface ReviewModalProps {
+interface ReviewModalProps extends CommonModalProps {
   movie: Movie | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
+  onSave: ListChangeHandler;
 }
 
 export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps) {

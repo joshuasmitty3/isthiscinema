@@ -5,7 +5,7 @@ import SearchResults from "@/components/SearchResults";
 import WatchList from "@/components/WatchList";
 import WatchedList from "@/components/WatchedList";
 import MovieDetail from "@/components/MovieDetail";
-import { Movie, SearchResult, User } from "@/lib/types";
+import { Movie, SearchResult, User, ListChangeHandler } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
@@ -15,6 +15,11 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 export default function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
   const queryClient = useQueryClient();
   const { query, setQuery, results, isLoading } = useSearch();
+  
+  const handleListsChange: ListChangeHandler = () => {
+    queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+    queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
+  };
 
   const { data: watchedList = [] } = useQuery({
     queryKey: ["watchedlist"],
@@ -55,21 +60,13 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
           </TabsList>
 
           <TabsContent value="watchlist">
-            <WatchList 
-              onListsChange={() => {
-                queryClient.invalidateQueries({ queryKey: ["watchlist"] });
-                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
-              }}
-            />
+            <WatchList onListsChange={handleListsChange} />
           </TabsContent>
 
           <TabsContent value="watched">
             <WatchedList 
               movies={watchedList} 
-              onListsChange={() => {
-                queryClient.invalidateQueries({ queryKey: ["watchlist"] });
-                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
-              }}
+              onListsChange={handleListsChange}
             />
           </TabsContent>
 
@@ -79,10 +76,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
               query={query}
               isLoading={isLoading}
               onSelectMovie={() => {}}
-              onListsChange={() => {
-                queryClient.invalidateQueries({ queryKey: ["watchlist"] });
-                queryClient.invalidateQueries({ queryKey: ["watchedlist"] });
-              }}
+              onListsChange={handleListsChange}
             />
           </TabsContent>
         </Tabs>

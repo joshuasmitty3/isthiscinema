@@ -3,14 +3,14 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
-import type { Movie } from "@/lib/types";
+import type { Movie, ListChangeHandler, MovieAction } from "@/lib/types";
 import { moveToWatched, removeFromWatchList } from "@/lib/api";
 import { logStateChange, logError } from '../utils/logger';
 import MovieCard from './MovieCard';
 import MovieDetail from './MovieDetail';
 
 interface WatchListProps {
-  onListsChange?: () => void;
+  onListsChange?: ListChangeHandler;
 }
 
 export default function WatchList({ onListsChange }: WatchListProps) {
