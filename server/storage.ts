@@ -61,8 +61,17 @@ export class PostgresStorage implements StorageInterface {
   async getWatchListForUser(userId: number): Promise<MovieWithDetails[]> {
     const watchListItems = await db
       .select({
-        ...movies,
-        order: watchList.order,
+        id: movies.id,
+        imdbId: movies.imdbId,
+        title: movies.title,
+        year: movies.year,
+        director: movies.director,
+        poster: movies.poster,
+        plot: movies.plot,
+        runtime: movies.runtime,
+        genre: movies.genre,
+        actors: movies.actors,
+        order: watchList.order
       })
       .from(movies)
       .innerJoin(watchList, eq(movies.id, watchList.movieId))
@@ -105,7 +114,16 @@ export class PostgresStorage implements StorageInterface {
   async getWatchedListForUser(userId: number): Promise<MovieWithDetails[]> {
     const watchedListItems = await db
       .select({
-        ...movies,
+        id: movies.id,
+        imdbId: movies.imdbId,
+        title: movies.title,
+        year: movies.year,
+        director: movies.director,
+        poster: movies.poster,
+        plot: movies.plot,
+        runtime: movies.runtime,
+        genre: movies.genre,
+        actors: movies.actors,
         watchedDate: watchedList.watchedDate,
         review: watchedList.review,
         rating: watchedList.rating
@@ -139,14 +157,19 @@ export class PostgresStorage implements StorageInterface {
     await db.delete(watchedList)
       .where(and(
         eq(watchedList.userId, userId),
-        eq(watchList.movieId, movieId)
+        eq(watchedList.movieId, movieId)
       ));
   }
 
   async moveToWatched(userId: number, movieId: number, review?: string): Promise<void> {
     try {
-      const watchListItemExists = await db.select().from(watchList).where(and(eq(watchList.userId, userId), eq(watchList.movieId, movieId))).count() > 0;
-      if (!watchListItemExists) {
+      const watchListItems = await db.select().from(watchList)
+        .where(and(
+          eq(watchList.userId, userId),
+          eq(watchList.movieId, movieId)
+        ));
+      
+      if (!watchListItems.length) {
         throw new Error('Movie not found in watch list');
       }
 
