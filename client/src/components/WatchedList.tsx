@@ -147,9 +147,20 @@ export default function WatchedList({ movies, onOpenReviewModal = () => {} }: Wa
                               throw new Error('Failed to remove movie');
                             }
                             // Use React Query to invalidate and refetch
+                            // Get the queryClient instance from the component scope
                             const queryClient = useQueryClient();
-                            await queryClient.invalidateQueries(['watchedlist']);
-                            await queryClient.invalidateQueries(['watchlist']);
+                            
+                            // Remove from UI immediately for better UX
+                            queryClient.setQueryData(['watchedlist'], (old: Movie[] | undefined) => 
+                              old?.filter(m => m.id !== movie.id) || []
+                            );
+                            
+                            // Invalidate both queries to trigger a background refresh
+                            await Promise.all([
+                              queryClient.invalidateQueries(['watchedlist']),
+                              queryClient.invalidateQueries(['watchlist'])
+                            ]);
+                            
                             if (onListsChange) {
                               onListsChange();
                             }
