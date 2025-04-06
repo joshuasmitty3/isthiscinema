@@ -5,16 +5,20 @@ import postgres from 'postgres';
 import * as dotenv from 'dotenv';
 
 const runMigrate = async () => {
-  const connection = postgres(process.env.DATABASE_URL!);
-  const db = drizzle(connection);
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
+  const sql = postgres(process.env.DATABASE_URL, { max: 1 });
+  const db = drizzle(sql);
 
   console.log("Running migrations...");
   
-  await migrate(db, { migrationsFolder: "migrations" });
+  await migrate(db, { migrationsFolder: "drizzle" });
   
   console.log("Migrations complete!");
   
-  await connection.end();
+  await sql.end();
 };
 
 runMigrate().catch((err) => {
