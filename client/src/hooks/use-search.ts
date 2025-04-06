@@ -6,6 +6,7 @@ import { SearchResult } from "@/lib/types";
 import { useToast } from "./use-toast";
 
 export function useSearch(onSearch: (results: SearchResult[], query: string, loading: boolean) => void) {
+  const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const MIN_SEARCH_LENGTH = 2;
@@ -38,5 +39,9 @@ export function useSearch(onSearch: (results: SearchResult[], query: string, loa
     }
   }, DEBOUNCE_MS);
 
-  return { isLoading, debouncedSearch };
+  useEffect(() => {
+    debouncedSearch(query);
+  }, [query, debouncedSearch]);
+
+  return { query, setQuery, isLoading, debouncedSearch };
 }
