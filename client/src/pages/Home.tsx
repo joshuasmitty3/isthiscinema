@@ -46,7 +46,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout: () => v
                   }}
                   className="w-full h-full px-3 py-1.5 bg-transparent border-none focus:outline-none text-sm"
                 />
-                {isSearching ? (
+                {isLoading ? (
                   <LoadingSpinner size="sm" className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4" />
                 ) : (
                   <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none opacity-50" />
