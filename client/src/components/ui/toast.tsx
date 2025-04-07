@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -43,18 +44,24 @@ const Toast = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root>
 >(({ className, ...props }, ref) => {
   const { playSuccess } = useToastSound();
-  // Use a ref to track previous and current state for sound effect
   const prevOpenRef = React.useRef(false);
   
   React.useEffect(() => {
-    // Safely check if toast is open based on className changes
-    const isOpen = ref.current?.classList.contains('data-[state=open]:animate-in');
+    if (!ref || typeof ref === 'function') return;
     
-    if (isOpen && !prevOpenRef.current && props.children?.toString().includes('success')) {
-      playSuccess();
-    }
+    const element = ref.current;
+    if (!element) return;
     
-    prevOpenRef.current = isOpen || false;
+    const observer = new MutationObserver(() => {
+      const isOpen = element.getAttribute('data-state') === 'open';
+      if (isOpen && !prevOpenRef.current && props.children?.toString().includes('success')) {
+        playSuccess();
+      }
+      prevOpenRef.current = isOpen;
+    });
+    
+    observer.observe(element, { attributes: true });
+    return () => observer.disconnect();
   }, [props.children, playSuccess]);
 
   return (
@@ -145,11 +152,8 @@ export {
   ToastAction,
 }
 
-
-// Placeholder for sound functionality.  Needs actual implementation.
 function useToastSound() {
   const playSuccess = () => {
-    // Implement sound playback here.  Requires additional packages and configuration.
     console.log("Playing success sound effect.");
   };
   return { playSuccess };
