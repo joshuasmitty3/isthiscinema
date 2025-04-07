@@ -1,5 +1,5 @@
 import { User } from "@/lib/types";
-import { RiLogoutBoxLine, RiUser3Line } from "react-icons/ri";
+import { RiLogoutBoxLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 
 interface LayoutProps {

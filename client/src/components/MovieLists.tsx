@@ -16,16 +16,3 @@ export default function MovieLists({ lists, onListsChange, isLoading }) {
     </div>
   );
 }
-
-
-// Placeholder ListSkeleton component
-export const ListSkeleton = () => {
-  return (
-    <div className="animate-pulse">
-      {/*Skeleton structure to mimic list items*/}
-      <div className="bg-gray-200 rounded h-12 w-full mb-2"></div>
-      <div className="bg-gray-200 rounded h-12 w-full mb-2"></div>
-      <div className="bg-gray-200 rounded h-12 w-full mb-2"></div>
-    </div>
-  )
-};

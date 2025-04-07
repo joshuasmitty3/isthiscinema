@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { apiRequest } from "./lib/queryClient";
 import { LoadingSpinner } from "./components/ui/loading-spinner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -76,19 +76,6 @@ function Router() {
 }
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check initial authentication
-    apiRequest("GET", "/api/me")
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  if (isLoading) {
-    return <LoadingSpinner size="lg" className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
