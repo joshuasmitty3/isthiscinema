@@ -7,36 +7,12 @@ import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import { useEffect, useState } from "react";
 import { apiRequest } from "./lib/queryClient";
-import { LoadingSpinner } from "./components/ui/loading-spinner"; // Added import
-import MovieCard from "@/components/MovieCard"; // Assuming MovieCard exists
+import { LoadingSpinner } from "./components/ui/loading-spinner";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
-
-// Using the previously defined MovieCardTest component instead
-import MovieCardTest from './components/MovieCardTest';
-
-// Added logging utility
-const logEvent = (event, data) => {
+// Logging utility
+const logEvent = (event: string, data: unknown) => {
   console.log(`Event: ${event}`, data);
-};
-
-//Added ErrorBoundary component
-const ErrorBoundary = ({ children }) => {
-  const [hasError, setHasError] = useState(false);
-
-  const handleError = (error) => {
-    logEvent('Error', error); //Log the error
-    setHasError(true);
-  };
-
-  if (hasError) {
-    return (
-      <div>
-        <h1>Something went wrong.</h1>
-      </div>
-    );
-  }
-
-  return children;
 };
 
 
@@ -94,7 +70,6 @@ function Router() {
       <Route path="/">
         {!user ? <Redirect to="/login" /> : <Home user={user} onLogout={handleLogout} />}
       </Route>
-      <Route path="/test/movie-card" component={MovieCardTest} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -116,10 +91,10 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ErrorBoundary> {/* Added ErrorBoundary */}
+      <ErrorBoundary>
         <Router />
         <Toaster />
-      </ErrorBoundary> {/* Closed ErrorBoundary */}
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 }
