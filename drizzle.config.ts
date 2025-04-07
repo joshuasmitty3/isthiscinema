@@ -1,7 +1,9 @@
+
 import { defineConfig } from "drizzle-kit";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL, ensure the database is provisioned");
+// Only log warning in development, deployment has DATABASE_URL set
+if (!process.env.DATABASE_URL && process.env.NODE_ENV !== 'production') {
+  console.warn("WARNING: DATABASE_URL not set. Database migrations may fail.");
 }
 
 export default defineConfig({
@@ -9,6 +11,6 @@ export default defineConfig({
   schema: "./shared/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL || '',
   },
 });

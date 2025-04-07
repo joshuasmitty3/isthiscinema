@@ -6,16 +6,14 @@ import * as schema from '../shared/schema';
 // Disable WebSockets for HTTP-only deployment environments
 neonConfig.fetchConnectionCache = true;
 
-if (!process.env.DATABASE_URL) {
-  console.error('Error: DATABASE_URL environment variable is not set');
-  process.exit(1);
-}
+// Initialize database connection
+const sql = neon(process.env.DATABASE_URL || '');
+export const db = drizzle(sql, { schema });
 
-try {
-  const sql = neon(process.env.DATABASE_URL);
-  export const db = drizzle(sql, { schema });
-  console.log("Database connection initialized successfully");
-} catch (error) {
-  console.error('Failed to initialize database connection:', error);
+// Verify connection
+db.select().from(users).limit(1).catch(error => {
+  console.error('Database connection failed:', error);
   process.exit(1);
-}
+});
+
+console.log("Database connection initialized");
