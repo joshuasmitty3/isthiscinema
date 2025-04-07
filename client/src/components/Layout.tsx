@@ -1,31 +1,19 @@
 import { User } from "@/lib/types";
-import { RiLogoutBoxLine } from "react-icons/ri";
-import { Button } from "@/components/ui/button";
 
 interface LayoutProps {
   children: React.ReactNode;
   user: User;
-  onLogout: () => void;
+  onLogout?: () => void; // Made optional since we're not using it
 }
 
-export default function Layout({ children, user, onLogout }: LayoutProps) {
+export default function Layout({ children, user }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-neutral-100">
       <header className="bg-primary text-white shadow-md">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-heading font-semibold">is it cinema?</h1>
-          
           <div className="flex items-center space-x-2">
-            <span className="text-sm hidden sm:inline">{user.username}</span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:bg-primary/30 transition-colors rounded-full"
-              onClick={onLogout}
-              title="Logout"
-            >
-              <RiLogoutBoxLine className="h-5 w-5" />
-            </Button>
+            <span className="text-sm sm:inline">{user.username}</span>
           </div>
         </div>
       </header>
