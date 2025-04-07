@@ -8,7 +8,7 @@ function App() {
   // Create a default user (bypassing login)
   const defaultUser = {
     id: 1,
-    username: "moviefan"
+    username: ""
   };
 
   return (

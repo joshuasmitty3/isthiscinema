@@ -12,9 +12,7 @@ export default function Layout({ children, user }: LayoutProps) {
       <header className="bg-primary text-white shadow-md">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-heading font-semibold">is it cinema?</h1>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm sm:inline">{user.username}</span>
-          </div>
+          {/* Username display removed */}
         </div>
       </header>
       
