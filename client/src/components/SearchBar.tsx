@@ -38,7 +38,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
               target.setSelectionRange(cursorPosition, cursorPosition);
             });
           }}
-          className="w-full py-3 px-4 pr-10 bg-white border border-neutral-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="w-full py-3 px-4 pr-10 bg-white border border-neutral-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 overflow-visible"
         />
         <Button
           type="submit"
