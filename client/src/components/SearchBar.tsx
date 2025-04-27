@@ -27,7 +27,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         <Input
           ref={inputRef}
           type="text"
-          placeholder="Search for movies..."
+          placeholder="Search movies..."
           value={query}
           onChange={(e) => {
             const target = e.target as HTMLInputElement;
