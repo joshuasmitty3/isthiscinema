@@ -1,68 +1,78 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { 
-  insertUserSchema, 
-  insertMovieSchema, 
-  insertWatchListSchema, 
+import { requireAuth, verifyPassword, hashPassword } from "./auth";
+import {
+  insertMovieSchema,
+  insertWatchListSchema,
   insertWatchedListSchema,
   type OmdbDetailedMovie,
-  type SearchResult
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import fetch from "node-fetch";
-// import session from "express-session"; // Removed
-// import MemoryStore from "memorystore"; // Removed
 import { Parser } from "json2csv";
-
-export function setupWatchListRoutes(app: Express) {
-  // Get watch list
-  app.get("/api/watchlist", async (req: Request, res: Response) => {
-    const movies = await storage.getWatchList(1); // Always use user ID 1
-    res.json(movies);
-  });
-
-  // Remove from watch list
-  app.delete("/api/watchlist/:movieId", async (req: Request, res: Response) => {
-    await storage.removeFromWatchList(1, req.params.movieId); // Always use user ID 1
-    res.json({ success: true });
-  });
-
-  // Reorder watch list
-  app.post("/api/watchlist/reorder", async (req: Request, res: Response) => {
-    const { movieId, direction } = req.body;
-    await storage.reorderWatchList(1, movieId, direction); // Always use user ID 1
-    res.json({ success: true });
-  });
-}
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 
-// Removed auth middleware - all requests now allowed
+const zodToValidationError = (error: ZodError) => fromZodError(error);
 
-// Removed auth routes
-// app.post("/api/login", async (req, res) => { ... });
-// app.post("/api/logout", (req, res) => { ... });
-// app.get("/api/me", async (req, res) => { ... });
-
+function userId(req: Request): number {
+  return (req.session as any).userId as number;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Removed auth middleware - all requests now allowed
 
-  // Removed auth routes
+  // Auth routes (public)
   app.post("/api/login", async (req, res) => {
-    //This route is now a placeholder and does nothing.
-    res.status(200).json({ message: "Login not implemented" });
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+    const user = await storage.getUserByUsername(username);
+    if (!user || !(await verifyPassword(password, user.password))) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+    (req.session as any).userId = user.id;
+    return res.status(200).json({ id: user.id, username: user.username });
   });
 
   app.post("/api/logout", (req, res) => {
-      res.status(200).json({ message: "Logout not implemented" });
+    req.session.destroy(() => {
+      res.status(200).json({ message: "Logged out" });
+    });
   });
 
   app.get("/api/me", async (req, res) => {
-      res.status(200).json({ message: "Me route not implemented" });
+    const id = (req.session as any).userId;
+    if (!id) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    const user = await storage.getUser(id);
+    if (!user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    return res.status(200).json({ id: user.id, username: user.username });
   });
+
+  // First-time setup: only works when no users exist yet
+  app.post("/api/setup", async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+    const existingUser = await storage.getUserByUsername(username);
+    if (existingUser) {
+      return res.status(403).json({ message: "Setup already complete" });
+    }
+    const hashed = await hashPassword(password);
+    const user = await storage.createUser({ username, password: hashed });
+    (req.session as any).userId = user.id;
+    return res.status(201).json({ id: user.id, username: user.username });
+  });
+
+  // All routes below require authentication
+  app.use("/api", requireAuth);
 
   // OMDB API routes
   app.get("/api/movies/search", async (req, res) => {
@@ -75,11 +85,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${encodeURIComponent(query)}&type=movie`);
       const data = await response.json();
 
-      if (data.Response === "False") {
+      if ((data as any).Response === "False") {
         return res.status(200).json({ results: [] });
       }
 
-      return res.status(200).json({ results: data.Search });
+      return res.status(200).json({ results: (data as any).Search });
     } catch (error) {
       console.error("Movie search error:", error);
       return res.status(500).json({ message: "Failed to search movies" });
@@ -89,13 +99,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/movies/:imdbId", async (req, res) => {
     try {
       const { imdbId } = req.params;
-      // const userId = req.session.userId as number; // Removed
+      const uid = userId(req);
 
-      // First check if movie exists in our database
       let movie = await storage.getMovieByImdbId(imdbId);
 
       if (!movie) {
-        // Fetch from OMDB API
         const response = await fetch(`http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&i=${imdbId}&plot=full`);
         const omdbMovie = await response.json() as OmdbDetailedMovie;
 
@@ -103,7 +111,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Movie not found" });
         }
 
-        // Save to database
         movie = await storage.createMovie({
           imdbId: omdbMovie.imdbID,
           title: omdbMovie.Title,
@@ -117,9 +124,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get user-specific data
-      const watchList = await storage.getWatchListForUser(1); // Always use user ID 1
-      const watchedList = await storage.getWatchedListForUser(1); // Always use user ID 1
+      const watchList = await storage.getWatchListForUser(uid);
+      const watchedList = await storage.getWatchedListForUser(uid);
 
       const inWatchList = watchList.some(item => item.id === movie!.id);
       const watchedItem = watchedList.find(item => item.id === movie!.id);
@@ -141,9 +147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Watch list routes
   app.get("/api/watchlist", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
-      const watchList = await storage.getWatchListForUser(1); // Always use user ID 1
-
+      const watchList = await storage.getWatchListForUser(userId(req));
       return res.status(200).json(watchList);
     } catch (error) {
       console.error("Get watch list error:", error);
@@ -153,35 +157,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/watchlist", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
-      // Validate request
       let data;
       try {
         data = insertWatchListSchema.parse({
           ...req.body,
-          userId: 1 // Always use user ID 1
+          userId: userId(req)
         });
       } catch (e) {
         if (e instanceof ZodError) {
-          return res.status(400).json({ 
-            message: "Invalid data", 
-            errors: zodToValidationError(e).details 
+          return res.status(400).json({
+            message: "Invalid data",
+            errors: zodToValidationError(e).details
           });
         }
         throw e;
       }
 
-      // Get current watch list to determine order
-      const currentWatchList = await storage.getWatchListForUser(1); // Always use user ID 1
-      const order = (currentWatchList.length > 0) 
-        ? Math.max(...currentWatchList.map(item => item.order || 0)) + 1 
+      const currentWatchList = await storage.getWatchListForUser(userId(req));
+      const order = (currentWatchList.length > 0)
+        ? Math.max(...currentWatchList.map(item => item.order || 0)) + 1
         : 1;
 
-      const result = await storage.addToWatchList({
-        ...data,
-        order
-      });
-
+      const result = await storage.addToWatchList({ ...data, order });
       return res.status(201).json(result);
     } catch (error) {
       console.error("Add to watch list error:", error);
@@ -191,15 +188,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/watchlist/:movieId", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
       const movieId = parseInt(req.params.movieId, 10);
-
       if (isNaN(movieId)) {
         return res.status(400).json({ message: "Invalid movie ID" });
       }
-
-      await storage.removeFromWatchList(1, movieId); // Always use user ID 1
-
+      await storage.removeFromWatchList(userId(req), movieId);
       return res.status(200).json({ message: "Removed from watch list" });
     } catch (error) {
       console.error("Remove from watch list error:", error);
@@ -209,15 +202,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/watchlist/order", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
       const { movieIds } = req.body;
-
       if (!Array.isArray(movieIds)) {
         return res.status(400).json({ message: "movieIds must be an array" });
       }
-
-      await storage.updateWatchListOrder(1, movieIds); // Always use user ID 1
-
+      await storage.updateWatchListOrder(userId(req), movieIds);
       return res.status(200).json({ message: "Watch list order updated" });
     } catch (error) {
       console.error("Update watch list order error:", error);
@@ -228,9 +217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Watched list routes
   app.get("/api/watchedlist", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
-      const watchedList = await storage.getWatchedListForUser(1); // Always use user ID 1
-
+      const watchedList = await storage.getWatchedListForUser(userId(req));
       return res.status(200).json(watchedList);
     } catch (error) {
       console.error("Get watched list error:", error);
@@ -240,27 +227,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/watchedlist", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
-
-      // Validate request
       let data;
       try {
         data = insertWatchedListSchema.parse({
           ...req.body,
-          userId: 1 // Always use user ID 1
+          userId: userId(req)
         });
       } catch (e) {
         if (e instanceof ZodError) {
-          return res.status(400).json({ 
-            message: "Invalid data", 
-            errors: zodToValidationError(e).details 
+          return res.status(400).json({
+            message: "Invalid data",
+            errors: zodToValidationError(e).details
           });
         }
         throw e;
       }
-
       const result = await storage.addToWatchedList(data);
-
       return res.status(201).json(result);
     } catch (error) {
       console.error("Add to watched list error:", error);
@@ -270,20 +252,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/watchedlist/:movieId/review", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
       const movieId = parseInt(req.params.movieId, 10);
       const { review } = req.body;
 
       if (isNaN(movieId)) {
         return res.status(400).json({ message: "Invalid movie ID" });
       }
-
       if (typeof review !== 'string' || review.length > 140) {
         return res.status(400).json({ message: "Review must be a string with max 140 characters" });
       }
-
-      await storage.updateReview(1, movieId, review); // Always use user ID 1
-
+      await storage.updateReview(userId(req), movieId, review);
       return res.status(200).json({ message: "Review updated" });
     } catch (error) {
       console.error("Update review error:", error);
@@ -293,14 +271,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/watchedlist/:movieId", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
       const movieId = parseInt(req.params.movieId, 10);
-
       if (isNaN(movieId)) {
         return res.status(400).json({ message: "Invalid movie ID" });
       }
-
-      await storage.removeFromWatchedList(1, movieId); // Always use user ID 1
+      await storage.removeFromWatchedList(userId(req), movieId);
       return res.status(200).json({ message: "Removed from watched list" });
     } catch (error) {
       console.error("Remove from watched list error:", error);
@@ -310,25 +285,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/movies/:movieId/move-to-watched", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
       const movieId = parseInt(req.params.movieId, 10);
       const { review } = req.body;
 
       if (isNaN(movieId)) {
         return res.status(400).json({ message: "Invalid movie ID" });
       }
-
       if (review && typeof review !== 'string') {
         return res.status(400).json({ message: "Review must be a string" });
       }
-
       if (review && review.length > 140) {
         return res.status(400).json({ message: "Review must not exceed 140 characters" });
       }
 
-      await storage.moveToWatched(1, movieId, review); // Always use user ID 1
-      console.log(`User 1 moved movie ${movieId} to watched list`); // Always use user ID 1
-
+      await storage.moveToWatched(userId(req), movieId, review);
       return res.status(200).json({ message: "Moved to watched list" });
     } catch (error: any) {
       console.error("Move to watched error:", error);
@@ -342,31 +312,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // CSV Export
   app.get("/api/export/csv", async (req, res) => {
     try {
-      // const userId = req.session.userId as number; // Removed
-      const watchedList = await storage.getWatchedListForUser(1); // Always use user ID 1
+      const watchedList = await storage.getWatchedListForUser(userId(req));
 
-      // Prepare data for CSV
-      const csvData = [
-        ...watchedList.map(movie => ({
-          title: movie.title,
-          year: movie.year,
-          director: movie.director,
-          list: "Watched",
-          order: "",
-          watchedDate: movie.watchedDate ? new Date(movie.watchedDate).toISOString().split('T')[0] : "",
-          review: movie.review || ""
-        }))
-      ];
+      const csvData = watchedList.map(movie => ({
+        title: movie.title,
+        year: movie.year,
+        director: movie.director,
+        list: "Watched",
+        order: "",
+        watchedDate: movie.watchedDate ? new Date(movie.watchedDate).toISOString().split('T')[0] : "",
+        review: movie.review || ""
+      }));
 
-      // Generate CSV
       const fields = ['title', 'year', 'director', 'list', 'order', 'watchedDate', 'review'];
       const parser = new Parser({ fields });
       const csv = parser.parse(csvData);
 
-      // Set headers for file download
       res.setHeader('Content-Disposition', 'attachment; filename=movie-watch-list.csv');
       res.setHeader('Content-Type', 'text/csv');
-
       return res.status(200).send(csv);
     } catch (error) {
       console.error("CSV export error:", error);
@@ -377,8 +340,3 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   return httpServer;
 }
-
-const { fromZodError } = await import("zod-validation-error");
-const { insertUserSchema, insertMovieSchema, insertWatchListSchema, insertWatchedListSchema } = await import("@shared/schema");
-
-const zodToValidationError = (error: ZodError) => fromZodError(error);

@@ -12,7 +12,7 @@ import { Search } from "lucide-react";
 import { useSearch } from "@/hooks/use-search";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export default function Home({ user }: { user: User }) {
+export default function Home({ user, onLogout }: { user: User; onLogout?: () => void }) {
   const queryClient = useQueryClient();
   const { query, setQuery, results, isLoading } = useSearch();
   
@@ -33,7 +33,7 @@ export default function Home({ user }: { user: User }) {
   });
 
   return (
-    <Layout user={user}>
+    <Layout user={user} onLogout={onLogout}>
       <div className="container mx-auto px-4 py-4">
         <Tabs defaultValue="watchlist" className="w-full">
           <TabsList className="w-full mb-4">
