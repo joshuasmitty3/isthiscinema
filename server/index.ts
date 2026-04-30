@@ -1,17 +1,27 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Trust Vercel/proxy HTTPS termination so secure cookies work
+app.set("trust proxy", 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+});
 
 const PgSession = connectPgSimple(session);
 app.use(session({
   store: new PgSession({
-    conString: process.env.DATABASE_URL,
+    pool,
     tableName: "sessions",
     createTableIfMissing: true,
   }),

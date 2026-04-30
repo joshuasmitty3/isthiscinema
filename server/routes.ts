@@ -21,6 +21,18 @@ function userId(req: Request): number {
   return (req.session as any).userId as number;
 }
 
+function saveSession(req: Request): Promise<void> {
+  return new Promise((resolve, reject) => req.session.save(err => err ? reject(err) : resolve()));
+}
+
+async function migrateLegacyDataIfNeeded(newUserId: number): Promise<void> {
+  if (newUserId === 1) return;
+  const legacyUser = await storage.getUser(1);
+  if (!legacyUser) {
+    await storage.migrateUserData(1, newUserId);
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth routes (public)
@@ -34,6 +46,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "Invalid username or password" });
     }
     (req.session as any).userId = user.id;
+    await saveSession(req);
+    await migrateLegacyDataIfNeeded(user.id);
     return res.status(200).json({ id: user.id, username: user.username });
   });
 
@@ -52,13 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-    // One-time migration: if user_id=1 has no user record it's orphaned legacy data — claim it
-    if (user.id !== 1) {
-      const legacyUser = await storage.getUser(1);
-      if (!legacyUser) {
-        await storage.migrateUserData(1, user.id);
-      }
-    }
+    await migrateLegacyDataIfNeeded(user.id);
     return res.status(200).json({ id: user.id, username: user.username });
   });
 
@@ -75,6 +83,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const hashed = await hashPassword(password);
     const user = await storage.createUser({ username, password: hashed });
     (req.session as any).userId = user.id;
+    await saveSession(req);
+    await migrateLegacyDataIfNeeded(user.id);
     return res.status(201).json({ id: user.id, username: user.username });
   });
 
