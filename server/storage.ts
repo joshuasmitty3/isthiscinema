@@ -191,6 +191,11 @@ export class PostgresStorage implements StorageInterface {
     }
   }
 
+  async migrateUserData(fromUserId: number, toUserId: number): Promise<void> {
+    await db.update(watchList).set({ userId: toUserId }).where(eq(watchList.userId, fromUserId));
+    await db.update(watchedList).set({ userId: toUserId }).where(eq(watchedList.userId, fromUserId));
+  }
+
   async getMovieById(id: number): Promise<Movie | undefined> {
     const result = await this.getMovie(id);
     return result || undefined;
