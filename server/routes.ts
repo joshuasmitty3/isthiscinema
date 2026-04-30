@@ -52,6 +52,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
+    // One-time migration: if user_id=1 has no user record it's orphaned legacy data — claim it
+    if (user.id !== 1) {
+      const legacyUser = await storage.getUser(1);
+      if (!legacyUser) {
+        await storage.migrateUserData(1, user.id);
+      }
+    }
     return res.status(200).json({ id: user.id, username: user.username });
   });
 
