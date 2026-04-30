@@ -1,27 +1,36 @@
 import { useState } from "react";
 import { User } from "@/lib/types";
-import { login } from "@/lib/api";
+import { setupAccount } from "@/lib/api";
 
-interface LoginPageProps {
-  onLogin: (user: User) => void;
-  onSetup: () => void;
+interface SetupPageProps {
+  onSetup: (user: User) => void;
+  onBack: () => void;
 }
 
-export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
+export default function SetupPage({ onSetup, onBack }: SetupPageProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (password !== confirm) {
+      setError("Passwords don't match.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
     setLoading(true);
     try {
-      const user = await login(username, password);
-      onLogin(user);
-    } catch {
-      setError("Invalid username or password.");
+      const user = await setupAccount(username, password);
+      onSetup(user);
+    } catch (err: any) {
+      setError(err.message || "Could not create account.");
     } finally {
       setLoading(false);
     }
@@ -37,7 +46,8 @@ export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
 
       <main className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-sm bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-semibold text-neutral-800 mb-6 text-center">sign in</h2>
+          <h2 className="text-2xl font-semibold text-neutral-800 mb-1 text-center">create account</h2>
+          <p className="text-sm text-neutral-500 text-center mb-6">pick a username and password for yourself</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1" htmlFor="username">
@@ -50,6 +60,7 @@ export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
                 onChange={e => setUsername(e.target.value)}
                 required
                 autoFocus
+                autoComplete="username"
                 className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
@@ -63,6 +74,21 @@ export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
+                autoComplete="new-password"
+                className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1" htmlFor="confirm">
+                confirm password
+              </label>
+              <input
+                id="confirm"
+                type="password"
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
+                required
+                autoComplete="new-password"
                 className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
@@ -74,13 +100,13 @@ export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
               disabled={loading}
               className="w-full py-2 px-4 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? "signing in…" : "sign in"}
+              {loading ? "creating account…" : "create account"}
             </button>
           </form>
           <p className="mt-4 text-center text-sm text-neutral-500">
-            new here?{" "}
-            <button onClick={onSetup} className="text-primary hover:underline">
-              create an account
+            already have an account?{" "}
+            <button onClick={onBack} className="text-primary hover:underline">
+              sign in
             </button>
           </p>
         </div>

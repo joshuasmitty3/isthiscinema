@@ -27,6 +27,15 @@ export async function logout(): Promise<void> {
   await apiRequest("POST", "/api/logout");
 }
 
+export async function setupAccount(username: string, password: string): Promise<User> {
+  const res = await apiRequest("POST", "/api/setup", { username, password });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).message || "Failed to create account");
+  }
+  return await res.json();
+}
+
 export async function getCurrentUser(): Promise<User | null> {
   try {
     const res = await fetch("/api/me", { credentials: "include" });

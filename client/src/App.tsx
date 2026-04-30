@@ -5,17 +5,20 @@ import { queryClient } from "./lib/queryClient";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Home from "@/pages/Home";
 import LoginPage from "@/pages/LoginPage";
+import SetupPage from "@/pages/SetupPage";
 import { getCurrentUser, logout } from "@/lib/api";
 import { User } from "@/lib/types";
 
+type View = "checking" | "login" | "setup" | "app";
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [checking, setChecking] = useState(true);
+  const [view, setView] = useState<View>("checking");
 
   useEffect(() => {
     getCurrentUser().then(u => {
       setUser(u);
-      setChecking(false);
+      setView(u ? "app" : "login");
     });
   }, []);
 
@@ -23,9 +26,15 @@ function App() {
     await logout();
     queryClient.clear();
     setUser(null);
+    setView("login");
   }
 
-  if (checking) {
+  function handleLogin(u: User) {
+    setUser(u);
+    setView("app");
+  }
+
+  if (view === "checking") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-100">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -33,14 +42,28 @@ function App() {
     );
   }
 
+  if (view === "setup") {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <SetupPage onSetup={handleLogin} onBack={() => setView("login")} />
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
+
+  if (view === "login") {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <LoginPage onLogin={handleLogin} onSetup={() => setView("setup")} />
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
-        {user ? (
-          <Home user={user} onLogout={handleLogout} />
-        ) : (
-          <LoginPage onLogin={setUser} />
-        )}
+        <Home user={user!} onLogout={handleLogout} />
         <Toaster />
       </ErrorBoundary>
     </QueryClientProvider>
