@@ -18,18 +18,31 @@ const invalidateMovieQueries = async () => {
  * Authentication API Functions
  */
 export async function login(username: string, password: string): Promise<User> {
+  const res = await apiRequest("POST", "/api/login", { username, password });
+  if (!res.ok) throw new Error("Login failed");
+  return await res.json();
+}
+
+export async function logout(): Promise<void> {
+  await apiRequest("POST", "/api/logout");
+}
+
+export async function setupAccount(username: string, password: string): Promise<User> {
+  const res = await apiRequest("POST", "/api/setup", { username, password });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).message || "Failed to create account");
+  }
+  return await res.json();
+}
+
+export async function getCurrentUser(): Promise<User | null> {
   try {
-    const res = await apiRequest("POST", "/api/login", { username, password });
+    const res = await fetch("/api/me", { credentials: "include" });
+    if (!res.ok) return null;
     return await res.json();
-  } catch (error) {
-    handleError(error, {
-      component: "Authentication",
-      title: "Login Failed",
-      fallbackMessage: "Authentication failed. Please check your credentials.",
-      severity: ErrorSeverity.ERROR,
-      showToast: true
-    });
-    throw error;
+  } catch {
+    return null;
   }
 }
 
