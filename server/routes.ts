@@ -14,6 +14,14 @@ import fetch from "node-fetch";
 import { Parser } from "json2csv";
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
+if (!OMDB_API_KEY) {
+  console.error("ERROR: Missing OMDB_API_KEY environment variable");
+  process.exit(1);
+}
+if (!process.env.SESSION_SECRET && process.env.NODE_ENV === "production") {
+  console.error("ERROR: SESSION_SECRET must be set in production");
+  process.exit(1);
+}
 
 const zodToValidationError = (error: ZodError) => fromZodError(error);
 
@@ -34,8 +42,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes (public)
   app.post("/api/login", async (req, res) => {
     const { username, password } = req.body;
-    if (!username || !password) {
+    if (!username || !password || typeof username !== "string" || typeof password !== "string") {
       return res.status(400).json({ message: "Username and password are required" });
+    }
+    if (username.length > 50 || password.length > 128) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
     const user = await storage.getUserByUsername(username);
     if (!user || !(await verifyPassword(password, user.password))) {
@@ -67,8 +78,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // First-time setup: only works when no users exist yet
   app.post("/api/setup", async (req, res) => {
     const { username, password } = req.body;
-    if (!username || !password) {
+    if (!username || !password || typeof username !== "string" || typeof password !== "string") {
       return res.status(400).json({ message: "Username and password are required" });
+    }
+    if (username.length < 2 || username.length > 50) {
+      return res.status(400).json({ message: "Username must be 2-50 characters" });
+    }
+    if (password.length < 6 || password.length > 128) {
+      return res.status(400).json({ message: "Password must be 6-128 characters" });
     }
     const existingUser = await storage.getUserByUsername(username);
     if (existingUser) {

@@ -24,7 +24,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
   const { data: watchedList = [] } = useQuery({
     queryKey: ["watchedlist"],
     queryFn: async () => {
-      const response = await fetch("/api/watchedlist");
+      const response = await fetch("/api/watchedlist", { credentials: "include" });
       if (!response.ok) {
         throw new Error("Failed to fetch watched list");
       }

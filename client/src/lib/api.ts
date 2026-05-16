@@ -88,11 +88,7 @@ export async function getMovieDetails(imdbId: string): Promise<Movie> {
 export async function addToWatchList(movieId: number): Promise<void> {
   try {
     console.log('API call - Adding movie:', movieId);
-    await apiRequest("POST", "/api/watchlist", { 
-      movieId,
-      order: 1, // The server will calculate the correct order anyway
-      userId: 1
-    });
+    await apiRequest("POST", "/api/watchlist", { movieId, order: 1 });
     await invalidateMovieQueries();
     console.log('API response: success');
   } catch (error) {
@@ -141,12 +137,7 @@ export async function updateWatchListOrder(movieIds: number[]): Promise<void> {
  */
 export async function addToWatchedList(movieId: number, review?: string): Promise<void> {
   try {
-    await apiRequest("POST", "/api/watchedlist", { 
-      movieId, 
-      review,
-      watchedDate: new Date().toISOString(),
-      userId: 1
-    });
+    await apiRequest("POST", "/api/watchedlist", { movieId, review, watchedDate: new Date().toISOString() });
     await invalidateMovieQueries();
   } catch (error) {
     handleError(error, {
@@ -195,14 +186,7 @@ export async function removeFromWatchedList(movieId: number): Promise<any> {
  */
 export async function moveToWatched(movieId: number, review?: string): Promise<any> {
   try {
-    const response = await apiRequest(
-      "POST", 
-      `/api/movies/${movieId}/move-to-watched`, 
-      { 
-        review,
-        userId: 1
-      }
-    );
+    const response = await apiRequest("POST", `/api/movies/${movieId}/move-to-watched`, { review });
     
     console.log(`Successfully moved movie ${movieId} to watched list`);
     await invalidateMovieQueries();
