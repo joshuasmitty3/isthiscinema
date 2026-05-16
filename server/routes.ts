@@ -81,32 +81,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.status(201).json({ id: user.id, username: user.username });
   });
 
-  // Temporary debug endpoint — public so we can diagnose auth/data issues
-  app.get("/api/debug/db-state", async (req, res) => {
-    const { db } = await import("./db");
-    const { users, watchList, watchedList } = await import("@shared/schema");
-    const { count } = await import("drizzle-orm");
-
-    const allUsers = await db.select({ id: users.id, username: users.username }).from(users);
-
-    const watchCounts = await db
-      .select({ userId: watchList.userId, count: count() })
-      .from(watchList)
-      .groupBy(watchList.userId);
-
-    const watchedCounts = await db
-      .select({ userId: watchedList.userId, count: count() })
-      .from(watchedList)
-      .groupBy(watchedList.userId);
-
-    return res.json({
-      sessionUserId: (req.session as any)?.userId ?? null,
-      usersInDb: allUsers,
-      watchListByUserId: watchCounts,
-      watchedListByUserId: watchedCounts,
-    });
-  });
-
   // All routes below require authentication
   app.use("/api", requireAuth);
 
