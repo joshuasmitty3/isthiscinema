@@ -21,10 +21,6 @@ function userId(req: Request): number {
   return (req.session as any).userId as number;
 }
 
-function saveSession(req: Request): Promise<void> {
-  return new Promise((resolve, reject) => req.session.save(err => err ? reject(err) : resolve()));
-}
-
 async function migrateLegacyDataIfNeeded(newUserId: number): Promise<void> {
   if (newUserId === 1) return;
   const legacyUser = await storage.getUser(1);
@@ -46,15 +42,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "Invalid username or password" });
     }
     (req.session as any).userId = user.id;
-    await saveSession(req);
     await migrateLegacyDataIfNeeded(user.id);
     return res.status(200).json({ id: user.id, username: user.username });
   });
 
   app.post("/api/logout", (req, res) => {
-    req.session.destroy(() => {
-      res.status(200).json({ message: "Logged out" });
-    });
+    req.session = null;
+    res.status(200).json({ message: "Logged out" });
   });
 
   app.get("/api/me", async (req, res) => {
@@ -83,19 +77,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const hashed = await hashPassword(password);
     const user = await storage.createUser({ username, password: hashed });
     (req.session as any).userId = user.id;
-    await saveSession(req);
     await migrateLegacyDataIfNeeded(user.id);
     return res.status(201).json({ id: user.id, username: user.username });
   });
 
-  // All routes below require authentication
-  app.use("/api", requireAuth);
-
-  // Temporary debug endpoint — shows DB state to diagnose missing data
+  // Temporary debug endpoint — public so we can diagnose auth/data issues
   app.get("/api/debug/db-state", async (req, res) => {
     const { db } = await import("./db");
     const { users, watchList, watchedList } = await import("@shared/schema");
-    const { sql, count } = await import("drizzle-orm");
+    const { count } = await import("drizzle-orm");
 
     const allUsers = await db.select({ id: users.id, username: users.username }).from(users);
 
@@ -110,12 +100,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       .groupBy(watchedList.userId);
 
     return res.json({
-      yourUserId: userId(req),
+      sessionUserId: (req.session as any)?.userId ?? null,
       usersInDb: allUsers,
       watchListByUserId: watchCounts,
       watchedListByUserId: watchedCounts,
     });
   });
+
+  // All routes below require authentication
+  app.use("/api", requireAuth);
 
   // OMDB API routes
   app.get("/api/movies/search", async (req, res) => {
