@@ -91,6 +91,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // All routes below require authentication
   app.use("/api", requireAuth);
 
+  // Temporary debug endpoint — shows DB state to diagnose missing data
+  app.get("/api/debug/db-state", async (req, res) => {
+    const { db } = await import("./db");
+    const { users, watchList, watchedList } = await import("@shared/schema");
+    const { sql, count } = await import("drizzle-orm");
+
+    const allUsers = await db.select({ id: users.id, username: users.username }).from(users);
+
+    const watchCounts = await db
+      .select({ userId: watchList.userId, count: count() })
+      .from(watchList)
+      .groupBy(watchList.userId);
+
+    const watchedCounts = await db
+      .select({ userId: watchedList.userId, count: count() })
+      .from(watchedList)
+      .groupBy(watchedList.userId);
+
+    return res.json({
+      yourUserId: userId(req),
+      usersInDb: allUsers,
+      watchListByUserId: watchCounts,
+      watchedListByUserId: watchedCounts,
+    });
+  });
+
   // OMDB API routes
   app.get("/api/movies/search", async (req, res) => {
     try {
