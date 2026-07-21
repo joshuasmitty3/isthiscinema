@@ -1,13 +1,12 @@
 
 import { create } from 'zustand';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 interface MoviesStore {
   watchlist: any[];
   watchedlist: any[];
   setWatchlist: (movies: any[]) => void;
   setWatchedlist: (movies: any[]) => void;
-  reorderWatchlist: (startIndex: number, endIndex: number) => void;
 }
 
 const useMoviesStore = create<MoviesStore>((set) => ({
@@ -15,19 +14,10 @@ const useMoviesStore = create<MoviesStore>((set) => ({
   watchedlist: [],
   setWatchlist: (movies) => set({ watchlist: movies }),
   setWatchedlist: (movies) => set({ watchedlist: movies }),
-  reorderWatchlist: (startIndex, endIndex) => {
-    set((state) => {
-      const newWatchlist = [...state.watchlist];
-      const [movedItem] = newWatchlist.splice(startIndex, 1);
-      newWatchlist.splice(endIndex, 0, movedItem);
-      return { watchlist: newWatchlist };
-    });
-  },
 }));
 
 export function useMovies() {
-  const queryClient = useQueryClient();
-  const { watchlist, watchedlist, setWatchlist, setWatchedlist, reorderWatchlist } = useMoviesStore();
+  const { watchlist, watchedlist, setWatchlist, setWatchedlist } = useMoviesStore();
 
   const { data: fetchedWatchlist, refetch: refetchWatchlist } = useQuery({
     queryKey: ['watchlist'],
@@ -51,47 +41,9 @@ export function useMovies() {
     },
   });
 
-  const reorderMutation = useMutation({
-    mutationFn: async ({ startIndex, endIndex }: { startIndex: number; endIndex: number }) => {
-      const newOrder = [...fetchedWatchlist];
-      const [movedItem] = newOrder.splice(startIndex, 1);
-      newOrder.splice(endIndex, 0, movedItem);
-
-      const response = await fetch('/api/watchlist/order', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ movieIds: newOrder.map(movie => movie.id) }),
-      });
-      if (!response.ok) throw new Error('Failed to update watchlist order');
-      return { newOrder, response: await response.json() };
-    },
-    onMutate: async ({ startIndex, endIndex }) => {
-      await queryClient.cancelQueries(['watchlist']);
-      const previousWatchlist = queryClient.getQueryData(['watchlist']);
-      
-      const newOrder = [...fetchedWatchlist];
-      const [movedItem] = newOrder.splice(startIndex, 1);
-      newOrder.splice(endIndex, 0, movedItem);
-      
-      queryClient.setQueryData(['watchlist'], newOrder);
-      return { previousWatchlist };
-    },
-    onError: (err, variables, context) => {
-      if (context?.previousWatchlist) {
-        queryClient.setQueryData(['watchlist'], context.previousWatchlist);
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries(['watchlist']);
-    }
-  });
-
   return {
     watchlist: fetchedWatchlist || [],
     watchedlist: fetchedWatchedlist || [],
-    reorderWatchlist,
     refetchLists: () => {
       return Promise.all([
         refetchWatchlist(),

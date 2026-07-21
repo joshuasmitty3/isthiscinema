@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import SearchBar from "@/components/SearchBar";
 import SearchResults from "@/components/SearchResults";
 import WatchList from "@/components/WatchList";
 import WatchedList from "@/components/WatchedList";
@@ -34,28 +33,28 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
 
   return (
     <Layout user={user} onLogout={onLogout}>
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 pt-3 pb-4">
         <Tabs defaultValue="watchlist" className="w-full">
           <TabsList className="w-full mb-4">
             <TabsTrigger value="watchlist" className="flex-1">worth watching</TabsTrigger>
             <TabsTrigger value="watched" className="flex-1">already watched</TabsTrigger>
             <TabsTrigger asChild value="search" className="flex-1 !p-0">
-              <div className="relative w-full flex items-center justify-center">
-                <input 
-                  type="text" 
+              <div className="relative w-full flex items-center">
+                {isLoading ? (
+                  <LoadingSpinner size="sm" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
+                ) : (
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
+                )}
+                <input
+                  type="text"
                   placeholder=""
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);
                   }}
-                  className="w-full h-full px-3 py-1.5 bg-transparent border-none focus:outline-none text-sm"
+                  className="w-full h-full pl-9 pr-3 py-1.5 bg-transparent border-none focus:outline-none text-sm"
                   aria-label="Search movies"
                 />
-                {isLoading ? (
-                  <LoadingSpinner size="sm" className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4" />
-                ) : (
-                  <Search className="h-4 w-4 opacity-50" />
-                )}
               </div>
             </TabsTrigger>
           </TabsList>

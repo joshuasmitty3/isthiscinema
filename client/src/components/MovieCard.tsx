@@ -5,11 +5,6 @@ import type { Movie, MovieAction, MovieActionType } from "@/lib/types";
 interface MovieCardProps {
   movie: Movie;
   actions: MovieAction[];
-  isCompact?: boolean;
-}
-
-interface ExtendedMovieCardProps extends MovieCardProps {
-  isDragging?: boolean;
 }
 
 const icons: Record<MovieActionType, React.ReactNode> = {
@@ -18,22 +13,9 @@ const icons: Record<MovieActionType, React.ReactNode> = {
   details: <RiInformationLine className="w-4 h-4" />
 };
 
-export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function MovieCard(
-  { movie, actions, isCompact = false, isDragging, ...props }, 
-  ref
-) {
+export default function MovieCard({ movie, actions }: MovieCardProps) {
   return (
-    <div 
-      ref={ref}
-      {...props}
-      className={`
-        bg-white rounded-lg overflow-hidden
-        border border-neutral-200
-        shadow hover:shadow-md
-        ${isCompact ? 'p-3' : 'p-4'}
-        ${isDragging ? 'opacity-50' : ''}
-      `}
-    >
+    <div className="bg-white rounded-lg overflow-hidden border border-neutral-200 shadow-sm hover:shadow-md transition-shadow p-4">
       <div className="flex gap-3">
         <img
           src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
@@ -73,9 +55,9 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
                 key={type}
                 className={`
                   p-2 rounded-md transition-all
-                  ${type === "watch" ? "text-[hsl(30,25%,40%)] hover:bg-[hsl(30,25%,95%)] hover:scale-110" :
-                    type === "remove" ? "text-red-600 hover:bg-red-50 hover:scale-110" :
-                    "text-[hsl(30,25%,40%)] hover:bg-[hsl(30,25%,95%)] hover:scale-110"}
+                  ${type === "remove"
+                    ? "text-red-600 hover:bg-red-50 hover:scale-110"
+                    : "text-primary hover:bg-primary/10 hover:scale-110"}
                 `}
                 onClick={() => handler(movie)}
               >
@@ -87,4 +69,4 @@ export default React.forwardRef<HTMLDivElement, ExtendedMovieCardProps>(function
       </div>
     </div>
   );
-});
+}

@@ -101,19 +101,6 @@ export class PostgresStorage implements StorageInterface {
       ));
   }
 
-  async updateWatchListOrder(userId: number, movieIds: number[]): Promise<void> {
-    await Promise.all(
-      movieIds.map((movieId, index) =>
-        db.update(watchList)
-          .set({ order: movieIds.length - index })
-          .where(and(
-            eq(watchList.userId, userId),
-            eq(watchList.movieId, movieId)
-          ))
-      )
-    );
-  }
-
   // Watched list operations
   async getWatchedListForUser(userId: number): Promise<MovieWithDetails[]> {
     const watchedListItems = await db

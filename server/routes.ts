@@ -227,20 +227,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/watchlist/order", async (req, res) => {
-    try {
-      const { movieIds } = req.body;
-      if (!Array.isArray(movieIds)) {
-        return res.status(400).json({ message: "movieIds must be an array" });
-      }
-      await storage.updateWatchListOrder(userId(req), movieIds);
-      return res.status(200).json({ message: "Watch list order updated" });
-    } catch (error) {
-      console.error("Update watch list order error:", error);
-      return res.status(500).json({ message: "Failed to update watch list order" });
-    }
-  });
-
   // Watched list routes
   app.get("/api/watchedlist", async (req, res) => {
     try {

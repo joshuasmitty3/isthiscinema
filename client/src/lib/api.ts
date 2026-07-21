@@ -117,21 +117,6 @@ export async function removeFromWatchList(movieId: number): Promise<void> {
   }
 }
 
-export async function updateWatchListOrder(movieIds: number[]): Promise<void> {
-  try {
-    await apiRequest("PUT", "/api/watchlist/order", { movieIds });
-    await invalidateMovieQueries();
-  } catch (error) {
-    handleError(error, {
-      component: "WatchList",
-      title: "Failed to Reorder List",
-      fallbackMessage: "Could not update the order of your watch list. Please try again.",
-      severity: ErrorSeverity.ERROR
-    });
-    throw error;
-  }
-}
-
 /**
  * Watched List API Functions
  */

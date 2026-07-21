@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Movie, ListChangeHandler } from "@/lib/types";
 import { format } from "date-fns";
@@ -98,8 +97,6 @@ export default function WatchedList({
 
   return (
     <div>
-    <Card className="border border-neutral-200">
-      <CardContent className="p-4">
         <div className="flex justify-end items-center mb-4">
           <Button
             onClick={handleExportCSV}
@@ -116,11 +113,11 @@ export default function WatchedList({
             You haven't watched any movies yet. Mark movies as watched from your watch list.
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {movies.map((movie) => (
               <div
                 key={movie.id}
-                className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="movie-card bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start p-3">
                   <div
@@ -158,7 +155,7 @@ export default function WatchedList({
                     <div className="mt-2 flex space-x-2">
                       <Button
                         size="sm"
-                        className="text-xs px-2 py-1 bg-[#D2B48C]/10 text-primary hover:bg-[#D2B48C]/20"
+                        className="text-xs px-2 py-1 bg-primary/10 text-primary hover:bg-primary/20"
                         onClick={() => {
                           setSelectedMovie(movie);
                           setIsReviewModalOpen(true);
@@ -181,9 +178,7 @@ export default function WatchedList({
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
-    <MovieDetail 
+    <MovieDetail
       movie={selectedMovie}
       isOpen={isDetailOpen}
       onClose={handleCloseModal}

@@ -31,7 +31,7 @@ export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
     <div className="min-h-screen flex flex-col bg-neutral-100">
       <header className="bg-primary text-white shadow-md">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-xl font-heading font-semibold">is it cinema?</h1>
+          <h1 className="text-xl font-heading font-semibold">is this cinema?</h1>
         </div>
       </header>
 
@@ -87,7 +87,7 @@ export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
       </main>
 
       <footer className="bg-primary/10 py-3 text-center text-sm text-neutral-600">
-        <p>is it cinema? &copy; {new Date().getFullYear()}</p>
+        <p>is this cinema? &copy; {new Date().getFullYear()}</p>
       </footer>
     </div>
   );

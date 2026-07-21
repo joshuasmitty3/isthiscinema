@@ -133,7 +133,6 @@ export interface StorageInterface {
   getWatchListForUser(userId: number): Promise<MovieWithDetails[]>;
   addToWatchList(watchListItem: InsertWatchListItem): Promise<WatchListItem>;
   removeFromWatchList(userId: number, movieId: number): Promise<void>;
-  updateWatchListOrder(userId: number, movieIds: number[]): Promise<void>;
 
   // Watched list operations
   getWatchedListForUser(userId: number): Promise<MovieWithDetails[]>;
