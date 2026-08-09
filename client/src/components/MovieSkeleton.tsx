@@ -9,7 +9,7 @@ interface MovieSkeletonProps {
 
 export function MovieSkeleton({ className, showActions = true }: MovieSkeletonProps) {
   return (
-    <div className={cn("bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm", className)}>
+    <div className={cn("bg-card border border-border rounded-md overflow-hidden", className)}>
       <div className="relative">
         <Skeleton className="aspect-[2/3]" />
         {showActions && (

@@ -59,22 +59,28 @@ export default function WatchList({ onListsChange }: WatchListProps) {
 
   return (
     <>
-      <div className="space-y-3">
-        {watchlist?.map((movie: Movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-            actions={[
-              { type: "watch", handler: handleMoveToWatchedList },
-              { type: "remove", handler: handleRemoveFromWatchList },
-              { type: "details", handler: () => {
-                setSelectedMovie(movie);
-                setIsDetailOpen(true);
-              }}
-            ]}
-          />
-        ))}
-      </div>
+      {watchlist?.length === 0 ? (
+        <div className="py-16 text-center font-mono text-sm text-muted-foreground">
+          nothing here yet — add a film to get started.
+        </div>
+      ) : (
+        <div className="border-t border-border">
+          {watchlist?.map((movie: Movie) => (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              actions={[
+                { type: "watch", handler: handleMoveToWatchedList },
+                { type: "remove", handler: handleRemoveFromWatchList },
+                { type: "details", handler: () => {
+                  setSelectedMovie(movie);
+                  setIsDetailOpen(true);
+                }}
+              ]}
+            />
+          ))}
+        </div>
+      )}
       {selectedMovie && (
         <MovieDetail
           movie={selectedMovie}

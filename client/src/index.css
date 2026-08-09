@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * isthiscinema dark palette — matches the design mockup exactly.
+ * Defined unlayered so these win over the theme-json plugin's injected
+ * <style data-inject-first> block (which loads before this compiled CSS).
+ * theme.json only drives --primary (gold); the neutrals live here.
+ */
+:root {
+  --background: 220 6% 10%;          /* #17181A page */
+  --foreground: 43 13% 90%;          /* #E8E6E1 body text */
+  --card: 220 5% 16%;                /* poster slots / subtle surfaces */
+  --card-foreground: 43 13% 90%;
+  --popover: 220 6% 12%;             /* modals sit just above the page */
+  --popover-foreground: 43 13% 90%;
+  --muted: 220 5% 16%;
+  --muted-foreground: 220 3% 55%;    /* #8A8C90 meta text */
+  --border: 220 5% 20%;              /* divider lines */
+  --input: 220 6% 13%;               /* search field surface */
+  --primary: 48 65% 57%;             /* #D9BC4B gold accent */
+  --primary-foreground: 220 6% 10%;  /* dark text on gold */
+  --secondary: 220 5% 16%;
+  --secondary-foreground: 43 13% 90%;
+  --accent: 220 5% 18%;
+  --accent-foreground: 43 13% 90%;
+  --ring: 48 65% 57%;
+}
+
 @layer base {
   * {
     @apply border-border;

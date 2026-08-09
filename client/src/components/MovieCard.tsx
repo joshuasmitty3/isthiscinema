@@ -1,71 +1,86 @@
-import React from 'react';
-import { RiEyeLine, RiDeleteBin6Line, RiInformationLine } from "react-icons/ri";
-import type { Movie, MovieAction, MovieActionType } from "@/lib/types";
+import { Check, X } from "lucide-react";
+import type { Movie, MovieAction } from "@/lib/types";
 
 interface MovieCardProps {
   movie: Movie;
   actions: MovieAction[];
 }
 
-const icons: Record<MovieActionType, React.ReactNode> = {
-  watch: <RiEyeLine className="w-4 h-4" />,
-  remove: <RiDeleteBin6Line className="w-4 h-4" />,
-  details: <RiInformationLine className="w-4 h-4" />
-};
-
 export default function MovieCard({ movie, actions }: MovieCardProps) {
+  const handlerFor = (type: MovieAction["type"]) =>
+    actions.find((a) => a.type === type)?.handler;
+
+  const onWatch = handlerFor("watch");
+  const onRemove = handlerFor("remove");
+  const onDetails = handlerFor("details");
+
+  const hasPoster = movie.poster && movie.poster !== "N/A";
+  const meta = [movie.director, movie.genre, movie.runtime]
+    .filter(Boolean)
+    .join("  ·  ");
+
   return (
-    <div className="bg-white rounded-lg overflow-hidden border border-neutral-200 shadow-sm hover:shadow-md transition-shadow p-4">
-      <div className="flex gap-3">
-        <img
-          src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-          alt={movie.title}
-          className="rounded-md object-cover w-32 h-48"
-        />
-        <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-start gap-2">
-            <h3 className="font-medium text-neutral-900 line-clamp-2">{movie.title}</h3>
-            <span className="text-xs text-neutral-600 whitespace-nowrap">{movie.year}</span>
-          </div>
-          <div className="mt-1 space-y-1">
-            {movie.director && (
-              <p className="text-xs text-neutral-600">
-                <span className="font-medium">Director:</span> {movie.director}
-              </p>
-            )}
-            {movie.runtime && (
-              <p className="text-xs text-neutral-600">
-                <span className="font-medium">Runtime:</span> {movie.runtime}
-              </p>
-            )}
-            {movie.genre && (
-              <p className="text-xs text-neutral-600">
-                <span className="font-medium">Genre:</span> {movie.genre}
-              </p>
-            )}
-            {movie.actors && (
-              <p className="text-xs text-neutral-600">
-                <span className="font-medium">Cast:</span> {movie.actors}
-              </p>
-            )}
-          </div>
-          <div className="mt-3 flex gap-2">
-            {actions.map(({type, handler}) => (
-              <button
-                key={type}
-                className={`
-                  p-2 rounded-md transition-all
-                  ${type === "remove"
-                    ? "text-red-600 hover:bg-red-50 hover:scale-110"
-                    : "text-primary hover:bg-primary/10 hover:scale-110"}
-                `}
-                onClick={() => handler(movie)}
-              >
-                {icons[type] || null}
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="group flex items-center gap-4 py-4 border-b border-border">
+      <button
+        type="button"
+        onClick={() => onDetails?.(movie)}
+        className="flex-none w-12 h-16 rounded-sm overflow-hidden bg-card"
+        aria-label={`details for ${movie.title}`}
+      >
+        {hasPoster ? (
+          <img
+            src={movie.poster}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="flex w-full h-full items-center justify-center font-mono text-[9px] text-muted-foreground">
+            poster
+          </span>
+        )}
+      </button>
+
+      <div
+        className="flex-1 min-w-0 cursor-pointer"
+        onClick={() => onDetails?.(movie)}
+      >
+        <h3 className="font-heading text-base font-medium text-foreground truncate">
+          {movie.title}
+        </h3>
+        {meta && (
+          <p className="font-mono text-[11px] text-muted-foreground mt-1 truncate">
+            {meta}
+          </p>
+        )}
+      </div>
+
+      <span className="font-mono text-xs text-muted-foreground/70 tabular-nums flex-none">
+        {movie.year}
+      </span>
+
+      <div className="flex items-center gap-1 flex-none opacity-60 group-hover:opacity-100 transition-opacity">
+        {onWatch && (
+          <button
+            type="button"
+            onClick={() => onWatch(movie)}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+            aria-label={`mark ${movie.title} as watched`}
+            title="mark as watched"
+          >
+            <Check className="w-4 h-4" />
+          </button>
+        )}
+        {onRemove && (
+          <button
+            type="button"
+            onClick={() => onRemove(movie)}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label={`remove ${movie.title}`}
+            title="remove"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   );

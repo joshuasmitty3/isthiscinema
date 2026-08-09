@@ -97,14 +97,14 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange, ref
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-lg font-medium font-heading">Movie Details</DialogTitle>
+          <DialogTitle className="font-mono text-xs uppercase tracking-wider text-muted-foreground">details</DialogTitle>
         </DialogHeader>
 
-        <div className="p-4">
+        <div>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="sm:w-1/3">
               <div
-                className={`${isZoomed ? "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" : "aspect-[2/3] rounded-md overflow-hidden shadow-sm"}`}
+                className={`${isZoomed ? "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" : "aspect-[2/3] rounded-md overflow-hidden bg-card"}`}
                 onClick={() => setIsZoomed(!isZoomed)}
               >
                 <img
@@ -116,70 +116,63 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange, ref
             </div>
 
             <div className="sm:w-2/3">
-              <h4 className="text-xl font-medium mb-1">{movie.title}</h4>
-              <div className="text-sm text-neutral-600 mb-3">
-                <p>{movie.year} • {movie.director} {movie.runtime && `• ${movie.runtime}`}</p>
-                {movie.genre && <p className="mt-1">{movie.genre}</p>}
+              <h4 className="font-heading text-xl font-medium mb-2 text-foreground">{movie.title}</h4>
+              <div className="font-mono text-[11px] text-muted-foreground mb-4 space-y-1">
+                <p>{[movie.year, movie.director, movie.runtime].filter(Boolean).join("  ·  ")}</p>
+                {movie.genre && <p>{movie.genre}</p>}
               </div>
 
               <div className="mb-4">
-                <h5 className="text-sm font-medium mb-1">Synopsis</h5>
-                <p className="text-sm">{movie.plot}</p>
+                <h5 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">synopsis</h5>
+                <p className="text-sm text-foreground/90 leading-relaxed">{movie.plot}</p>
               </div>
 
               {movie.actors && (
                 <div className="mb-4">
-                  <h5 className="text-sm font-medium mb-1">Cast</h5>
-                  <p className="text-sm">{movie.actors}</p>
+                  <h5 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">cast</h5>
+                  <p className="text-sm text-foreground/90">{movie.actors}</p>
                 </div>
               )}
 
-              <div className="pt-2 border-t border-neutral-200">
-                <div className="flex space-x-2">
+              <div className="pt-3 border-t border-border">
+                <div className="flex flex-wrap gap-2">
                   {!movie.inWatchList && !movie.inWatchedList ? (
                     <Button
                       onClick={handleAddToWatchList}
                       disabled={isLoading}
-                      className="flex-1 py-2 px-3 bg-primary text-white rounded-md hover:bg-primary/90"
+                      className="flex-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                     >
-                      Add to Watch List
+                      add to watch list
                     </Button>
                   ) : movie.inWatchList && !movie.inWatchedList ? (
                     <Button
                       onClick={handleMoveToWatched}
                       disabled={isLoading}
-                      className="flex-1 py-2 px-3 bg-[#4CAF50] text-white rounded-md hover:bg-[#4CAF50]/90"
+                      className="flex-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                     >
-                      Mark as Watched
+                      mark as watched
                     </Button>
                   ) : (
-                    <>
-                      <Button
-                        disabled
-                        className="flex-1 py-2 px-3 bg-neutral-200 text-neutral-600 rounded-md"
-                      >
-                        In Watched List
-                      </Button>
+                    <div className="w-full">
                       {movie.inWatchedList && (
                         <>
+                          <div className="mb-3 font-mono text-[11px] text-muted-foreground space-y-1">
+                            <p>watched {new Date(movie.watchedDate!).toLocaleDateString()}</p>
+                            {movie.review && (
+                              <p className="border-l border-border pl-3 text-muted-foreground/90">{movie.review}</p>
+                            )}
+                          </div>
                           <Button
                             onClick={handleRemoveFromWatched}
                             disabled={isLoading}
-                            className="flex-1 py-2 px-3 bg-red-500 text-white rounded-md hover:bg-red-600"
+                            variant="outline"
+                            className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
                           >
-                            Remove from Watched List
+                            remove from watched list
                           </Button>
-                          <div className="mt-4">
-                            <p className="text-sm text-gray-600">
-                              Watched on: {new Date(movie.watchedDate!).toLocaleDateString()}
-                            </p>
-                            {movie.review && (
-                              <p className="text-sm text-gray-600">Review: {movie.review}</p>
-                            )}
-                          </div>
                         </>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
               </div>

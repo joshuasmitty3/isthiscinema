@@ -69,24 +69,24 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md w-full">
-        <DialogTitle className="text-lg font-semibold">Review {movie?.title}</DialogTitle>
-        <div className="p-4">
+        <DialogTitle className="font-heading text-lg font-medium text-foreground">review {movie?.title}</DialogTitle>
+        <div>
           <div className="mb-4">
-            <Textarea 
+            <Textarea
               value={review}
               onChange={(e) => setReview(e.target.value.slice(0, maxLength))}
               rows={4}
-              placeholder="What did you think of this movie? (0/140 characters)"
-              className="w-full p-3 border border-neutral-200 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="what did you think?"
+              className="w-full p-3 rounded-md border border-border bg-input text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
             />
-            <div className={`text-xs text-right mt-1 ${review.length >= maxLength ? 'text-[#F44336]' : 'text-neutral-600'}`}>
-              {review.length}/{maxLength} characters
+            <div className={`font-mono text-xs text-right mt-1 ${review.length >= maxLength ? 'text-destructive' : 'text-muted-foreground'}`}>
+              {review.length}/{maxLength}
             </div>
           </div>
 
           <div className="flex justify-between">
             {movie.review && (
-              <Button 
+              <Button
                 variant="destructive"
                 onClick={async () => {
                   try {
@@ -113,24 +113,24 @@ export function ReviewModal({ movie, isOpen, onClose, onSave }: ReviewModalProps
                 disabled={isLoading}
                 className="py-2 px-4"
               >
-                Delete Review
+                delete
               </Button>
             )}
             <div className="flex space-x-3 ml-auto">
-              <Button 
+              <Button
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
-                className="py-2 px-4 border border-neutral-200 text-neutral-600 rounded-md hover:bg-neutral-100"
+                className="py-2 px-4 border-border text-muted-foreground rounded-md hover:bg-accent hover:text-foreground"
               >
-                Cancel
+                cancel
               </Button>
-              <Button 
+              <Button
                 onClick={handleSave}
                 disabled={isLoading || review.trim().length < minLength}
-                className="py-2 px-4 bg-primary text-white rounded-md hover:bg-primary/90"
+                className="py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
               >
-                Save Review
+                save review
               </Button>
             </div>
           </div>

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Movie, ListChangeHandler } from "@/lib/types";
 import { format } from "date-fns";
 import { exportToCSV, removeFromWatchedList } from "@/lib/api";
@@ -97,81 +96,82 @@ export default function WatchedList({
 
   return (
     <div>
-        <div className="flex justify-end items-center mb-4">
-          <Button
-            onClick={handleExportCSV}
-            variant="ghost"
-            className="text-sm text-primary hover:text-primary/80"
-            title="Export CSV"
-          >
-            <RiDownloadLine />
-          </Button>
-        </div>
+        {movies.length > 0 && (
+          <div className="flex justify-end items-center mb-2">
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
+              title="Export CSV"
+            >
+              <RiDownloadLine className="w-3.5 h-3.5" /> export csv
+            </button>
+          </div>
+        )}
 
         {movies.length === 0 ? (
-          <div className="text-center py-8 text-neutral-500">
-            You haven't watched any movies yet. Mark movies as watched from your watch list.
+          <div className="py-16 text-center font-mono text-sm text-muted-foreground">
+            nothing watched yet — mark a film as watched from your list.
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="border-t border-border">
             {movies.map((movie) => (
               <div
                 key={movie.id}
-                className="movie-card bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="group flex items-start gap-4 py-4 border-b border-border"
               >
-                <div className="flex items-start p-3">
-                  <div
-                    className="w-20 h-28 flex-shrink-0 rounded overflow-hidden cursor-pointer"
-                    onClick={() => handleMovieClick(movie)}
-                  >
-                    <img
-                      src={movie.poster !== "N/A" ? movie.poster : "https://via.placeholder.com/300x450?text=No+Poster"}
-                      alt={movie.title}
-                      className="w-full h-full object-cover"
-                    />
+                <button
+                  type="button"
+                  className="flex-none w-12 h-16 rounded-sm overflow-hidden bg-card"
+                  onClick={() => handleMovieClick(movie)}
+                  aria-label={`details for ${movie.title}`}
+                >
+                  {movie.poster && movie.poster !== "N/A" ? (
+                    <img src={movie.poster} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="flex w-full h-full items-center justify-center font-mono text-[9px] text-muted-foreground">
+                      poster
+                    </span>
+                  )}
+                </button>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-baseline gap-3">
+                    <h3
+                      className="font-heading text-base font-medium text-foreground truncate cursor-pointer"
+                      onClick={() => handleMovieClick(movie)}
+                    >
+                      {movie.title}
+                    </h3>
+                    <span className="font-mono text-xs text-muted-foreground/70 whitespace-nowrap flex-none">
+                      {movie.watchedDate ? format(new Date(movie.watchedDate), "MMM d, yyyy") : ""}
+                    </span>
                   </div>
-                  <div className="flex-1 pl-3 min-w-0">
-                    <div className="flex justify-between items-start">
-                      <h3
-                        className="font-medium cursor-pointer"
-                        onClick={() => handleMovieClick(movie)}
-                      >
-                        {movie.title}
-                      </h3>
-                      <span className="text-xs text-neutral-600 whitespace-nowrap">
-                        {movie.watchedDate ? format(new Date(movie.watchedDate), "MMM d, yyyy") : "N/A"}
-                      </span>
-                    </div>
-                    <p className="text-xs text-neutral-600 mb-1">
-                      {movie.year} • {movie.director}
+                  <p className="font-mono text-[11px] text-muted-foreground mt-1 truncate">
+                    {[movie.year, movie.director].filter(Boolean).join("  ·  ")}
+                  </p>
+
+                  {movie.review && (
+                    <p className="mt-2 border-l border-border pl-3 font-mono text-xs text-muted-foreground/90 line-clamp-2">
+                      {movie.review}
                     </p>
+                  )}
 
-                    {movie.review && (
-                      <div className="mt-2 bg-neutral-100 rounded p-2">
-                        <p className="text-xs line-clamp-2">{movie.review}</p>
-                      </div>
-                    )}
-
-                    <div className="mt-2 flex space-x-2">
-                      <Button
-                        size="sm"
-                        className="text-xs px-2 py-1 bg-primary/10 text-primary hover:bg-primary/20"
-                        onClick={() => {
-                          setSelectedMovie(movie);
-                          setIsReviewModalOpen(true);
-                        }}
-                      >
-                        Review
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs px-2 py-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"
-                        onClick={() => handleRemoveFromWatchedList(movie)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
+                  <div className="mt-2 flex gap-4 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <button
+                      className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => {
+                        setSelectedMovie(movie);
+                        setIsReviewModalOpen(true);
+                      }}
+                    >
+                      review
+                    </button>
+                    <button
+                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => handleRemoveFromWatchedList(movie)}
+                    >
+                      remove
+                    </button>
                   </div>
                 </div>
               </div>

@@ -19,6 +19,7 @@ export default {
           "sans-serif",
         ],
         heading: ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ['"Space Mono"', "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",

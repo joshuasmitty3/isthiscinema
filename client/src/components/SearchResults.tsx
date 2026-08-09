@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { getMovieDetails, addToWatchList } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { RiAddLine } from "react-icons/ri";
 import { Movie, SearchResult, ListChangeHandler } from "@/lib/types";
-import { Button } from "./ui/button";
 import { MovieSkeleton } from "./MovieSkeleton";
 import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 
@@ -77,23 +75,22 @@ export default function SearchResults({
   }
 
   return (
-    <Card className="mb-8 border border-neutral-200">
-      <CardContent className="p-4">
-        <h2 className="text-lg font-medium mb-4 font-heading">
-          Search Results for "{query}"
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {isLoading ? (
-            <>
-              {Array.from({ length: 10 }).map((_, i) => (
-                <MovieSkeleton key={i} />
-              ))}
-            </>
-          ) : (
-            results.map((result) => (
+    <div className="mb-8">
+      <h2 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4">
+        results for "{query}"
+      </h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {isLoading ? (
+          <>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <MovieSkeleton key={i} />
+            ))}
+          </>
+        ) : (
+          results.map((result) => (
             <div
               key={result.imdbID}
-              className="movie-card bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              className="group bg-card border border-border rounded-md overflow-hidden hover:border-primary/40 transition-colors"
               onClick={() => handleMovieClick(result)}
             >
               <div className="relative aspect-[2/3] cursor-pointer">
@@ -102,29 +99,27 @@ export default function SearchResults({
                   alt={result.Title}
                   className="w-full h-full object-cover"
                 />
-                <Button
+                <button
                   data-movie-id={result.imdbID}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleAddToWatchList(result);
                   }}
                   disabled={addingMovie === result.imdbID}
-                  className="absolute top-2 right-2 p-1 bg-primary/90 text-white rounded-full hover:bg-primary transition-all duration-300 hover:rotate-90 active:scale-95 active:bg-green-500"
-                  size="icon"
-                  variant="ghost"
+                  className="absolute top-2 right-2 grid place-items-center h-7 w-7 rounded-full bg-primary text-primary-foreground shadow-sm hover:rotate-90 active:scale-95 transition-all duration-300 disabled:opacity-50"
+                  aria-label={`add ${result.Title}`}
                 >
                   <RiAddLine className="h-4 w-4" />
-                </Button>
+                </button>
               </div>
-              <div className="p-2">
-                <h3 className="text-sm font-medium truncate">{result.Title}</h3>
-                <p className="text-xs text-neutral-600">{result.Year}</p>
+              <div className="p-2.5">
+                <h3 className="font-heading text-sm font-medium text-foreground truncate">{result.Title}</h3>
+                <p className="font-mono text-[11px] text-muted-foreground mt-0.5">{result.Year}</p>
               </div>
             </div>
           ))
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </div>
   );
 }
