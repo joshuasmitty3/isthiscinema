@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 import Layout from "@/components/Layout";
 import SearchResults from "@/components/SearchResults";
 import WatchList from "@/components/WatchList";
@@ -18,9 +18,13 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
   const queryClient = useQueryClient();
   const { query, setQuery, results, isLoading } = useSearch();
   const { watchlist, watchedlist } = useMovies();
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
-  const searching = query.trim().length >= 2;
+  const openSearch = () => setSearchOpen(true);
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setQuery("");
+  };
 
   const handleListsChange: ListChangeHandler = () => {
     queryClient.invalidateQueries({ queryKey: ["watchlist"] });
@@ -31,47 +35,62 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
     <Layout user={user} onLogout={onLogout}>
       <div className="container mx-auto px-4 pt-4 pb-4">
         <Tabs defaultValue="watchlist" className="w-full">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border">
+          <div className="border-b border-border">
             <TabsList className="h-auto gap-6 rounded-none bg-transparent p-0">
-              <TabsTrigger value="watchlist" className={tabClass}>
+              <TabsTrigger value="watchlist" className={tabClass} onClick={closeSearch}>
                 worth watching
                 <span className="ml-1.5 font-mono text-xs text-muted-foreground">{watchlist.length}</span>
               </TabsTrigger>
-              <TabsTrigger value="watched" className={tabClass}>
+              <TabsTrigger value="watched" className={tabClass} onClick={closeSearch}>
                 already watched
                 <span className="ml-1.5 font-mono text-xs text-muted-foreground">{watchedlist.length}</span>
               </TabsTrigger>
             </TabsList>
-
-            <div className="w-full pb-3 sm:w-64">
-              <div className="relative">
-                {isLoading ? (
-                  <LoadingSpinner size="sm" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                ) : (
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                )}
-                <input
-                  ref={searchRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="search…"
-                  aria-label="Search movies"
-                  className="h-9 w-full rounded-md border border-border bg-input pl-9 pr-3 font-mono text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/30"
-                />
-              </div>
-            </div>
           </div>
 
-          {searching ? (
-            <div className="mt-6">
-              <SearchResults
-                results={results}
-                query={query}
-                isLoading={isLoading}
-                onSelectMovie={() => {}}
-                onListsChange={handleListsChange}
-              />
+          {searchOpen ? (
+            <div className="mt-4">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  {isLoading ? (
+                    <LoadingSpinner size="sm" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                  ) : (
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  )}
+                  <input
+                    autoFocus
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="search for a film to add…"
+                    aria-label="Search movies"
+                    className="h-10 w-full rounded-md border border-border bg-input pl-9 pr-3 font-mono text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/30"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={closeSearch}
+                  className="flex-none font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  cancel
+                </button>
+              </div>
+
+              <div className="mt-6">
+                {query.trim().length < 2 ? (
+                  <p className="py-10 text-center font-mono text-sm text-muted-foreground">
+                    start typing to find a film…
+                  </p>
+                ) : (
+                  <SearchResults
+                    results={results}
+                    query={query}
+                    isLoading={isLoading}
+                    onSelectMovie={() => {}}
+                    onListsChange={handleListsChange}
+                  />
+                )}
+              </div>
             </div>
           ) : (
             <>
@@ -79,7 +98,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
                 <div className="mb-2 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => searchRef.current?.focus()}
+                    onClick={openSearch}
                     className="rounded-md border border-dashed border-primary/50 px-3 py-1.5 font-mono text-sm text-primary transition-colors hover:bg-primary/10"
                   >
                     + add a film

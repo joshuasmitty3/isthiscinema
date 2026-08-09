@@ -7,7 +7,7 @@ interface LoginPageProps {
   onSetup: () => void;
 }
 
-export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
+export default function LoginPage({ onLogin }: LoginPageProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -84,13 +84,6 @@ export default function LoginPage({ onLogin, onSetup }: LoginPageProps) {
               {loading ? "signing in…" : "sign in"}
             </button>
           </form>
-
-          <p className="mt-6 text-center font-mono text-xs text-muted-foreground">
-            new here?{" "}
-            <button onClick={onSetup} className="text-primary hover:underline">
-              create an account
-            </button>
-          </p>
         </div>
       </main>
 

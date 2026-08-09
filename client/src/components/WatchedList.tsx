@@ -1,12 +1,10 @@
 import { Movie, ListChangeHandler } from "@/lib/types";
 import { format } from "date-fns";
-import { exportToCSV, removeFromWatchedList } from "@/lib/api";
-import { RiDownloadLine } from "react-icons/ri";
+import { removeFromWatchedList } from "@/lib/api";
 import MovieDetail from "./MovieDetail";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ReviewModal } from "./ReviewModal";
-import { downloadBlob } from "@/lib/downloadUtils";
 import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 
 interface WatchedListProps {
@@ -25,28 +23,6 @@ export default function WatchedList({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const queryClient = useQueryClient();
-
-  const handleExportCSV = async () => {
-    try {
-      const blob = await exportToCSV();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `movie-list-${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      handleError(error, {
-        component: "WatchedList",
-        title: "Export Failed",
-        fallbackMessage: "Could not export your movie lists to CSV. Please try again.",
-        severity: ErrorSeverity.ERROR,
-        showToast: true
-      });
-    }
-  };
 
   const handleMovieClick = (movie: Movie) => {
     setSelectedMovie(movie);
@@ -96,18 +72,6 @@ export default function WatchedList({
 
   return (
     <div>
-        {movies.length > 0 && (
-          <div className="flex justify-end items-center mb-2">
-            <button
-              onClick={handleExportCSV}
-              className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
-              title="Export CSV"
-            >
-              <RiDownloadLine className="w-3.5 h-3.5" /> export csv
-            </button>
-          </div>
-        )}
-
         {movies.length === 0 ? (
           <div className="py-16 text-center font-mono text-sm text-muted-foreground">
             nothing watched yet — mark a film as watched from your list.
