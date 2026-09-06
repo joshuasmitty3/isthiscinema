@@ -5,9 +5,10 @@ import { login } from "@/lib/api";
 interface LoginPageProps {
   onLogin: (user: User) => void;
   onSetup: () => void;
+  onBack?: () => void;
 }
 
-export default function LoginPage({ onLogin }: LoginPageProps) {
+export default function LoginPage({ onLogin, onBack }: LoginPageProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -84,6 +85,16 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               {loading ? "signing in…" : "sign in"}
             </button>
           </form>
+
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="mt-6 block w-full text-center font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← back to browsing
+            </button>
+          )}
         </div>
       </main>
 

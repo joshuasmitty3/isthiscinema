@@ -118,6 +118,7 @@ export interface StorageInterface {
   // User operations
   getUser(id: number): Promise<User | null>;
   getUserByUsername(username: string): Promise<User | null>;
+  getFirstUserId(): Promise<number | null>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<User>): Promise<void>;
   deleteUser(id: number): Promise<void>;

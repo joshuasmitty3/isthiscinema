@@ -18,7 +18,9 @@ function App() {
   useEffect(() => {
     getCurrentUser().then(u => {
       setUser(u);
-      setView(u ? "app" : "login");
+      // Always land in the app. Logged out means a read-only view of the
+      // shared lists, not a locked login wall.
+      setView("app");
     });
   }, []);
 
@@ -26,11 +28,14 @@ function App() {
     await logout();
     queryClient.clear();
     setUser(null);
-    setView("login");
+    setView("app");
   }
 
   function handleLogin(u: User) {
     setUser(u);
+    // Drop any lists cached during the anonymous view so they refetch as the
+    // owner (harmless with one shared account, correct if that ever changes).
+    queryClient.clear();
     setView("app");
   }
 
@@ -54,7 +59,7 @@ function App() {
   if (view === "login") {
     return (
       <QueryClientProvider client={queryClient}>
-        <LoginPage onLogin={handleLogin} onSetup={() => setView("setup")} />
+        <LoginPage onLogin={handleLogin} onSetup={() => setView("setup")} onBack={() => setView("app")} />
         <Toaster />
       </QueryClientProvider>
     );
@@ -63,7 +68,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
-        <Home user={user!} onLogout={handleLogout} />
+        <Home user={user} onLogout={handleLogout} onSignIn={() => setView("login")} />
         <Toaster />
       </ErrorBoundary>
     </QueryClientProvider>
