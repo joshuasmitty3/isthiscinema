@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { useMovies } from "@/lib/movies";
 import { useQueryClient } from "@tanstack/react-query";
-import type { Movie, ListChangeHandler } from "@/lib/types";
+import type { Movie, MovieAction, ListChangeHandler } from "@/lib/types";
 import { moveToWatched, removeFromWatchList } from "@/lib/api";
 import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 import MovieCard from './MovieCard';
 import MovieDetail from './MovieDetail';
 
 interface WatchListProps {
+  canEdit?: boolean;
   onListsChange?: ListChangeHandler;
 }
 
-export default function WatchList({ onListsChange }: WatchListProps) {
+export default function WatchList({ canEdit = false, onListsChange }: WatchListProps) {
   const queryClient = useQueryClient();
   const { watchlist } = useMovies();
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
@@ -65,24 +66,29 @@ export default function WatchList({ onListsChange }: WatchListProps) {
         </div>
       ) : (
         <div className="border-t border-border">
-          {watchlist?.map((movie: Movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              actions={[
-                { type: "watch", handler: handleMoveToWatchedList },
-                { type: "remove", handler: handleRemoveFromWatchList },
-                { type: "details", handler: () => {
+          {watchlist?.map((movie: Movie) => {
+            const actions: MovieAction[] = [
+              ...(canEdit
+                ? ([
+                    { type: "watch", handler: handleMoveToWatchedList },
+                    { type: "remove", handler: handleRemoveFromWatchList },
+                  ] as MovieAction[])
+                : []),
+              {
+                type: "details",
+                handler: () => {
                   setSelectedMovie(movie);
                   setIsDetailOpen(true);
-                }}
-              ]}
-            />
-          ))}
+                },
+              },
+            ];
+            return <MovieCard key={movie.id} movie={movie} actions={actions} />;
+          })}
         </div>
       )}
       {selectedMovie && (
         <MovieDetail
+          canEdit={canEdit}
           movie={selectedMovie}
           isOpen={isDetailOpen}
           onClose={() => {

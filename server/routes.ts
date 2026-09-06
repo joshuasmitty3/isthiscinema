@@ -29,6 +29,26 @@ function userId(req: Request): number {
   return (req.session as any).userId as number;
 }
 
+// The account whose lists anonymous visitors see. There is a single shared
+// login, so the "public" user is the owner account (lowest id), overridable
+// with the PUBLIC_USER_ID env var if that ever changes.
+async function getPublicUserId(): Promise<number | null> {
+  if (process.env.PUBLIC_USER_ID) {
+    const parsed = parseInt(process.env.PUBLIC_USER_ID, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return storage.getFirstUserId();
+}
+
+// Session user if logged in, otherwise the public (owner) user. Reads use
+// this so anonymous visitors see the shared lists; writes stay behind
+// requireAuth, so a null here never reaches a mutation.
+async function effectiveUserId(req: Request): Promise<number | null> {
+  const sessionUid = (req.session as any).userId;
+  if (sessionUid) return sessionUid as number;
+  return getPublicUserId();
+}
+
 async function migrateLegacyDataIfNeeded(newUserId: number): Promise<void> {
   if (newUserId === 1) return;
   const legacyUser = await storage.getUser(1);
@@ -98,11 +118,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.status(201).json({ id: user.id, username: user.username });
   });
 
-  // All routes below require authentication
-  app.use("/api", requireAuth);
+  // GET (read) routes below are public: anonymous visitors get a read-only
+  // view of the shared lists. Every write route (POST/PUT/DELETE) carries
+  // requireAuth individually, which is the real boundary that stops an
+  // anonymous person from changing anything.
 
   // OMDB API routes
-  app.get("/api/movies/search", async (req, res) => {
+  // Search only exists to add films (a write), so it stays behind auth.
+  app.get("/api/movies/search", requireAuth, async (req, res) => {
     try {
       const { query } = req.query;
       if (!query || typeof query !== 'string') {
@@ -126,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/movies/:imdbId", async (req, res) => {
     try {
       const { imdbId } = req.params;
-      const uid = userId(req);
+      const uid = await effectiveUserId(req);
 
       let movie = await storage.getMovieByImdbId(imdbId);
 
@@ -151,8 +174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const watchList = await storage.getWatchListForUser(uid);
-      const watchedList = await storage.getWatchedListForUser(uid);
+      const watchList = uid !== null ? await storage.getWatchListForUser(uid) : [];
+      const watchedList = uid !== null ? await storage.getWatchedListForUser(uid) : [];
 
       const inWatchList = watchList.some(item => item.id === movie!.id);
       const watchedItem = watchedList.find(item => item.id === movie!.id);
@@ -174,7 +197,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Watch list routes
   app.get("/api/watchlist", async (req, res) => {
     try {
-      const watchList = await storage.getWatchListForUser(userId(req));
+      const uid = await effectiveUserId(req);
+      const watchList = uid !== null ? await storage.getWatchListForUser(uid) : [];
       return res.status(200).json(watchList);
     } catch (error) {
       console.error("Get watch list error:", error);
@@ -182,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/watchlist", async (req, res) => {
+  app.post("/api/watchlist", requireAuth, async (req, res) => {
     try {
       let data;
       try {
@@ -213,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/watchlist/:movieId", async (req, res) => {
+  app.delete("/api/watchlist/:movieId", requireAuth, async (req, res) => {
     try {
       const movieId = parseInt(req.params.movieId, 10);
       if (isNaN(movieId)) {
@@ -230,7 +254,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Watched list routes
   app.get("/api/watchedlist", async (req, res) => {
     try {
-      const watchedList = await storage.getWatchedListForUser(userId(req));
+      const uid = await effectiveUserId(req);
+      const watchedList = uid !== null ? await storage.getWatchedListForUser(uid) : [];
       return res.status(200).json(watchedList);
     } catch (error) {
       console.error("Get watched list error:", error);
@@ -238,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/watchedlist", async (req, res) => {
+  app.post("/api/watchedlist", requireAuth, async (req, res) => {
     try {
       let data;
       try {
@@ -263,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/watchedlist/:movieId/review", async (req, res) => {
+  app.put("/api/watchedlist/:movieId/review", requireAuth, async (req, res) => {
     try {
       const movieId = parseInt(req.params.movieId, 10);
       const { review } = req.body;
@@ -282,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/watchedlist/:movieId", async (req, res) => {
+  app.delete("/api/watchedlist/:movieId", requireAuth, async (req, res) => {
     try {
       const movieId = parseInt(req.params.movieId, 10);
       if (isNaN(movieId)) {
@@ -296,7 +321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/movies/:movieId/move-to-watched", async (req, res) => {
+  app.post("/api/movies/:movieId/move-to-watched", requireAuth, async (req, res) => {
     try {
       const movieId = parseInt(req.params.movieId, 10);
       const { review } = req.body;
@@ -322,8 +347,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // CSV Export
-  app.get("/api/export/csv", async (req, res) => {
+  // CSV Export — owner convenience, keep behind auth.
+  app.get("/api/export/csv", requireAuth, async (req, res) => {
     try {
       const watchedList = await storage.getWatchedListForUser(userId(req));
 

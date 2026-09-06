@@ -8,11 +8,12 @@ import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 
 interface MovieDetailProps extends CommonModalProps {
   movie: Movie | null;
+  canEdit?: boolean;
   onListsChange: ListChangeHandler;
   refetch: ListChangeHandler;
 }
 
-export default function MovieDetail({ movie, isOpen, onClose, onListsChange, refetch }: MovieDetailProps) {
+export default function MovieDetail({ movie, canEdit = false, isOpen, onClose, onListsChange, refetch }: MovieDetailProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const { toast } = useToast();
@@ -134,48 +135,61 @@ export default function MovieDetail({ movie, isOpen, onClose, onListsChange, ref
                 </div>
               )}
 
-              <div className="pt-3 border-t border-border">
-                <div className="flex flex-wrap gap-2">
-                  {!movie.inWatchList && !movie.inWatchedList ? (
-                    <Button
-                      onClick={handleAddToWatchList}
-                      disabled={isLoading}
-                      className="flex-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                    >
-                      add to watch list
-                    </Button>
-                  ) : movie.inWatchList && !movie.inWatchedList ? (
-                    <Button
-                      onClick={handleMoveToWatched}
-                      disabled={isLoading}
-                      className="flex-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                    >
-                      mark as watched
-                    </Button>
-                  ) : (
-                    <div className="w-full">
-                      {movie.inWatchedList && (
-                        <>
-                          <div className="mb-3 font-mono text-[11px] text-muted-foreground space-y-1">
-                            <p>watched {new Date(movie.watchedDate!).toLocaleDateString()}</p>
-                            {movie.review && (
-                              <p className="border-l border-border pl-3 text-muted-foreground/90">{movie.review}</p>
-                            )}
-                          </div>
-                          <Button
-                            onClick={handleRemoveFromWatched}
-                            disabled={isLoading}
-                            variant="outline"
-                            className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
-                          >
-                            remove from watched list
-                          </Button>
-                        </>
+              {canEdit ? (
+                <div className="pt-3 border-t border-border">
+                  <div className="flex flex-wrap gap-2">
+                    {!movie.inWatchList && !movie.inWatchedList ? (
+                      <Button
+                        onClick={handleAddToWatchList}
+                        disabled={isLoading}
+                        className="flex-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                      >
+                        add to watch list
+                      </Button>
+                    ) : movie.inWatchList && !movie.inWatchedList ? (
+                      <Button
+                        onClick={handleMoveToWatched}
+                        disabled={isLoading}
+                        className="flex-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                      >
+                        mark as watched
+                      </Button>
+                    ) : (
+                      <div className="w-full">
+                        {movie.inWatchedList && (
+                          <>
+                            <div className="mb-3 font-mono text-[11px] text-muted-foreground space-y-1">
+                              <p>watched {new Date(movie.watchedDate!).toLocaleDateString()}</p>
+                              {movie.review && (
+                                <p className="border-l border-border pl-3 text-muted-foreground/90">{movie.review}</p>
+                              )}
+                            </div>
+                            <Button
+                              onClick={handleRemoveFromWatched}
+                              disabled={isLoading}
+                              variant="outline"
+                              className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
+                            >
+                              remove from watched list
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                movie.inWatchedList && (
+                  <div className="pt-3 border-t border-border">
+                    <div className="font-mono text-[11px] text-muted-foreground space-y-1">
+                      <p>watched {new Date(movie.watchedDate!).toLocaleDateString()}</p>
+                      {movie.review && (
+                        <p className="border-l border-border pl-3 text-muted-foreground/90">{movie.review}</p>
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                )
+              )}
             </div>
           </div>
         </div>

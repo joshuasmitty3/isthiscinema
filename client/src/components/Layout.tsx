@@ -2,24 +2,36 @@ import { User } from "@/lib/types";
 
 interface LayoutProps {
   children: React.ReactNode;
-  user: User;
+  user: User | null;
   onLogout?: () => void;
+  onSignIn?: () => void;
 }
 
-export default function Layout({ children, user, onLogout }: LayoutProps) {
+export default function Layout({ children, user, onLogout, onSignIn }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <div className="container mx-auto px-4 pt-6 pb-1 flex justify-between items-center">
         <h1 className="font-heading text-lg font-semibold tracking-tight">
           is this <span className="text-primary">cinema</span>
         </h1>
-        {onLogout && (
-          <button
-            onClick={onLogout}
-            className="font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            sign out
-          </button>
+        {user ? (
+          onLogout && (
+            <button
+              onClick={onLogout}
+              className="font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              sign out
+            </button>
+          )
+        ) : (
+          onSignIn && (
+            <button
+              onClick={onSignIn}
+              className="font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              sign in
+            </button>
+          )
         )}
       </div>
 

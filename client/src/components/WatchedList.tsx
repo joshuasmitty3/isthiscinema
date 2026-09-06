@@ -9,15 +9,17 @@ import { handleError, ErrorSeverity } from "@/utils/errorHandler";
 
 interface WatchedListProps {
   movies: Movie[];
+  canEdit?: boolean;
   onSelectMovie?: (movie: Movie) => void;
   onOpenReviewModal?: (movie: Movie) => void;
   onListsChange?: ListChangeHandler;
 }
 
-export default function WatchedList({ 
-  movies, 
+export default function WatchedList({
+  movies,
+  canEdit = false,
   onOpenReviewModal = () => {},
-  onListsChange 
+  onListsChange
 }: WatchedListProps) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -120,29 +122,32 @@ export default function WatchedList({
                     </p>
                   )}
 
-                  <div className="mt-2 flex gap-4 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <button
-                      className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
-                      onClick={() => {
-                        setSelectedMovie(movie);
-                        setIsReviewModalOpen(true);
-                      }}
-                    >
-                      review
-                    </button>
-                    <button
-                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                      onClick={() => handleRemoveFromWatchedList(movie)}
-                    >
-                      remove
-                    </button>
-                  </div>
+                  {canEdit && (
+                    <div className="mt-2 flex gap-4 opacity-60 group-hover:opacity-100 transition-opacity">
+                      <button
+                        className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
+                        onClick={() => {
+                          setSelectedMovie(movie);
+                          setIsReviewModalOpen(true);
+                        }}
+                      >
+                        review
+                      </button>
+                      <button
+                        className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => handleRemoveFromWatchedList(movie)}
+                      >
+                        remove
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
     <MovieDetail
+      canEdit={canEdit}
       movie={selectedMovie}
       isOpen={isDetailOpen}
       onClose={handleCloseModal}

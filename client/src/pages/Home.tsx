@@ -14,7 +14,16 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 const tabClass =
   "relative rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 -mb-px text-sm font-medium text-muted-foreground shadow-none transition-colors data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none";
 
-export default function Home({ user, onLogout }: { user: User; onLogout?: () => void }) {
+export default function Home({
+  user,
+  onLogout,
+  onSignIn,
+}: {
+  user: User | null;
+  onLogout?: () => void;
+  onSignIn?: () => void;
+}) {
+  const canEdit = !!user;
   const queryClient = useQueryClient();
   const { query, setQuery, results, isLoading } = useSearch();
   const { watchlist, watchedlist } = useMovies();
@@ -32,7 +41,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
   };
 
   return (
-    <Layout user={user} onLogout={onLogout}>
+    <Layout user={user} onLogout={onLogout} onSignIn={onSignIn}>
       <div className="container mx-auto px-4 pt-4 pb-4">
         <Tabs defaultValue="watchlist" className="w-full">
           <div className="border-b border-border">
@@ -48,7 +57,7 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
             </TabsList>
           </div>
 
-          {searchOpen ? (
+          {canEdit && searchOpen ? (
             <div className="mt-4">
               <div className="flex items-center gap-3">
                 <div className="relative flex-1">
@@ -95,20 +104,22 @@ export default function Home({ user, onLogout }: { user: User; onLogout?: () => 
           ) : (
             <>
               <TabsContent value="watchlist" className="mt-4">
-                <div className="mb-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={openSearch}
-                    className="rounded-md border border-dashed border-primary/50 px-3 py-1.5 font-mono text-sm text-primary transition-colors hover:bg-primary/10"
-                  >
-                    + add a film
-                  </button>
-                </div>
-                <WatchList onListsChange={handleListsChange} />
+                {canEdit && (
+                  <div className="mb-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={openSearch}
+                      className="rounded-md border border-dashed border-primary/50 px-3 py-1.5 font-mono text-sm text-primary transition-colors hover:bg-primary/10"
+                    >
+                      + add a film
+                    </button>
+                  </div>
+                )}
+                <WatchList canEdit={canEdit} onListsChange={handleListsChange} />
               </TabsContent>
 
               <TabsContent value="watched" className="mt-4">
-                <WatchedList movies={watchedlist} onListsChange={handleListsChange} />
+                <WatchedList canEdit={canEdit} movies={watchedlist} onListsChange={handleListsChange} />
               </TabsContent>
             </>
           )}

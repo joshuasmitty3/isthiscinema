@@ -6,7 +6,7 @@ import {
   type MovieWithDetails, type StorageInterface
 } from "@shared/schema";
 import { db } from './db';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, asc } from 'drizzle-orm';
 
 export class PostgresStorage implements StorageInterface {
   // User operations
@@ -18,6 +18,13 @@ export class PostgresStorage implements StorageInterface {
   async getUserByUsername(username: string): Promise<User | null> {
     const result = await db.select().from(users).where(eq(users.username, username));
     return result[0] || null;
+  }
+
+  // Lowest user id — the owner account, used as the "public" reader for
+  // anonymous (not-logged-in) visitors.
+  async getFirstUserId(): Promise<number | null> {
+    const result = await db.select({ id: users.id }).from(users).orderBy(asc(users.id)).limit(1);
+    return result[0]?.id ?? null;
   }
 
   async createUser(user: InsertUser): Promise<User> {
