@@ -134,10 +134,10 @@ export default function WatchedList({
                       type="button"
                       aria-expanded={expandedReviews.has(movie.id)}
                       onClick={() => toggleReview(movie.id)}
-                      className={`mt-2 w-full bg-transparent border-l border-border pl-3 text-left font-mono text-xs transition-all duration-150 ease-out hover:-translate-y-px active:-translate-y-px ${
+                      className={`mt-2 w-full bg-transparent border-l pl-3 text-left font-mono text-xs transition-all duration-150 ease-out hover:-translate-y-px active:-translate-y-px ${
                         expandedReviews.has(movie.id)
-                          ? "block text-foreground"
-                          : "text-muted-foreground/90 line-clamp-2"
+                          ? "block text-foreground border-primary"
+                          : "text-muted-foreground/90 line-clamp-2 border-border"
                       }`}
                     >
                       {movie.review}
