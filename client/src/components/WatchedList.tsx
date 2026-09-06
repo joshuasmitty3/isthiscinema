@@ -24,7 +24,20 @@ export default function WatchedList({
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [expandedReviews, setExpandedReviews] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
+
+  const toggleReview = (id: number) => {
+    setExpandedReviews((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   const handleMovieClick = (movie: Movie) => {
     setSelectedMovie(movie);
@@ -117,9 +130,18 @@ export default function WatchedList({
                   </p>
 
                   {movie.review && (
-                    <p className="mt-2 border-l border-border pl-3 font-mono text-xs text-muted-foreground/90 line-clamp-2">
+                    <button
+                      type="button"
+                      aria-expanded={expandedReviews.has(movie.id)}
+                      onClick={() => toggleReview(movie.id)}
+                      className={`mt-2 w-full bg-transparent border-l pl-3 text-left font-mono text-xs transition-all duration-150 ease-out hover:-translate-y-px active:-translate-y-px ${
+                        expandedReviews.has(movie.id)
+                          ? "block text-foreground border-primary"
+                          : "text-muted-foreground/90 line-clamp-2 border-border"
+                      }`}
+                    >
                       {movie.review}
-                    </p>
+                    </button>
                   )}
 
                   {canEdit && (
