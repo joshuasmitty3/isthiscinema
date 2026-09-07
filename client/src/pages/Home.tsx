@@ -3,6 +3,8 @@ import Layout from "@/components/Layout";
 import SearchResults from "@/components/SearchResults";
 import WatchList from "@/components/WatchList";
 import WatchedList from "@/components/WatchedList";
+import RamblingList from "@/components/RamblingList";
+import { getRamblings } from "@/lib/ramblings";
 import { User, ListChangeHandler } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMovies } from "@/lib/movies";
@@ -18,15 +20,18 @@ export default function Home({
   user,
   onLogout,
   onSignIn,
+  initialTab = "watchlist",
 }: {
   user: User | null;
   onLogout?: () => void;
   onSignIn?: () => void;
+  initialTab?: "watchlist" | "watched" | "rambling";
 }) {
   const canEdit = !!user;
   const queryClient = useQueryClient();
   const { query, setQuery, results, isLoading } = useSearch();
   const { watchlist, watchedlist } = useMovies();
+  const ramblingCount = getRamblings().length;
   const [searchOpen, setSearchOpen] = useState(false);
 
   const openSearch = () => setSearchOpen(true);
@@ -43,7 +48,7 @@ export default function Home({
   return (
     <Layout user={user} onLogout={onLogout} onSignIn={onSignIn}>
       <div className="container mx-auto px-4 pt-4 pb-4">
-        <Tabs defaultValue="watchlist" className="w-full">
+        <Tabs defaultValue={initialTab} className="w-full">
           <div className="border-b border-border">
             <TabsList className="h-auto gap-6 rounded-none bg-transparent p-0">
               <TabsTrigger value="watchlist" className={tabClass} onClick={closeSearch}>
@@ -53,6 +58,10 @@ export default function Home({
               <TabsTrigger value="watched" className={tabClass} onClick={closeSearch}>
                 already watched
                 <span className="ml-1.5 font-mono text-xs text-muted-foreground">{watchedlist.length}</span>
+              </TabsTrigger>
+              <TabsTrigger value="rambling" className={tabClass} onClick={closeSearch}>
+                rambling
+                <span className="ml-1.5 font-mono text-xs text-muted-foreground">{ramblingCount}</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -120,6 +129,10 @@ export default function Home({
 
               <TabsContent value="watched" className="mt-4">
                 <WatchedList canEdit={canEdit} movies={watchedlist} onListsChange={handleListsChange} />
+              </TabsContent>
+
+              <TabsContent value="rambling" className="mt-4">
+                <RamblingList />
               </TabsContent>
             </>
           )}
