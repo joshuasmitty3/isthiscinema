@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 export interface Rambling {
   slug: string;
   title: string;
+  subtitle?: string; // optional one-line subtitle from frontmatter
   date: string; // raw ISO-ish string from frontmatter, e.g. "2026-09-07"
   html: string; // sanitized HTML for the body
 }
@@ -16,8 +17,8 @@ const files = import.meta.glob("../ramblings/*.md", {
   eager: true,
 }) as Record<string, string>;
 
-// Only bold, italics, links, paragraphs, and line breaks are allowed through.
-// Anything else (headings included) is stripped on render.
+// Only bold, italics, links, images, paragraphs, and line breaks are allowed
+// through. Anything else (headings included) is stripped on render.
 DOMPurify.addHook("afterSanitizeAttributes", (node) => {
   if (node.tagName === "A") {
     node.setAttribute("target", "_blank");
@@ -26,8 +27,8 @@ DOMPurify.addHook("afterSanitizeAttributes", (node) => {
 });
 
 const SANITIZE_CONFIG = {
-  ALLOWED_TAGS: ["p", "br", "strong", "em", "a"],
-  ALLOWED_ATTR: ["href", "target", "rel"],
+  ALLOWED_TAGS: ["p", "br", "strong", "em", "a", "img"],
+  ALLOWED_ATTR: ["href", "target", "rel", "src", "alt"],
 };
 
 function slugFromPath(path: string): string {
@@ -37,7 +38,7 @@ function slugFromPath(path: string): string {
 // Minimal frontmatter parser: a leading --- block of key: value lines,
 // then the body. Kept in-house to avoid a Node-oriented dependency in the
 // browser bundle.
-function parse(raw: string): { title: string; date: string; body: string } {
+function parse(raw: string): { title: string; subtitle: string; date: string; body: string } {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   const meta: Record<string, string> = {};
   let body = raw;
@@ -56,7 +57,12 @@ function parse(raw: string): { title: string; date: string; body: string } {
     }
   }
 
-  return { title: meta.title ?? "untitled", date: meta.date ?? "", body: body.trim() };
+  return {
+    title: meta.title ?? "untitled",
+    subtitle: meta.subtitle ?? "",
+    date: meta.date ?? "",
+    body: body.trim(),
+  };
 }
 
 function render(body: string): string {
@@ -67,8 +73,8 @@ function render(body: string): string {
 // Built once at module load. Newest first by date.
 const ramblings: Rambling[] = Object.entries(files)
   .map(([path, raw]) => {
-    const { title, date, body } = parse(raw);
-    return { slug: slugFromPath(path), title, date, html: render(body) };
+    const { title, subtitle, date, body } = parse(raw);
+    return { slug: slugFromPath(path), title, subtitle, date, html: render(body) };
   })
   .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
