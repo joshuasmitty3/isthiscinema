@@ -1,6 +1,6 @@
 ---
-title: The genius of Heat
-subtitle: What I learned watching Heat for the third time.
+title: the genius of heat
+subtitle: what i learned watching heat for the third time.
 date: 2026-10-04
 ---
 
@@ -22,6 +22,6 @@ Mann's technical display of heists and multi-layered action sequences are so sat
 
 Which brings me to the cinematography. From its deep blue scenes, brutalist sets, and the endless diner/upscale restaurant kitchen calls, it's simply good. Nothing over the top, just crisp and clean in a way that didn't distract from the overall vibe.
 
-In my opinion, Heat is like a meta display of craftsmanship and devotion. If you're familiar with Mann's work, I see Heat as his third attempt at this story where Mann got everything right. (I'll skip the runtime criticism—it's roughly three hours for the record. And I selfishly wish Tangerine Dream scored this project. Anyway, I digress.) The makings of Neil McCauley are etched in Thief (1981). In Thief, James Cann plays Frank, who is a highly skilled robber who wants to move onto the next chapter of his life with a wife and family but his last job goes awry. I've never seen L.A. Takedown (1989), but it's the direct precursor to Heat. Despite their flaws, Mann refines the mechanic scenes and improves the structure each time, turning his signature elements into something masterful.
+In my opinion, Heat is like a meta display of craftsmanship and devotion. If you're familiar with Mann's work, I see Heat as his third attempt at this story where Mann got everything right. (I'll skip the runtime criticism—it's roughly three hours for the record. And I selfishly wish Tangerine Dream scored this project. Anyway, I digress.) The makings of Neil McCauley are etched in Thief (1981). In Thief, James Caan plays Frank, who is a highly skilled robber who wants to move onto the next chapter of his life with a wife and family but his last job goes awry. I've never seen L.A. Takedown (1989), but it's the direct precursor to Heat. Despite their flaws, Mann refines the mechanic scenes and improves the structure each time, turning his signature elements into something masterful.
 
 It's rare to see such a clear through line between a filmmaker's work—Thief to L.A. Takedown to Heat. He's like a craftsman refining his skills in a single piece. This rewatch made me crave more films that build tension and release with the same precision. I wish more filmmakers would steal from Mann's playbook. If you want to see a master at work, watch Heat.
