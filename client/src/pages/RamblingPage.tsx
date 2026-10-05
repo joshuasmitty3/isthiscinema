@@ -33,13 +33,18 @@ export default function RamblingPage({ slug, user, onLogout, onSignIn }: Ramblin
             <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
               {rambling.title}
             </h1>
+            {rambling.subtitle && (
+              <p className="mt-2 text-base text-muted-foreground">
+                {rambling.subtitle}
+              </p>
+            )}
             {rambling.date && (
               <p className="mt-1.5 font-mono text-xs text-muted-foreground/70">
                 {format(new Date(rambling.date), "MMM d, yyyy")}
               </p>
             )}
             <div
-              className="mt-8 text-[15px] leading-relaxed text-foreground/90 [&_p]:mb-5 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-primary/80 [&_strong]:font-semibold [&_strong]:text-foreground [&_em]:italic"
+              className="mt-8 text-[15px] leading-relaxed text-foreground/90 [&_p]:mb-5 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-primary/80 [&_strong]:font-semibold [&_strong]:text-foreground [&_em]:italic [&_img]:my-8 [&_img]:block [&_img]:mx-auto [&_img]:w-auto [&_img]:max-w-full [&_img]:max-h-[560px] [&_img]:rounded-md [&_img]:border [&_img]:border-border"
               dangerouslySetInnerHTML={{ __html: rambling.html }}
             />
           </article>
