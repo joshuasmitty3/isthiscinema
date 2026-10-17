@@ -12,6 +12,7 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import fetch from "node-fetch";
 import { Parser } from "json2csv";
+import { privateRamblings } from "./privateRamblings";
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 if (!OMDB_API_KEY) {
@@ -373,6 +374,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("CSV export error:", error);
       return res.status(500).json({ message: "Failed to export CSV" });
     }
+  });
+
+  // Private ramblings: login-only. Anonymous visitors get 401 and never
+  // receive the content (which lives in the server bundle, not the client).
+  app.get("/api/ramblings/private", requireAuth, (_req, res) => {
+    return res.status(200).json(privateRamblings);
   });
 
   const httpServer = createServer(app);

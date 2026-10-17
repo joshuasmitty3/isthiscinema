@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { format } from "date-fns";
 import Layout from "@/components/Layout";
 import { getRambling } from "@/lib/ramblings";
+import { usePrivateRamblings } from "@/hooks/use-private-ramblings";
 import { User } from "@/lib/types";
 
 interface RamblingPageProps {
@@ -12,7 +13,8 @@ interface RamblingPageProps {
 }
 
 export default function RamblingPage({ slug, user, onLogout, onSignIn }: RamblingPageProps) {
-  const rambling = getRambling(slug);
+  const { ramblings: privateRamblings, isLoading } = usePrivateRamblings(!!user);
+  const rambling = getRambling(slug) ?? privateRamblings.find((r) => r.slug === slug);
 
   return (
     <Layout user={user} onLogout={onLogout} onSignIn={onSignIn}>
@@ -25,9 +27,15 @@ export default function RamblingPage({ slug, user, onLogout, onSignIn }: Ramblin
         </Link>
 
         {!rambling ? (
-          <div className="py-16 text-center font-mono text-sm text-muted-foreground">
-            that rambling doesn't exist.
-          </div>
+          isLoading ? (
+            <div className="py-16 text-center font-mono text-sm text-muted-foreground">
+              loading…
+            </div>
+          ) : (
+            <div className="py-16 text-center font-mono text-sm text-muted-foreground">
+              that rambling doesn't exist.
+            </div>
+          )
         ) : (
           <article className="mx-auto mt-8 max-w-[640px]">
             <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground">

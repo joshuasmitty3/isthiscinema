@@ -5,6 +5,7 @@ import WatchList from "@/components/WatchList";
 import WatchedList from "@/components/WatchedList";
 import RamblingList from "@/components/RamblingList";
 import { getRamblings } from "@/lib/ramblings";
+import { usePrivateRamblings } from "@/hooks/use-private-ramblings";
 import { User, ListChangeHandler } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMovies } from "@/lib/movies";
@@ -31,7 +32,7 @@ export default function Home({
   const queryClient = useQueryClient();
   const { query, setQuery, results, isLoading } = useSearch();
   const { watchlist, watchedlist } = useMovies();
-  const ramblingCount = getRamblings().length;
+  const ramblingCount = getRamblings().length + usePrivateRamblings(canEdit).ramblings.length;
   const [searchOpen, setSearchOpen] = useState(false);
 
   const openSearch = () => setSearchOpen(true);
@@ -132,7 +133,7 @@ export default function Home({
               </TabsContent>
 
               <TabsContent value="rambling" className="mt-4">
-                <RamblingList />
+                <RamblingList user={user} />
               </TabsContent>
             </>
           )}
