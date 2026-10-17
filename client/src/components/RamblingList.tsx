@@ -1,9 +1,12 @@
 import { Link } from "wouter";
 import { format } from "date-fns";
-import { getRamblings } from "@/lib/ramblings";
+import { combineRamblings } from "@/lib/ramblings";
+import { usePrivateRamblings } from "@/hooks/use-private-ramblings";
+import { User } from "@/lib/types";
 
-export default function RamblingList() {
-  const ramblings = getRamblings();
+export default function RamblingList({ user }: { user: User | null }) {
+  const { ramblings: privateRamblings } = usePrivateRamblings(!!user);
+  const ramblings = combineRamblings(privateRamblings);
 
   if (ramblings.length === 0) {
     return (

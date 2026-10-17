@@ -70,13 +70,15 @@ function render(body: string): string {
   return DOMPurify.sanitize(rawHtml, SANITIZE_CONFIG);
 }
 
+const byDateDesc = (a: Rambling, b: Rambling) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
+
 // Built once at module load. Newest first by date.
 const ramblings: Rambling[] = Object.entries(files)
   .map(([path, raw]) => {
     const { title, subtitle, date, body } = parse(raw);
     return { slug: slugFromPath(path), title, subtitle, date, html: render(body) };
   })
-  .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  .sort(byDateDesc);
 
 export function getRamblings(): Rambling[] {
   return ramblings;
@@ -84,4 +86,31 @@ export function getRamblings(): Rambling[] {
 
 export function getRambling(slug: string): Rambling | undefined {
   return ramblings.find((r) => r.slug === slug);
+}
+
+// Raw essay fields as delivered by the private (login-only) API, before
+// the Markdown body is rendered to HTML.
+export interface RamblingSource {
+  slug: string;
+  title: string;
+  subtitle?: string;
+  date: string;
+  body: string;
+}
+
+// Render a raw essay (e.g. one fetched from the private API) into a Rambling,
+// using the same Markdown + sanitize pipeline as the public essays.
+export function makeRambling(src: RamblingSource): Rambling {
+  return {
+    slug: src.slug,
+    title: src.title,
+    subtitle: src.subtitle || undefined,
+    date: src.date,
+    html: render(src.body),
+  };
+}
+
+// Public essays plus any extras (private ones, when signed in), newest first.
+export function combineRamblings(extra: Rambling[] = []): Rambling[] {
+  return [...ramblings, ...extra].sort(byDateDesc);
 }
