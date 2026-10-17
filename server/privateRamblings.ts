@@ -25,9 +25,9 @@ It wasn't the rejection that stung. Obviously that sucked, the timing was poetic
 
 Throwing AI into the job hunting mix added little beyond more frenzy. The arms race between applicants and recruiters continues to escalate.
 
-Now a year later, I have a job and I'm learning and growing with some interesting of opportunities, but it's a challenge. Jimmy's a lunatic, there's daily chaos between leadership and priorities and my role expectations are unclear. Yet. This is what I wished for.
+Now a year later, I have a job and I'm learning and growing with some interesting opportunities, but it's a challenge. Jimmy's a lunatic, there's daily chaos between leadership and priorities and my role expectations are unclear. Yet. This is what I wished for.
 
-More importantly than the job, I have a son now. We didn't know it a year ago, sitting in that airport, annoyed by the delays but passing the time quietly laughing together while people-watching, but Xavier was with us then. In between drinks at a dive bar a few nights earlier, Brittany had mentioned her period was late, but it'd been late before so we didn't assume anything. We'd gone down this path before, and it had ended in loss.
+More importantly than the job, I have a son now. We didn't know it a year ago, sitting in that airport, annoyed by the delays but passing the time quietly laughing together while people-watching, but Xavier was with us then. In between drinks at a dive bar a few nights earlier, Brittany had mentioned her period was late. It had been late before, so we didn't let ourselves assume anything, especially since the last time had ended in loss.
 
 Right now I'm sitting on a bench, watching our napping four month old. He was up late last night, in the midst of a sleep regression and crying and throwing up as he's done for most of his life so far and we're tired like all new parents are and the apartment is too small for a new kid and a new job, yet. This is what we wished for. The poetry is not lost. The seasons of our lives rhyme in odd ways and I am beyond grateful.`,
   },
