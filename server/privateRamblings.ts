@@ -25,6 +25,6 @@ it wasn't rejection. i was relieved to have at least gotten a few rounds of inte
 
 a year later, i have a job. the founder's a lunatic, my role's unclear (why am i reporting to hr?) and the company is trying to scale too fast. it's a chaotic mess. yet, within chaos lives opportunity. growth. more importantly than the job, i have a son. we didn't know it a year ago, sitting in that airport, annoyed by the delays, passing the time laughing together people-watching, but our son was with us then. my wife mentioned her period was late, but it had been late before, so we didn't let ourselves assume anything, especially since the last time had ended in loss.
 
-i'm writing this on a beautiful fall day, sitting on a bench.. watching our napping four month old. he was up late last night, in the midst of a sleep regression, red-faced crying and throwing up, a staple of his life thus far. yet, in the midst of the late-night crying sessions and the day-time work stressing, i remember, this is what we wished for.`,
+i'm writing this on a beautiful fall day, sitting on a bench, watching our napping four month old. he was up late last night, in the midst of a sleep regression, red-faced crying and throwing up, a staple of his life thus far. we're tired, like all new parents, and the apartment is too small for a new kid and a new job. yet, in the midst of the late-night crying sessions and the day-time work stressing, i remember, this is what we wished for.`,
   },
 ];
