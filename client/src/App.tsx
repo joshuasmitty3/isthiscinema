@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { queryClient } from "./lib/queryClient";
@@ -12,6 +12,17 @@ import { getCurrentUser, logout } from "@/lib/api";
 import { User } from "@/lib/types";
 
 type View = "checking" | "login" | "setup" | "app";
+
+// Reset scroll to the top on every route change (wouter doesn't do this on
+// its own), so navigating into an essay starts at the top, not wherever the
+// previous page was scrolled.
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  return null;
+}
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -72,6 +83,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
+        <ScrollToTop />
         <Switch>
           <Route path="/rambling/:slug">
             {(params) => (
