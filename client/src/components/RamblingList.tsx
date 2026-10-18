@@ -12,7 +12,7 @@ export default function RamblingList({ user }: { user: User | null }) {
     <img
       src="/ramblings/ramblings-header.jpg"
       alt=""
-      className="mb-8 w-full rounded-md border border-border"
+      className="mb-8 block w-1/2 mx-auto rounded-md border border-border"
     />
   );
 
