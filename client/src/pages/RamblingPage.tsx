@@ -48,7 +48,7 @@ export default function RamblingPage({ slug, user, onLogout, onSignIn }: Ramblin
             )}
             {rambling.date && (
               <p className="mt-1.5 font-mono text-xs text-muted-foreground/70">
-                {format(new Date(rambling.date), "MMM d, yyyy")}
+                {format(new Date(`${rambling.date}T00:00:00`), "MMM d, yyyy")}
               </p>
             )}
             <div
